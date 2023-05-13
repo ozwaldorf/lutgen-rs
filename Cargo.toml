@@ -8,7 +8,7 @@ repository = "https://github.com/ozwaldorf/lutgen-rs"
 documentation = "https://docs.rs/lutgen"
 categories = ["multimedia::images"]
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
-description = "A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for arbitrary color palettes using guassian distribution."
+description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary color palettes."
 
 [dependencies]
 image = "0.24"

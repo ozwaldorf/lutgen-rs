@@ -1,6 +1,17 @@
-# lutgen-rs
+<header>
+    <h1 align="center">lutgen-rs</h1>
+    <p align="center">
+        <a href="https://crates.io/crates/lutgen"><img alt="crate" src="https://img.shields.io/crates/v/lutgen?style=for-the-badge" /></a>
+        <a href="./LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
+        <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/rust.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/rust.yml?label=CI&style=for-the-badge" /></a>
+        <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/publish.yml"><img alt="publish" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/publish.yml?label=Publish&style=for-the-badge" /></a>
+    </p>
+    <p align="center">
+        A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary color palettes.
+    </p>
+</header>
 
-A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for arbitrary color palettes using guassian distribution.
+---
 
 ## Usage
 
