@@ -4,17 +4,17 @@ use exoquant::Color;
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum Palette {
-    {% for palette in palettes -%}
-    {{ palette.type_name | pascal_case }},
+    {% for name, palette in palettes -%}
+    {{ name | pascal_case }},
     {% endfor %}
 }
 
 impl Palette {
     pub fn get(&self) -> &'static [Color] {
         match self {
-            {% for palette in palettes -%}
-            Palette::{{ palette.type_name | pascal_case }} => &[
-                {% for hex in palette.palette -%}
+            {% for name, palette in palettes -%}
+            Palette::{{ name | pascal_case }} => &[
+                {% for hex in palette -%}
                 {% set color = hex | hex_to_rgb %}
                 Color {
                     r: {{ color.r }},

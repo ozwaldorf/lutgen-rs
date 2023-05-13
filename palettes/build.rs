@@ -17,18 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     tera.register_filter("hex_to_rgb", hex_to_rgb_filter);
     tera.register_filter("pascal_case", pascal_case);
 
-    let mut data: serde_json::Value = from_reader(read_to_string("palettes.json")?.as_bytes())?;
-
-    // for each distro
-    for palette in data.as_array_mut().unwrap() {
-        let palette = palette.as_object_mut().unwrap();
-        let name = palette.get("name").unwrap().as_str().unwrap();
-
-        // add rust type name
-        let reg = regex::Regex::new(r"[\-./!@)(+]").unwrap();
-        let type_name = reg.replace_all(name, "").replace(' ', "_");
-        palette.insert("type_name".to_string(), json!(type_name));
-    }
+    let data: serde_json::Value = from_reader(read_to_string("palettes.json")?.as_bytes())?;
 
     let rust_code = tera.render_str(
         &read_to_string("src/palettes.tera")?,
@@ -45,6 +34,11 @@ pub fn pascal_case(
     _: &HashMap<String, tera::Value>,
 ) -> tera::Result<tera::Value> {
     let s = try_get_value!("pascal_case", "value", String, value);
+
+    // cleanup special chars
+    let reg = regex::Regex::new(r"[\-./!@)(+]").unwrap();
+    let s = reg.replace_all(&s, "").replace(' ', "_");
+
     let sections: Vec<_> = s.split('_').collect();
     let mut buf = String::new();
     for str in sections {
