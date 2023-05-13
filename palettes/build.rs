@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let name = palette.get("name").unwrap().as_str().unwrap();
 
         // add rust type name
-        let reg = regex::Regex::new(r"[_\-./!@)(+]").unwrap();
+        let reg = regex::Regex::new(r"[\-./!@)(+]").unwrap();
         let type_name = reg.replace_all(name, "").replace(' ', "_");
         palette.insert("type_name".to_string(), json!(type_name));
     }
