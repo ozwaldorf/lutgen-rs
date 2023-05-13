@@ -9,8 +9,9 @@
 //! ```
 
 use exoquant::{Color, Remapper, SimpleColorSpace};
-use image::{ImageBuffer, Rgb};
-use imageproc::noise::gaussian_noise;
+use image::{ImageBuffer, Pixel, Rgb};
+use rand::{rngs::StdRng, SeedableRng};
+use rand_distr::{Distribution, Normal};
 
 use crate::Image;
 
@@ -25,15 +26,16 @@ pub fn remap_image(
     mean: f64,
     std_dev: f64,
     iterations: usize,
+    seed: u64,
 ) -> Image {
     rayon::scope(|s| {
         let (tx, rx) = std::sync::mpsc::channel();
         // Spawn a thread for each iteration
-        for i in 0..iterations as u64 {
+        for _ in 0..iterations as u64 {
             let tx = tx.clone();
             s.spawn(move |_| {
                 // Apply noise to the image
-                let output = gaussian_noise(image, mean, std_dev, i);
+                let output = gaussian_noise(image, mean, std_dev, seed);
                 // Remap the variant
                 let output = simple_remap(output, palette);
                 tx.send(output).unwrap();
@@ -44,6 +46,24 @@ pub fn remap_image(
         // Collect and evaluate the mean image
         sequence_mean(rx.into_iter().collect())
     })
+}
+
+/// Adds independent additive Gaussian noise to all channels
+/// of an image in place, with the given mean and standard deviation.
+pub fn gaussian_noise(image: &Image, mean: f64, stddev: f64, seed: u64) -> Image {
+    let mut output = image.clone();
+
+    let mut rng: StdRng = SeedableRng::seed_from_u64(seed);
+    let normal = Normal::new(mean, stddev).unwrap();
+
+    for p in output.pixels_mut() {
+        for c in p.channels_mut() {
+            let noise = normal.sample(&mut rng);
+            *c = (*c as f64 + noise).round() as u8;
+        }
+    }
+
+    output
 }
 
 /// Simple, non-dithering, nearest neighbor remap.

@@ -32,10 +32,11 @@ pub fn remap_image(
     mean: f64,
     std_dev: f64,
     iterations: usize,
+    seed: u64,
 ) -> Image {
     // Build distribution values
     let sample_count = (iterations as f64).cbrt().round() as usize;
-    let distribution_samples = gaussian_distribution(mean, std_dev, sample_count);
+    let distribution_samples = gaussian_distribution(mean, std_dev, sample_count, seed);
 
     // Setup the colorspace and map
     let colorspace = SimpleColorSpace::default();
@@ -62,8 +63,8 @@ pub fn remap_image(
 }
 
 /// Generate `n` values from a gaussian distribution curve.
-pub fn gaussian_distribution(mean: f64, std_dev: f64, n: usize) -> Vec<f64> {
-    let mut rng: StdRng = SeedableRng::seed_from_u64(0);
+pub fn gaussian_distribution(mean: f64, std_dev: f64, n: usize, seed: u64) -> Vec<f64> {
+    let mut rng: StdRng = SeedableRng::seed_from_u64(seed);
     let normal = Normal::new(mean, std_dev).unwrap();
     let mut values = Vec::with_capacity(n);
 

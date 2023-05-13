@@ -16,9 +16,10 @@ pub fn generate_v0_lut(
     mean: f64,
     std_dev: f64,
     iterations: usize,
+    seed: u64,
 ) -> Image {
     let identity = identity::generate(level);
-    interpolated_remap::v0::remap_image(&identity, palette, mean, std_dev, iterations)
+    interpolated_remap::v0::remap_image(&identity, palette, mean, std_dev, iterations, seed)
 }
 
 /// Helper method for generating a v1 interpolated hald-clut from a few parameters.
@@ -28,7 +29,8 @@ pub fn generate_v1_lut(
     mean: f64,
     std_dev: f64,
     iterations: usize,
+    seed: u64,
 ) -> Image {
     let identity = identity::generate(level);
-    interpolated_remap::v1::remap_image(identity, palette, mean, std_dev, iterations)
+    interpolated_remap::v1::remap_image(identity, palette, mean, std_dev, iterations, seed)
 }

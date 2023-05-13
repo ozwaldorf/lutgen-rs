@@ -23,7 +23,7 @@ Options:
 ### Library
 
 > By default, the `bin` feature and dependencies are enabled.
-> It's recommended to use `default-features = false` to minimalize the dependency tree and build time.
+> When used as a library, it's recommended to use `default-features = false` to minimalize the dependency tree and build time.
 
 Simple usage:
 
