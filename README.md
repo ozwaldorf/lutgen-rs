@@ -38,8 +38,8 @@ let palette = vec![
 ];
 
 // Generate the LUT using the v1 algorithm:
-let lut = lutgen::generate_v1_lut(&palette, 8, 4.0, 20.0, 512);
-// Or, v0: lutgen::generate_v0_lut(&palette, 8, 4.0, 20.0, 512);
+let lut = lutgen::generate_v1_lut(&palette, 8, 4.0, 20.0, 512, 0);
+// Or, v0: lutgen::generate_v0_lut(&palette, 8, 4.0, 20.0, 512, 0);
 ```
 
 Advanced usage:
@@ -59,9 +59,10 @@ let palette = vec![
 let mean = 4.0;
 let std_dev = 20.0;
 let iters = 512;
+let seed = 0;
 
 // Remap the identity using v1:
-let output_v1 = lutgen::interpolated_remap::v1::remap_image(identity, &palette, mean, std_dev, iters);
-// Or, v0: lutgen::interpolated_remap::v0::remap_image(&identity, &palette, mean, std_dev, iters);
+let output_v1 = lutgen::interpolated_remap::v1::remap_image(identity, &palette, mean, std_dev, iters, seed);
+// Or, v0: lutgen::interpolated_remap::v0::remap_image(&identity, &palette, mean, std_dev, iters, seed);
 ```
 
