@@ -6,17 +6,23 @@ A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for ar
 
 ### CLI
 
+```bash
+cargo install lutgen --version 0.1.0-alpha.0
+```
+
 ```text
+$ lutgen -h
+
 Usage: lutgen [OPTIONS]
 
 Options:
   -a <ALGORITHM>                 Algorithm to generate the LUT with [default: v1] [possible values: v1, v0]
-  -o, --output <OUTPUT>          File to write output to. Defaults to the parameters (ex: `hald_clut_v1_4_20_512.png`)
+  -o, --output <OUTPUT>          Path to write the generated file to. Defaults to the current dir with some parameters (ex: `./hald_clut_v1_4_20_512.png`)
   -l, --level <LEVEL>            HaldCLUT color depth. 8 bit = 512x512 image [default: 8]
   -m, --mean <MEAN>              Mean for the gaussian distribution [default: 4]
   -s, --std-dev <STD_DEV>        Standard deviation for the gaussian distribution [default: 20]
   -i, --iterations <ITERATIONS>  Number of iterations to average together [default: 512]
-  -h, --help                     Print help
+  -h, --help                     Print help (see more with '--help')
   -V, --version                  Print version
 ```
 
