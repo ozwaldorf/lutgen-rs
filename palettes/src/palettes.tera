@@ -2,21 +2,29 @@ use clap::ValueEnum;
 use exoquant::Color;
 
 #[allow(clippy::enum_variant_names)]
-#[derive(Clone, Debug, ValueEnum)]
+#[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum Palette {
-    CatppuccinMocha,
-    CatppuccinMacchiato,
-    CatppuccinFrappe,
-    CatppuccinLatte,
+    {% for palette in palettes -%}
+    {{ palette.type_name | pascal_case }},
+    {% endfor %}
 }
 
 impl Palette {
     pub fn get(&self) -> &'static [Color] {
         match self {
-            Palette::CatppuccinMocha => &catppuccin::MOCHA,
-            Palette::CatppuccinMacchiato => &catppuccin::MACCHIATO,
-            Palette::CatppuccinFrappe => &catppuccin::FRAPPE,
-            Palette::CatppuccinLatte => &catppuccin::LATTE,
+            {% for palette in palettes -%}
+            Palette::{{ palette.type_name | pascal_case }} => &[
+                {% for hex in palette.palette -%}
+                {% set color = hex | hex_to_rgb %}
+                Color {
+                    r: {{ color.r }},
+                    g: {{ color.g }},
+                    b: {{ color.b }},
+                    a: 255,
+                },
+                {% endfor %}
+            ],
+            {% endfor %}
         }
     }
 }

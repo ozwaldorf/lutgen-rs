@@ -1,0 +1,26 @@
+[package]
+name = "lutgen-palettes"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/lutgen-palettes"
+keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
+description = "Popular linux colorscheme palettes"
+
+[dependencies]
+exoquant.workspace = true
+clap.workspace = true
+clap.optional = true
+
+[build-dependencies]
+lazy_static = "1"
+regex = "1"
+serde_json = "1"
+serde_yaml = "0.9"
+tera = { version = "1", default-features = false }
+
+[features]
+default = ["clap"]

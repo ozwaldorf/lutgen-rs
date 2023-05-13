@@ -1,28 +1,45 @@
 [package]
 name = "lutgen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+categories.workspace = true
+documentation = "https://docs.rs/lutgen"
+keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
+description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary color palettes."
+
+[workspace]
+members = ["palettes"]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
-documentation = "https://docs.rs/lutgen"
 categories = ["multimedia::images"]
-keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
-description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary color palettes."
+
+[workspace.dependencies]
+exoquant = "0.2.0"
+clap = { version = "4.2.7", features = ["derive"] }
 
 [dependencies]
+exoquant.workspace = true
 image = "0.24"
-exoquant = "0.2.0"
 rand = "0.8.5"
 rand_distr = "0.4.3"
 rayon = "1.7.0"
 
 # bin dependencies
-clap = { version = "4.2.7", features = ["derive"], optional = true }
+clap.workspace = true
+clap.optional = true
+lutgen-palettes = { path = "palettes", features = ["clap"], optional = true }
 
 [features]
 default = ["bin"]
-bin = ["clap"]
+bin = ["clap", "lutgen-palettes"]
 
 [[bin]]
 name = "lutgen"
