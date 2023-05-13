@@ -1,6 +1,7 @@
 pub mod catppuccin {
     use exoquant::Color;
 
+    #[allow(dead_code)]
     pub const ALL: [(&str, &[Color; 26]); 4] = [
         ("mocha", &MOCHA),
         ("macchiato", &MACCHIATO),

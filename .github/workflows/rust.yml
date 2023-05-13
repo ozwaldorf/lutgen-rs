@@ -1,0 +1,93 @@
+name: Rust
+on:
+  push:
+    branches: ["*"]
+    paths-ignore:
+      - "**.md"
+      - "pages/**"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "pages/**"
+env:
+  TERM: xterm
+  TOOLCHAIN: nightly
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.TOOLCHAIN }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: lutgen
+          path: target/release/lutgen
+
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    needs: [build, test, fmt, clippy]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: lutgen
+          path: .
+      - run: chmod +x lutgen
+      - run: ./lutgen
+
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.TOOLCHAIN }}
+          components: rustfmt
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.TOOLCHAIN }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --all -- --nocapture
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.TOOLCHAIN }}
+          components: clippy
+          override: true
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-targets --all-features -- -D warnings -D clippy::all
