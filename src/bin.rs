@@ -110,12 +110,36 @@ fn main() {
     let mut colors = custom_palette
         .iter()
         .map(|s| {
+            fn show_hex_err(input: &str) {
+                let mut err =
+                    clap::Error::new(ErrorKind::ValueValidation).with_cmd(&Args::command());
+                err.insert(
+                    ContextKind::InvalidArg,
+                    ContextValue::String("hex color".into()),
+                );
+                err.insert(
+                    ContextKind::InvalidValue,
+                    ContextValue::String(input.to_string()),
+                );
+                err.print().unwrap();
+                exit(2);
+            }
+
             // parse hex string into rgb
             let hex = s.trim_start_matches('#');
-            let r = u8::from_str_radix(&hex[0..2], 16).unwrap();
-            let g = u8::from_str_radix(&hex[2..4], 16).unwrap();
-            let b = u8::from_str_radix(&hex[4..6], 16).unwrap();
-            Color::new(r, g, b, 255)
+            if hex.len() != 6 {
+                show_hex_err(s);
+                exit(2);
+            }
+            if let Ok(channel_bytes) = u32::from_str_radix(hex, 16) {
+                let r = (channel_bytes >> 16) & 0xFF;
+                let g = (channel_bytes >> 8) & 0xFF;
+                let b = channel_bytes & 0xFF;
+                Color::new(r as u8, g as u8, b as u8, 255)
+            } else {
+                show_hex_err(s);
+                exit(2);
+            }
         })
         .collect::<Vec<_>>();
 
@@ -142,10 +166,7 @@ fn main() {
         );
         err.insert(ContextKind::ActualNumValues, ContextValue::Number(0));
         err.insert(ContextKind::MinValues, ContextValue::Number(1));
-        err.insert(ContextKind::Usage, ContextValue::String("asdf".into()));
-
         err.print().unwrap();
-
         exit(2);
     }
 
