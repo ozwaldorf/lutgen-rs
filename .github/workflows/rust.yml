@@ -37,7 +37,7 @@ jobs:
           path: target/release/lutgen
 
   run:
-    name: Run
+    name: Generate LUT (catppuccin mocha)
     runs-on: ubuntu-latest
     needs: [build, test, fmt, clippy]
     steps:
@@ -46,7 +46,7 @@ jobs:
           name: lutgen
           path: .
       - run: chmod +x lutgen
-      - run: ./lutgen
+      - run: ./lutgen -p catppuccin-mocha
 
   fmt:
     name: Format
