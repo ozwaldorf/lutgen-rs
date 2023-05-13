@@ -14,7 +14,7 @@ const SEED: u64 = u64::from_be_bytes(*b"42080085");
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    #[arg(short, long, value_enum)]
+    #[arg(short, value_enum)]
     palette: Palette,
     /// Algorithm to generate the LUT with.
     #[arg(short, value_enum, default_value = "v1")]
