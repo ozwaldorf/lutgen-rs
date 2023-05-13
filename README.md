@@ -7,7 +7,7 @@ A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for ar
 ### CLI
 
 ```bash
-cargo install lutgen --version 0.1.0-alpha.0
+cargo install lutgen
 ```
 
 ```text

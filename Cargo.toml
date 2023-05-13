@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.1.0-alpha.0"
+version = "0.1.0"
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]

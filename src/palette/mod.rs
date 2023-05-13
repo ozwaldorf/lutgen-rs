@@ -1,3 +1,26 @@
+use clap::ValueEnum;
+use exoquant::Color;
+
+#[allow(clippy::enum_variant_names)]
+#[derive(Clone, Debug, ValueEnum)]
+pub enum Palette {
+    CatppuccinMocha,
+    CatppuccinMacchiato,
+    CatppuccinFrappe,
+    CatppuccinLatte,
+}
+
+impl Palette {
+    pub fn get(&self) -> &'static [Color] {
+        match self {
+            Palette::CatppuccinMocha => &catppuccin::MOCHA,
+            Palette::CatppuccinMacchiato => &catppuccin::MACCHIATO,
+            Palette::CatppuccinFrappe => &catppuccin::FRAPPE,
+            Palette::CatppuccinLatte => &catppuccin::LATTE,
+        }
+    }
+}
+
 pub mod catppuccin {
     use exoquant::Color;
 

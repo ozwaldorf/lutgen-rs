@@ -2,6 +2,7 @@ use std::{path::PathBuf, time::Instant};
 
 use clap::{arg, command, Parser, ValueEnum};
 use lutgen::{generate_v0_lut, generate_v1_lut};
+use palette::Palette;
 
 mod palette;
 
@@ -13,6 +14,8 @@ const SEED: u64 = u64::from_be_bytes(*b"42080085");
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    #[arg(short, long, value_enum)]
+    palette: Palette,
     /// Algorithm to generate the LUT with.
     #[arg(short, value_enum, default_value = "v1")]
     algorithm: Algorithm,
@@ -48,6 +51,7 @@ enum Algorithm {
 
 fn main() {
     let Args {
+        palette,
         algorithm,
         level,
         output,
@@ -59,27 +63,15 @@ fn main() {
     println!("Generating {algorithm:?} LUT... (level: {level}, mean: {mean}, std_dev: {std_dev}, iterations: {iterations})");
 
     let now = Instant::now();
+    let colors = palette.get();
     let palette_lut = match algorithm {
-        Algorithm::V0 => generate_v0_lut(
-            &palette::catppuccin::MOCHA,
-            level,
-            mean,
-            std_dev,
-            iterations,
-            SEED,
-        ),
-        Algorithm::V1 => generate_v1_lut(
-            &palette::catppuccin::MOCHA,
-            level,
-            mean,
-            std_dev,
-            iterations,
-            SEED,
-        ),
+        Algorithm::V0 => generate_v0_lut(colors, level, mean, std_dev, iterations, SEED),
+        Algorithm::V1 => generate_v1_lut(colors, level, mean, std_dev, iterations, SEED),
     };
 
     let filename = output.unwrap_or(PathBuf::from(format!(
-        "hald_clut_{level}_{algorithm:?}_{mean}_{std_dev}_{iterations}.png"
+        "{}_hald_clut_{level}_{algorithm:?}_{mean}_{std_dev}_{iterations}.png",
+        palette.to_possible_value().unwrap().get_name()
     )));
 
     println!("Finished in {:?}\nSaving to {filename:?}", now.elapsed());
