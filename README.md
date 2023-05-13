@@ -22,10 +22,13 @@ cargo install lutgen
 ```
 
 ```text
-Usage: lutgen [OPTIONS] -p <PALETTE>
+Usage: lutgen [OPTIONS] [CUSTOM_COLORS]...
+
+Arguments:
+  [CUSTOM_COLORS]...  List of custom colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
-  -p <PALETTE>                   [possible values: catppuccin-mocha, catppuccin-macchiato, catppuccin-frappe, catppuccin-latte]
+  -p <PALETTE>                   Add colors from a predefined base palette. Use `lutgen -p` to view all options
   -a <ALGORITHM>                 Algorithm to generate the LUT with [default: v1] [possible values: v1, v0]
   -o, --output <OUTPUT>          Path to write the generated file to. Defaults to the current dir with some parameters (ex: `./hald_clut_v1_4_20_512.png`)
   -l, --level <LEVEL>            HaldCLUT color depth. 8 bit = 512x512 image [default: 8]
