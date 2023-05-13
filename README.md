@@ -75,7 +75,7 @@ let params = GaussianV0Params {
     colorspace: SimpleColorSpace::default(),
 };
 let output = generate_lut::<GaussianV0Remapper<_>>(8, &palette, params);
-output.save("v0_hald_8.png").unwrap();
+// output.save("v0_hald_8.png").unwrap();
     
 // Generate a lut using the faster v1 algorithm
 let params = GaussianV1Params {
@@ -86,28 +86,45 @@ let params = GaussianV1Params {
     colorspace: SimpleColorSpace::default(),
 };
 let output = generate_lut::<GaussianV1Remapper<_>>(8, &palette, params);
-output.save("v1_hald_8.png").unwrap();
+// output.save("v1_hald_8.png").unwrap();
 ```
 
 Advanced usage:
 
 ```rust
-use exoquant::Color;
+use exoquant::{
+    Color,
+    SimpleColorSpace,
+};
+use lutgen::{
+    generate_lut,
+    interpolated_remap::{GaussianV1Params, GaussianV1Remapper, InterpolatedRemapper},
+};
 
 // Generate the base identity
-let identity = lutgen::identity::generate(8);
+let mut identity = lutgen::identity::generate(8);
 
-// Setup the palette and parameters
+// Setup the palette
 let palette = vec![
     Color::new(255, 0, 0, 255),
     Color::new(0, 255, 0, 255),
     Color::new(0, 0, 255, 255),
 ];
-let mean = 4.0;
-let std_dev = 20.0;
-let iters = 512;
-let seed = 0;
+
+// Setup the interpolated remapper
+let params = GaussianV1Params {
+    mean: 4.0,
+    std_dev: 20.0,
+    iterations: 512,
+    seed: 80085,
+    colorspace: SimpleColorSpace::default(),
+};
+let remapper = GaussianV1Remapper::new(&palette, params);
 
 // Remap the identity
+remapper.remap_image(&mut identity);
+
+// Save the output
+// identity.save("v1_hald_8.png").unwrap();
 ```
 
