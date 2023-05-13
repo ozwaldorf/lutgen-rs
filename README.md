@@ -25,18 +25,51 @@ cargo install lutgen
 Usage: lutgen [OPTIONS] [CUSTOM_COLORS]...
 
 Arguments:
-  [CUSTOM_COLORS]...  List of custom colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
+  [CUSTOM_COLORS]...
+          List of custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
-  -p <PALETTE>                   Add colors from a predefined base palette. Use `lutgen -p` to view all options
-  -a <ALGORITHM>                 Algorithm to generate the LUT with [default: v1] [possible values: v1, v0]
-  -o, --output <OUTPUT>          Path to write the generated file to. Defaults to the current dir with some parameters (ex: `./hald_clut_v1_4_20_512.png`)
-  -l, --level <LEVEL>            HaldCLUT color depth. 8 bit = 512x512 image [default: 8]
-  -m, --mean <MEAN>              Mean for the gaussian distribution [default: 4]
-  -s, --std-dev <STD_DEV>        Standard deviation for the gaussian distribution [default: 20]
-  -i, --iterations <ITERATIONS>  Number of iterations to average together [default: 512]
-  -h, --help                     Print help (see more with '--help')
-  -V, --version                  Print version
+  -p <PALETTE>
+          Add colors from a predefined base palette. Use `lutgen -p` to view all options
+
+  -a <ALGORITHM>
+          Interpolated remapping algorithm to generate the LUT with
+
+          [default: gaussian-v1]
+
+          Possible values:
+          - gaussian-v1:      Fastest algorithm for gaussian interpolated remapping
+          - gaussian-v0:      Original algorithm for gaussian interpolated remapping
+          - nearest-neighbor: Non-interpolated algorithm that remaps to the nearest neighbor
+
+  -o, --output <OUTPUT>
+          Path to write the generated file to. Defaults to the current dir with some parameters (ex: `./hald_clut_v1_4_20_512.png`)
+
+  -l, --level <LEVEL>
+          Hald level (ex: 8 = 512x512 image)
+
+          [default: 8]
+
+  -m, --mean <MEAN>
+          Mean for the gaussian distribution
+
+          [default: 4]
+
+  -s, --std-dev <STD_DEV>
+          Standard deviation for the gaussian distribution
+
+          [default: 20]
+
+  -i, --iterations <ITERATIONS>
+          Number of iterations to average together
+
+          [default: 512]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
 ```
 
 ### Library

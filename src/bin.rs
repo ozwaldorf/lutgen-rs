@@ -16,7 +16,7 @@ const SEED: u64 = u64::from_be_bytes(*b"42080085");
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// List of custom colors to add to the palette.
+    /// List of custom hexidecimal colors to add to the palette.
     /// If `-p` is not used to specify a base palette, at least 1 color is required.
     custom_colors: Vec<String>,
     /// Add colors from a predefined base palette. Use `lutgen -p` to view all options.
@@ -50,7 +50,7 @@ enum Algorithm {
     GaussianV1,
     /// Original algorithm for gaussian interpolated remapping
     GaussianV0,
-    /// Non-interpolated algorithm that only remaps to the nearest neighbor
+    /// Non-interpolated algorithm that remaps to the nearest neighbor
     NearestNeighbor,
 }
 
