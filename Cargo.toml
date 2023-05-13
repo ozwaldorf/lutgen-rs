@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.1.0"
+version = "0.1.0-alpha.0"
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
@@ -8,6 +8,7 @@ repository = "https://github.com/ozwaldorf/lutgen-rs"
 documentation = "https://docs.rs/lutgen"
 categories = ["multimedia::images"]
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
+description = "A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for arbitrary color palettes using guassian distribution."
 
 [dependencies]
 image = "0.24"
