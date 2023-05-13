@@ -37,9 +37,13 @@ lutgen-palettes = { version = "0.1.0", path = "palettes", optional = true }
 
 [features]
 default = ["bin"]
-bin = ["clap", "lutgen-palettes"]
+palettes = ["lutgen-palettes"]
+bin = ["clap", "palettes"]
 
 [[bin]]
 name = "lutgen"
 path = "src/bin.rs"
 required-features=["bin"]
+
+[profile.test]
+inherits = "release"

@@ -47,18 +47,46 @@ Options:
 Simple usage:
 
 ```rust
-use exoquant::Color;
+use exoquant::{
+    Color,
+    SimpleColorSpace,
+};
+use lutgen::{
+    interpolated_remap::{
+        GaussianV0Params, GaussianV0Remapper, GaussianV1Params, GaussianV1Remapper
+    },
+    generate_lut,
+};
 
-// Setup the palette and parameters
+// Setup the palette and colorspace for nearest neighbor lookups.
 let palette = vec![
     Color::new(255, 0, 0, 255),
     Color::new(0, 255, 0, 255),
     Color::new(0, 0, 255, 255),
 ];
+let colorspace = SimpleColorSpace::default();
 
-// Generate the LUT using the v1 algorithm:
-let lut = lutgen::generate_v1_lut(&palette, 8, 4.0, 20.0, 512, 0);
-// Or, v0: lutgen::generate_v0_lut(&palette, 8, 4.0, 20.0, 512, 0);
+// Generate a lut using the slower v0 algorithm
+let params = GaussianV0Params {
+    mean: 4.0,
+    std_dev: 20.0,
+    iterations: 512,
+    seed: 80085,
+    colorspace: SimpleColorSpace::default(),
+};
+let output = generate_lut::<GaussianV0Remapper<_>>(8, &palette, params);
+output.save("v0_hald_8.png").unwrap();
+    
+// Generate a lut using the faster v1 algorithm
+let params = GaussianV1Params {
+    mean: 4.0,
+    std_dev: 20.0,
+    iterations: 512,
+    seed: 80085,
+    colorspace: SimpleColorSpace::default(),
+};
+let output = generate_lut::<GaussianV1Remapper<_>>(8, &palette, params);
+output.save("v1_hald_8.png").unwrap();
 ```
 
 Advanced usage:
@@ -80,8 +108,6 @@ let std_dev = 20.0;
 let iters = 512;
 let seed = 0;
 
-// Remap the identity using v1:
-let output_v1 = lutgen::interpolated_remap::v1::remap_image(identity, &palette, mean, std_dev, iters, seed);
-// Or, v0: lutgen::interpolated_remap::v0::remap_image(&identity, &palette, mean, std_dev, iters, seed);
+// Remap the identity
 ```
 

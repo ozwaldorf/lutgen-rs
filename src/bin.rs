@@ -6,8 +6,7 @@ use clap::{
     CommandFactory, Parser, ValueEnum,
 };
 use exoquant::Color;
-use lutgen::{generate_v0_lut, generate_v1_lut};
-use lutgen_palettes::Palette;
+use lutgen::{generate_simple_gaussian_v0_lut, generate_simple_gaussian_v1_lut, Palette};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
 
@@ -116,8 +115,12 @@ fn main() {
     let now = Instant::now();
 
     let palette_lut = match algorithm {
-        Algorithm::V0 => generate_v0_lut(&colors, level, mean, std_dev, iterations, SEED),
-        Algorithm::V1 => generate_v1_lut(&colors, level, mean, std_dev, iterations, SEED),
+        Algorithm::V0 => {
+            generate_simple_gaussian_v0_lut(&colors, level, mean, std_dev, iterations, SEED)
+        }
+        Algorithm::V1 => {
+            generate_simple_gaussian_v1_lut(&colors, level, mean, std_dev, iterations, SEED)
+        }
     };
 
     let filename = output.unwrap_or(PathBuf::from(format!(
