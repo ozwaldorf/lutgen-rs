@@ -1,0 +1,64 @@
+# lutgen-rs
+
+A Library and CLI Tool to generate interpolated lookup tables (hald-clut) for arbitrary color palettes using guassian distribution.
+
+## Usage
+
+### CLI
+
+```text
+Usage: lutgen [OPTIONS]
+
+Options:
+  -a <ALGORITHM>                 Algorithm to generate the LUT with [default: v1] [possible values: v1, v0]
+  -o, --output <OUTPUT>          File to write output to. Defaults to the parameters (ex: `hald_clut_v1_4_20_512.png`)
+  -l, --level <LEVEL>            HaldCLUT color depth. 8 bit = 512x512 image [default: 8]
+  -m, --mean <MEAN>              Mean for the gaussian distribution [default: 4]
+  -s, --std-dev <STD_DEV>        Standard deviation for the gaussian distribution [default: 20]
+  -i, --iterations <ITERATIONS>  Number of iterations to average together [default: 512]
+  -h, --help                     Print help
+  -V, --version                  Print version
+```
+
+### Library
+
+Simple usage:
+
+```rust
+use exoquant::Color;
+
+// Setup the palette and parameters
+let palette = vec![
+    Color::new(255, 0, 0, 255),
+    Color::new(0, 255, 0, 255),
+    Color::new(0, 0, 255, 255),
+];
+
+// Generate the LUT using the v1 algorithm:
+let lut = lutgen::generate_v1_lut(&palette, 8, 4.0, 20.0, 512);
+// Or, v0: lutgen::generate_v0_lut(&palette, 8, 4.0, 20.0, 512);
+```
+
+Advanced usage:
+
+```rust
+use exoquant::Color;
+
+// Generate the base identity
+let identity = lutgen::identity::generate(8);
+
+// Setup the palette and parameters
+let palette = vec![
+    Color::new(255, 0, 0, 255),
+    Color::new(0, 255, 0, 255),
+    Color::new(0, 0, 255, 255),
+];
+let mean = 4.0;
+let std_dev = 20.0;
+let iters = 512;
+
+// Remap the identity using v1:
+let output_v1 = lutgen::interpolated_remap::v1::remap_image(identity, &palette, mean, std_dev, iters);
+// Or, v0: lutgen::interpolated_remap::v0::remap_image(&identity, &palette, mean, std_dev, iters);
+```
+
