@@ -17,8 +17,8 @@ pub fn generate(level: u32) -> Image {
         for green in 0..cube_size {
             for red in 0..cube_size {
                 let r = ((red as f64) / (cube_size - 1) as f64) * 255.0;
-                let g = ((green as f64) / (cube_size) as f64) * 255.0;
-                let b = ((blue as f64) / (cube_size) as f64) * 255.0;
+                let g = ((green as f64) / (cube_size - 1) as f64) * 255.0;
+                let b = ((blue as f64) / (cube_size - 1) as f64) * 255.0;
                 let pixel = image::Rgb([r as u8, g as u8, b as u8]);
 
                 let x = p % image_size as f64;
