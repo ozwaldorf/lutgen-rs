@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-palettes"
-version = "0.1.1"
+version = "0.2.0"
 documentation = "https://docs.rs/lutgen-palettes"
 keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
 description = "Popular linux colorscheme palettes"

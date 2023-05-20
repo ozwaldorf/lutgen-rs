@@ -10,7 +10,7 @@ use tera::{try_get_value, Context, Tera};
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed=palettes.json");
-    println!("cargo:rerun-if-changed=src/palettes.tera");
+    println!("cargo:rerun-if-changed=src/lib.tera");
 
     let out_dir = std::env::var("OUT_DIR")?;
     let mut tera = Tera::default();
@@ -20,11 +20,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     let data: serde_json::Value = from_reader(read_to_string("palettes.json")?.as_bytes())?;
 
     let rust_code = tera.render_str(
-        &read_to_string("src/palettes.tera")?,
+        &read_to_string("src/lib.tera")?,
         &Context::from_value(json!({ "palettes": data }))?,
     )?;
 
-    write(Path::new(&out_dir).join("palettes.rs"), rust_code)?;
+    write(Path::new(&out_dir).join("lib.rs"), rust_code)?;
 
     Ok(())
 }

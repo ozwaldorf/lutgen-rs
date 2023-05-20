@@ -1,0 +1,23 @@
+use clap::ValueEnum;
+
+#[derive(Clone, Copy, Debug, ValueEnum)]
+pub enum Palette {
+  {% for name, palette in palettes -%}
+    {{ name | pascal_case }},
+  {% endfor %}
+}
+
+impl Palette {
+    pub fn get(&self) -> &'static [[u8; 3]] {
+        match self {
+          {% for name, palette in palettes -%}
+            Palette::{{ name | pascal_case }} => &[
+              {% for hex in palette -%}
+                {% set color = hex | hex_to_rgb %}
+                [ {{ color.r }}u8, {{ color.g }}, {{ color.b }} ],
+              {% endfor %}
+            ],
+          {% endfor %}
+        }
+    }
+}
