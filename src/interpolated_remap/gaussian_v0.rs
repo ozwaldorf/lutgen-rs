@@ -8,7 +8,7 @@
 //!     -evaluate-sequence Mean <output.png>
 //! ```
 
-use exoquant::{Color, ColorSpace};
+use exoquant::ColorSpace;
 use image::{ImageBuffer, Pixel, Rgb};
 use rand::{rngs::StdRng, SeedableRng};
 use rand_distr::{Distribution, Normal};
@@ -40,7 +40,7 @@ pub struct GaussianV0Params<CS: ColorSpace> {
 impl<'a, CS: ColorSpace + Send + Sync> InterpolatedRemapper<'a> for GaussianV0Remapper<'a, CS> {
     type Params = GaussianV0Params<CS>;
 
-    fn new(palette: &'a [Color], params: Self::Params) -> Self {
+    fn new(palette: &'a [[u8; 3]], params: Self::Params) -> Self {
         let Self::Params {
             mean,
             std_dev,
@@ -84,7 +84,7 @@ impl<'a, CS: ColorSpace + Send + Sync> InterpolatedRemapper<'a> for GaussianV0Re
 
     /// Always panics, use v1 algorithm for single pixel interpolation
     fn remap_pixel(&self, _: &mut Rgb<u8>) {
-        unimplemented!("Use v1 for per pixel iterpolation")
+        unimplemented!("Use v1 for per-pixel iterpolation")
     }
 }
 

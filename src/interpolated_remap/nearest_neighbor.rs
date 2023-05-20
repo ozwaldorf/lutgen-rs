@@ -7,7 +7,7 @@ use crate::Image;
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
 /// algorithms.
 pub struct NearestNeighborRemapper<'a, CS: ColorSpace + Sync> {
-    palette: &'a [Color],
+    palette: &'a [[u8; 3]],
     color_map: ColorMap,
     pub colorspace: CS,
 }
@@ -15,9 +15,20 @@ pub struct NearestNeighborRemapper<'a, CS: ColorSpace + Sync> {
 impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a, CS> {
     type Params = CS;
 
-    fn new(palette: &'a [Color], colorspace: Self::Params) -> Self {
-        let color_map =
-            ColorMap::from_float_colors(palette.iter().map(|c| colorspace.to_float(*c)).collect());
+    fn new(palette: &'a [[u8; 3]], colorspace: Self::Params) -> Self {
+        let color_map = ColorMap::from_float_colors(
+            palette
+                .iter()
+                .map(|c| {
+                    colorspace.to_float(Color {
+                        r: c[0],
+                        g: c[1],
+                        b: c[2],
+                        a: 255,
+                    })
+                })
+                .collect(),
+        );
 
         Self {
             palette,
@@ -36,10 +47,7 @@ impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRema
         let colorf = self
             .colorspace
             .to_float(Color::new(pixel.0[0], pixel.0[1], pixel.0[2], 255));
-
         let idx = self.color_map.find_nearest(colorf);
-        let nearest = self.palette[idx];
-
-        *pixel = Rgb([nearest.r, nearest.g, nearest.b])
+        *pixel = Rgb(self.palette[idx]);
     }
 }

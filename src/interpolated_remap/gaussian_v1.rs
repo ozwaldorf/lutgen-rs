@@ -7,7 +7,7 @@
 //!     * Remap each variant using `nearest_neighbor` lookups.
 //!     * Average the variants together for the final interpolated color.
 
-use exoquant::{Color, ColorSpace, Colorf};
+use exoquant::{ColorSpace, Colorf};
 use image::Rgb;
 use rand::{rngs::StdRng, SeedableRng};
 use rand_distr::{Distribution, Normal};
@@ -34,7 +34,7 @@ pub struct GaussianV1Params<CS: ColorSpace> {
 impl<'a, CS: ColorSpace + Send + Sync> InterpolatedRemapper<'a> for GaussianV1Remapper<'a, CS> {
     type Params = GaussianV1Params<CS>;
 
-    fn new(palette: &'a [Color], params: Self::Params) -> Self {
+    fn new(palette: &'a [[u8; 3]], params: Self::Params) -> Self {
         // Build distribution values
         let sample_count = (params.iterations as f64).cbrt().round() as usize;
         let distribution_samples =

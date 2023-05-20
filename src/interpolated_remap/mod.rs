@@ -1,6 +1,5 @@
 //! Interpolated remapping algorithms.
 
-use exoquant::Color;
 pub use gaussian_v0::*;
 pub use gaussian_v1::*;
 use image::Rgb;
@@ -18,7 +17,7 @@ pub trait InterpolatedRemapper<'a>: Sync {
     /// Parameter for the algorithm
     type Params;
 
-    fn new(palette: &'a [Color], params: Self::Params) -> Self;
+    fn new(palette: &'a [[u8; 3]], params: Self::Params) -> Self;
 
     /// Remap a single pixel in place
     fn remap_pixel(&self, pixel: &mut Rgb<u8>);

@@ -5,7 +5,7 @@ use clap::{
     error::{ContextKind, ContextValue, ErrorKind},
     CommandFactory, Parser, ValueEnum,
 };
-use exoquant::{Color, SimpleColorSpace};
+use exoquant::SimpleColorSpace;
 use lutgen::{generate_lut, interpolated_remap::*, Image, Palette};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
@@ -57,7 +57,7 @@ enum Algorithm {
 impl Algorithm {
     fn generate(
         &self,
-        palette: &[Color],
+        palette: &[[u8; 3]],
         level: u32,
         mean: f64,
         std_dev: f64,
@@ -132,10 +132,10 @@ fn main() {
                 exit(2);
             }
             if let Ok(channel_bytes) = u32::from_str_radix(hex, 16) {
-                let r = (channel_bytes >> 16) & 0xFF;
-                let g = (channel_bytes >> 8) & 0xFF;
-                let b = channel_bytes & 0xFF;
-                Color::new(r as u8, g as u8, b as u8, 255)
+                let r = ((channel_bytes >> 16) & 0xFF) as u8;
+                let g = ((channel_bytes >> 8) & 0xFF) as u8;
+                let b = (channel_bytes & 0xFF) as u8;
+                [r, g, b]
             } else {
                 show_hex_err(s);
                 exit(2);

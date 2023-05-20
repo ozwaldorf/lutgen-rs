@@ -1,6 +1,5 @@
 #![doc = include_str!("../README.md")]
 
-use exoquant::Color;
 use image::{ImageBuffer, Rgb};
 use interpolated_remap::InterpolatedRemapper;
 /// Predefined constant palettes for popular colorschemes.
@@ -16,7 +15,7 @@ pub type Image = ImageBuffer<Rgb<u8>, Vec<u8>>;
 /// Generic method to generate a lut using anything that implements [`InterpolatedRemapper`]
 pub fn generate_lut<'a, A: InterpolatedRemapper<'a>>(
     level: u32,
-    palette: &'a [Color],
+    palette: &'a [[u8; 3]],
     params: A::Params,
 ) -> Image {
     let remapper = A::new(palette, params);
