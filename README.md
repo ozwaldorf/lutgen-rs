@@ -72,6 +72,20 @@ Options:
           Print version
 ```
 
+#### Using a Hald Clut 
+
+Images (imagemagick):
+
+```bash
+magick input.png hald_clut.png -hald-clut output.png
+```
+
+Videos (ffmpeg):
+
+```bash
+ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
+```
+
 ### Library
 
 > By default, the `bin` feature and dependencies are enabled.
@@ -80,10 +94,7 @@ Options:
 Simple usage:
 
 ```rust
-use exoquant::{
-    Color,
-    SimpleColorSpace,
-};
+use exoquant::SimpleColorSpace;
 use lutgen::{
     interpolated_remap::{
         GaussianV0Params, GaussianV0Remapper, GaussianV1Params, GaussianV1Remapper
@@ -93,9 +104,9 @@ use lutgen::{
 
 // Setup the palette and colorspace for nearest neighbor lookups.
 let palette = vec![
-    Color::new(255, 0, 0, 255),
-    Color::new(0, 255, 0, 255),
-    Color::new(0, 0, 255, 255),
+    [255, 0, 0],
+    [0, 255, 0],
+    [0, 0, 255],
 ];
 let colorspace = SimpleColorSpace::default();
 
@@ -139,9 +150,9 @@ let mut identity = lutgen::identity::generate(8);
 
 // Setup the palette
 let palette = vec![
-    Color::new(255, 0, 0, 255),
-    Color::new(0, 255, 0, 255),
-    Color::new(0, 0, 255, 255),
+    [255, 0, 0],
+    [0, 255, 0],
+    [0, 0, 255],
 ];
 
 // Setup the interpolated remapper
@@ -161,3 +172,9 @@ remapper.remap_image(&mut identity);
 // identity.save("v1_hald_8.png").unwrap();
 ```
 
+## Tasks
+
+[x] Basic hald-clut identity generation
+[x] Gaussian (original and optimized) based identity remapping
+[x] Support a bunch of popular base color palettes (thanks wezterm!)
+[ ] Applying a lut to images
