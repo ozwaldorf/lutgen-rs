@@ -13,28 +13,58 @@
 
 ---
 
+## Example
+
+<details>
+    <summary>Catppuccin Mocha Hald CLUT</summary>
+    <img src="assets/catppuccin-mocha_hald_clut_8_GaussianV1_0_20_512.png"/>
+</details>
+<details>
+    <summary>Original Image</summary>
+    <img src="assets/simon-berger-unsplash.jpg"/>
+</details>
+<details>
+    <summary>Corrected Image</summary>
+    <img src="assets/simon-berger-unsplash_catppuccin-mocha_8_GaussianV1_0_20_512.png">
+</details>
+
 ## Usage
 
 ### CLI
+
+Install
 
 ```bash
 cargo install lutgen
 ```
 
+Helptext
+
 ```text
-Usage: lutgen [OPTIONS] [CUSTOM_COLORS]...
+A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes.
+
+Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
+
+Commands:
+  correct
+          Correct an image using a hald clut, either provided or generated on the fly
+  help
+          Print this message or the help of the given subcommand(s)
 
 Arguments:
   [CUSTOM_COLORS]...
           List of custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
+  -o, --output <OUTPUT>
+          Optional path to write the generated file to
+
   -p <PALETTE>
           Add colors from a predefined base palette. Use `lutgen -p` to view all options
 
   -a <ALGORITHM>
           Interpolated remapping algorithm to generate the LUT with
-
+          
           [default: gaussian-v1]
 
           Possible values:
@@ -42,27 +72,24 @@ Options:
           - gaussian-v0:      Original algorithm for gaussian interpolated remapping
           - nearest-neighbor: Non-interpolated algorithm that remaps to the nearest neighbor
 
-  -o, --output <OUTPUT>
-          Path to write the generated file to. Defaults to the current dir with some parameters (ex: `./hald_clut_v1_4_20_512.png`)
-
   -l, --level <LEVEL>
           Hald level (ex: 8 = 512x512 image)
-
+          
           [default: 8]
 
   -m, --mean <MEAN>
           Mean for the gaussian distribution
-
-          [default: 4]
+          
+          [default: 0]
 
   -s, --std-dev <STD_DEV>
           Standard deviation for the gaussian distribution
-
+          
           [default: 20]
 
   -i, --iterations <ITERATIONS>
-          Number of iterations to average together
-
+          Number of gaussian samples to average together
+          
           [default: 512]
 
   -h, --help
@@ -72,15 +99,27 @@ Options:
           Print version
 ```
 
-#### Using a Hald Clut 
+#### Examples
 
-Images (imagemagick):
+Generating a LUT
 
 ```bash
-magick input.png hald_clut.png -hald-clut output.png
+lutgen -p catppuccin-mocha -o mocha_lut.png
 ```
 
-Videos (ffmpeg):
+Correcting an image with an ephimeral LUT
+
+```bash
+lutgen -p catppuccin-mocha correct assets/simon-berger-unsplash.jpg -o mocha_version.png
+```
+
+Correcting an image with a prerendered LUT
+
+```bash
+lutgen correct --hald-clut mocha_lut.png assets/simon-berger-unsplash.jpg
+```
+
+Correcting Videos (using ffmpeg):
 
 ```bash
 ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
