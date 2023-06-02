@@ -33,12 +33,13 @@ rayon = "1.7.0"
 
 # bin dependencies
 clap = { workspace = true, optional = true }
+spinners = { version = "4.1.0", optional = true }
 lutgen-palettes = { version = "0.2.0", path = "palettes", optional = true }
 
 [features]
 default = ["bin"]
 palettes = ["lutgen-palettes"]
-bin = ["clap", "palettes"]
+bin = ["clap", "spinners", "palettes"]
 
 [[bin]]
 name = "lutgen"

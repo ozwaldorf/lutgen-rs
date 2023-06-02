@@ -3,19 +3,20 @@ use std::{path::PathBuf, process::exit, time::Instant};
 use clap::{
     arg, command,
     error::{ContextKind, ContextValue, ErrorKind},
-    CommandFactory, Parser, ValueEnum,
+    CommandFactory, Parser, Subcommand, ValueEnum,
 };
 use exoquant::SimpleColorSpace;
-use lutgen::{generate_lut, interpolated_remap::*, Image, Palette};
+use lutgen::{generate_lut, identity, interpolated_remap::*, Image, Palette};
+use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
 
-/// Generate Hald CLUT images from arbitrary colors using gaussian distribution.
-///
-/// The default mean are equivelant to imagemagick's
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    #[command(subcommand)]
+    subcommand: Option<Subcommands>,
+
     /// List of custom hexidecimal colors to add to the palette.
     /// If `-p` is not used to specify a base palette, at least 1 color is required.
     custom_colors: Vec<String>,
@@ -31,17 +32,32 @@ struct Args {
     output: Option<PathBuf>,
     /// Hald level (ex: 8 = 512x512 image)
     #[arg(short, long, default_value_t = 8)]
-    level: u32,
+    level: u8,
     /// Mean for the gaussian distribution.
-    #[arg(short, long, default_value_t = 4.0)]
+    #[arg(short, long, default_value_t = 0.0)]
     mean: f64,
     /// Standard deviation for the gaussian distribution.
     #[arg(short, long, default_value_t = 20.0)]
     std_dev: f64,
-    /// Number of iterations to average together.
+    /// Number of gaussian samples to average together.
     #[arg(short, long, default_value_t = 512)]
     iterations: usize,
 }
+
+#[derive(Subcommand, Debug)]
+enum Subcommands {
+    /// Correct an image using a hald clut, either provided or generated on the fly.
+    Correct {
+        /// Optionally use an external hald-clut. If unspecified, the arguments provided
+        /// will be used to generate the lut on the fly.
+        #[arg(long)]
+        hald_clut: Option<PathBuf>,
+        /// Image to correct with a hald clut.
+        image: PathBuf,
+    },
+}
+
+/// Generate Hald CLUT images from arbitrary colors using gaussian distribution.
 
 #[derive(Default, Clone, Debug, ValueEnum)]
 enum Algorithm {
@@ -58,7 +74,7 @@ impl Algorithm {
     fn generate(
         &self,
         palette: &[[u8; 3]],
-        level: u32,
+        level: u8,
         mean: f64,
         std_dev: f64,
         iterations: usize,
@@ -96,7 +112,10 @@ impl Algorithm {
 }
 
 fn main() {
+    let total_time = Instant::now();
+
     let Args {
+        subcommand,
         custom_colors: custom_palette,
         palette,
         algorithm,
@@ -144,7 +163,6 @@ fn main() {
         .collect::<Vec<_>>();
 
     let mut name = String::new();
-
     if let Some(palette) = palette {
         let p_name = palette.to_possible_value().unwrap();
         if colors.is_empty() {
@@ -158,29 +176,109 @@ fn main() {
         name.push_str("custom");
     };
 
-    if colors.is_empty() {
-        let mut err = clap::Error::new(ErrorKind::TooFewValues).with_cmd(&Args::command());
-        err.insert(
-            ContextKind::InvalidArg,
-            ContextValue::String("COLORS".into()),
-        );
-        err.insert(ContextKind::ActualNumValues, ContextValue::Number(0));
-        err.insert(ContextKind::MinValues, ContextValue::Number(1));
-        err.print().unwrap();
-        exit(2);
-    }
+    let (output, filename) = match subcommand {
+        None => {
+            // Generate and save a hald clut identity
+            if colors.is_empty() {
+                min_colors_error()
+            }
 
-    println!("Generating {algorithm:?} LUT... (palette: {name}, level: {level}, mean: {mean}, std_dev: {std_dev}, iterations: {iterations})");
+            let mut sp = Spinner::new(Spinners::Dots3, format!("Generating `{name}` LUT..."));
+            let time = Instant::now();
 
+            let palette_lut = algorithm.generate(&colors, level, mean, std_dev, iterations, SEED);
+
+            sp.stop_and_persist(
+                "✔",
+                format!("Generated `{name}` LUT in {:?}", time.elapsed()),
+            );
+
+            (
+                palette_lut,
+                output.unwrap_or(PathBuf::from(format!(
+                    "{name}_hald_clut_{level}_{algorithm:?}_{mean}_{std_dev}_{iterations}.png",
+                ))),
+            )
+        }
+        Some(Subcommands::Correct { hald_clut, image }) => {
+            // Correct an image using a hald clut identity
+
+            // load or generate the lut
+            let (hald_clut, details) = match hald_clut {
+                Some(path) => {
+                    let mut sp = Spinner::new(Spinners::Dots3, format!("Loading {path:?}..."));
+                    let time = Instant::now();
+                    let lut = image::open(&path).unwrap().to_rgb8();
+                    sp.stop_and_persist("✔", format!("Loaded {path:?} in {:?}", time.elapsed()));
+                    (lut, "custom".into())
+                }
+                None => {
+                    if colors.is_empty() {
+                        min_colors_error()
+                    }
+
+                    let mut sp =
+                        Spinner::new(Spinners::Dots3, format!("Generating `{name}` LUT..."));
+                    let time = Instant::now();
+
+                    let palette_lut =
+                        algorithm.generate(&colors, level, mean, std_dev, iterations, SEED);
+
+                    sp.stop_and_persist(
+                        "✔",
+                        format!("Generated `{name}` LUT in {:?}", time.elapsed()),
+                    );
+
+                    (
+                        palette_lut,
+                        format!("{name}_{level}_{algorithm:?}_{mean}_{std_dev}_{iterations}"),
+                    )
+                }
+            };
+
+            // apply the lut to the image
+            let mut sp = Spinner::new(Spinners::Dots3, format!("Applying LUT to {image:?}..."));
+            let time = Instant::now();
+
+            let mut image_buf = image::open(&image).unwrap().to_rgb8();
+            identity::correct_image(&mut image_buf, &hald_clut);
+
+            sp.stop_and_persist(
+                "✔",
+                format!("Applied LUT to {image:?} in {:?}", time.elapsed()),
+            );
+
+            (
+                image_buf,
+                output.unwrap_or(PathBuf::from(format!(
+                    "{}_{details}.png",
+                    image.with_extension("").display()
+                ))),
+            )
+        }
+    };
+
+    let mut sp = Spinner::new(Spinners::Dots3, format!("Saving output to {filename:?}..."));
     let time = Instant::now();
-    let palette_lut = algorithm.generate(&colors, level, mean, std_dev, iterations, SEED);
-    let time = time.elapsed();
 
-    // Save output
-    let filename = output.unwrap_or(PathBuf::from(format!(
-        "{name}_hald_clut_{level}_{algorithm:?}_{mean}_{std_dev}_{iterations}.png",
-    )));
+    output.save(&filename).unwrap();
 
-    println!("Finished in {time:?}\nSaving to {filename:?}");
-    palette_lut.save(filename).unwrap();
+    sp.stop_and_persist(
+        "✔",
+        format!("Saved output to {filename:?} in {:?}", time.elapsed()),
+    );
+
+    println!("Finished in {:?}", total_time.elapsed());
+}
+
+fn min_colors_error() {
+    let mut err = clap::Error::new(ErrorKind::TooFewValues).with_cmd(&Args::command());
+    err.insert(
+        ContextKind::InvalidArg,
+        ContextValue::String("COLORS".into()),
+    );
+    err.insert(ContextKind::ActualNumValues, ContextValue::Number(0));
+    err.insert(ContextKind::MinValues, ContextValue::Number(1));
+    err.print().unwrap();
+    exit(2);
 }
