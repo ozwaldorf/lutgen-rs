@@ -46,24 +46,24 @@ A blazingly fast interpolated LUT generator using gaussian distribution for arbi
 Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
 
 Commands:
-  correct
+  apply
           Correct an image using a hald clut, either provided or generated on the fly
   help
           Print this message or the help of the given subcommand(s)
 
 Arguments:
   [CUSTOM_COLORS]...
-          List of custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
+          Optional list of custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
   -o, --output <OUTPUT>
           Optional path to write the generated file to
 
   -p <PALETTE>
-          Add colors from a predefined base palette. Use `lutgen -p` to view all options
+          Optional predefined base palette. Use `lutgen -p` to view all options. Compatible with custom colors
 
   -a <ALGORITHM>
-          Interpolated remapping algorithm to generate the LUT with
+          Remapping algorithm to generate the LUT with
           
           [default: gaussian-v1]
 
@@ -78,17 +78,17 @@ Options:
           [default: 8]
 
   -m, --mean <MEAN>
-          Mean for the gaussian distribution
+          Mean for gaussian distribution
           
           [default: 0]
 
   -s, --std-dev <STD_DEV>
-          Standard deviation for the gaussian distribution
+          Standard deviation for gaussian distribution
           
           [default: 20]
 
   -i, --iterations <ITERATIONS>
-          Number of gaussian samples to average together
+          Number of gaussian samples for each color to average together
           
           [default: 512]
 

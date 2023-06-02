@@ -54,7 +54,7 @@ struct Args {
 #[derive(Subcommand, Debug)]
 enum Subcommands {
     /// Correct an image using a hald clut, either provided or generated on the fly.
-    Correct {
+    Apply {
         /// Optionally use an external hald-clut. Conflicts with all options other than output.
         #[arg(
             long,
@@ -216,7 +216,7 @@ fn main() {
                 ))),
             )
         }
-        Some(Subcommands::Correct { hald_clut, image }) => {
+        Some(Subcommands::Apply { hald_clut, image }) => {
             // Correct an image using a hald clut identity
 
             // load or generate the lut
