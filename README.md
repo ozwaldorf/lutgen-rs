@@ -47,20 +47,20 @@ Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
 
 Commands:
   apply
-          Correct an image using a hald clut, either provided or generated on the fly
+          Correct an image using a hald clut, either generating it, or loading it externally
   help
           Print this message or the help of the given subcommand(s)
 
 Arguments:
   [CUSTOM_COLORS]...
-          Optional list of custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
+          Custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
   -o, --output <OUTPUT>
-          Optional path to write the generated file to
+          Path to write output to
 
   -p <PALETTE>
-          Optional predefined base palette. Use `lutgen -p` to view all options. Compatible with custom colors
+          Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors
 
   -a <ALGORITHM>
           Remapping algorithm to generate the LUT with
@@ -130,7 +130,7 @@ ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp
 > By default, the `bin` feature and dependencies are enabled.
 > When used as a library, it's recommended to use `default-features = false` to minimalize the dependency tree and build time.
 
-Simple usage:
+Generating a LUT (simple):
 
 ```rust
 use exoquant::SimpleColorSpace;
@@ -172,7 +172,7 @@ let output = generate_lut::<GaussianV1Remapper<_>>(8, &palette, params);
 // output.save("v1_hald_8.png").unwrap();
 ```
 
-Advanced usage:
+Generating a LUT (advanced):
 
 ```rust
 use exoquant::{
@@ -211,9 +211,24 @@ remapper.remap_image(&mut identity);
 // identity.save("v1_hald_8.png").unwrap();
 ```
 
+Applying a LUT:
+
+
+```rust
+use lutgen::identity::{generate, correct_image};
+
+let identity = lutgen::identity::generate(8);
+let mut image = image::open("assets/simon-berger-unsplash.jpg").unwrap().to_rgb8();
+
+correct_image(&mut image, &identity);
+
+// image.save("output.png").unwrap()
+```
+
 ## Tasks
 
 [x] Basic hald-clut identity generation
 [x] Gaussian (original and optimized) based identity remapping
 [x] Support a bunch of popular base color palettes (thanks wezterm!)
-[ ] Applying a lut to images
+[x] Basic applying a lut to an image
+[ ] Linear interpolation for applying a lut to an image

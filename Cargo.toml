@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.4.0"
+version = "0.4.1"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes."
@@ -24,24 +24,25 @@ exclude = ["assets"]
 
 [workspace.dependencies]
 exoquant = "0.2.0"
-clap = { version = "4.2.7", features = ["derive"] }
+clap = { version = "4.2", features = ["derive"] }
 
 [dependencies]
 exoquant.workspace = true
 image = "0.24"
-rand = "0.8.5"
-rand_distr = "0.4.3"
-rayon = "1.7.0"
+rand = "0.8"
+rand_distr = "0.4"
+rayon = "1.7"
 
 # bin dependencies
 clap = { workspace = true, optional = true }
 spinners = { version = "4.1.0", optional = true }
+dirs = { version = "5.0.1", optional = true }
 lutgen-palettes = { version = "0.2.0", path = "palettes", optional = true }
 
 [features]
 default = ["bin"]
 palettes = ["lutgen-palettes"]
-bin = ["clap", "spinners", "palettes"]
+bin = ["clap", "spinners", "dirs", "palettes"]
 
 [[bin]]
 name = "lutgen"
