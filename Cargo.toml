@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.4.0"
+version = "0.4.1"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes."
