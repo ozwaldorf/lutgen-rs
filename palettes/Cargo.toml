@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-palettes"
-version = "0.2.0"
+version = "0.2.1"
 documentation = "https://docs.rs/lutgen-palettes"
 keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
 description = "Popular linux colorscheme palettes"
@@ -13,7 +13,6 @@ categories.workspace = true
 [dependencies]
 exoquant.workspace = true
 clap.workspace = true
-#clap.optional = true
 
 [build-dependencies]
 regex = "1"
