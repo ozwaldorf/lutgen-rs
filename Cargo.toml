@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.3.1"
+version = "0.4.0"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes."
@@ -33,12 +33,13 @@ rayon = "1.7.0"
 
 # bin dependencies
 clap = { workspace = true, optional = true }
+spinners = { version = "4.1.0", optional = true }
 lutgen-palettes = { version = "0.1.1", path = "palettes", optional = true }
 
 [features]
 default = ["bin"]
 palettes = ["lutgen-palettes"]
-bin = ["clap", "palettes"]
+bin = ["clap", "spinners", "palettes"]
 
 [[bin]]
 name = "lutgen"

@@ -15,7 +15,7 @@ pub type Image = ImageBuffer<Rgb<u8>, Vec<u8>>;
 
 /// Generic method to generate a lut using anything that implements [`InterpolatedRemapper`]
 pub fn generate_lut<'a, A: InterpolatedRemapper<'a>>(
-    level: u32,
+    level: u8,
     palette: &'a [Color],
     params: A::Params,
 ) -> Image {
