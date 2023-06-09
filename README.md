@@ -17,15 +17,12 @@
 
 <details>
     <summary>Catppuccin Mocha Hald CLUT</summary>
-    <img src="assets/catppuccin-mocha_hald_clut_8_GaussianV1_0_20_512.png"/>
+    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/d7eee751-5a3d-407f-9052-d16e28369635" />
 </details>
 <details>
-    <summary>Original Image</summary>
-    <img src="assets/simon-berger-unsplash.jpg"/>
-</details>
-<details>
-    <summary>Corrected Image</summary>
-    <img src="assets/simon-berger-unsplash_catppuccin-mocha_8_GaussianV1_0_20_512.png">
+    <summary>Original and Corrected Images</summary>
+    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/76d5beaa-6ef8-4dec-8188-eeb56612df52" />
+    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/61a37d40-9423-419f-8199-5b24197e5485" />
 </details>
 
 ## Usage
