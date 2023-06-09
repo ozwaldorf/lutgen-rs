@@ -211,7 +211,7 @@ remapper.remap_image(&mut identity);
 Applying a LUT:
 
 
-```rust
+```rust,ignore
 use lutgen::identity::{generate, correct_image};
 
 let identity = lutgen::identity::generate(8);
