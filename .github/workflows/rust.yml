@@ -27,6 +27,8 @@ jobs:
         with:
           toolchain: ${{ env.TOOLCHAIN }}
           override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -74,6 +76,8 @@ jobs:
           profile: minimal
           toolchain: ${{ env.TOOLCHAIN }}
           override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -90,6 +94,8 @@ jobs:
           toolchain: ${{ env.TOOLCHAIN }}
           components: clippy
           override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
