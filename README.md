@@ -107,13 +107,13 @@ lutgen -p catppuccin-mocha -o mocha_lut.png
 Correcting an image with an ephimeral LUT
 
 ```bash
-lutgen -p catppuccin-mocha correct assets/simon-berger-unsplash.jpg -o mocha_version.png
+lutgen -p catppuccin-mocha apply assets/simon-berger-unsplash.jpg -o mocha_version.png
 ```
 
 Correcting an image with a prerendered LUT
 
 ```bash
-lutgen correct --hald-clut mocha_lut.png assets/simon-berger-unsplash.jpg
+lutgen apply --hald-clut mocha_lut.png input.jpg
 ```
 
 Correcting Videos (using ffmpeg):
