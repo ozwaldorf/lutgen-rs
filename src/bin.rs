@@ -11,7 +11,14 @@ use clap::{
 };
 use dirs::cache_dir;
 use exoquant::SimpleColorSpace;
-use lutgen::{generate_lut, identity, interpolated_remap::*, Image, Palette};
+use lutgen::{
+    generate_lut, identity,
+    interpolated_remap::{
+        shepard::{ShepardRemapper, ShepardsV1Params},
+        *,
+    },
+    Image, Palette,
+};
 use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
@@ -39,26 +46,95 @@ struct LutArgs {
     #[arg(short, value_enum, hide_possible_values = true)]
     #[clap(global = true)]
     palette: Option<Palette>,
-    /// Remapping algorithm to generate the LUT with.
-    #[arg(short, value_enum, default_value = "gaussian-v1")]
-    #[clap(global = true)]
-    algorithm: Algorithm,
     /// Hald level (ex: 8 = 512x512 image)
     #[arg(short, long, default_value_t = 8)]
     #[clap(global = true)]
     level: u8,
-    /// Mean for gaussian distribution.
+    /// Remapping algorithm to generate the LUT with.
+    #[arg(short, value_enum, default_value = "gaussian-v1")]
+    #[clap(global = true)]
+    algorithm: Algorithm,
+    /// Gaussian algorithm's mean parameter.
     #[arg(short, long, default_value_t = 0.0)]
     #[clap(global = true)]
     mean: f64,
-    /// Standard deviation for gaussian distribution.
+    /// Gaussian algorithm's standard deviation parameter.
     #[arg(short, long, default_value_t = 20.0)]
     #[clap(global = true)]
     std_dev: f64,
-    /// Number of gaussian samples for each color to average together.
+    /// Gaussian algorithm's target number of samples to take for each color.
     #[arg(short, long, default_value_t = 512)]
     #[clap(global = true)]
     iterations: usize,
+    /// Shepard algorithm's power parameter.
+    #[arg(
+        long,
+        default_value_t = 4.0,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    power: f64,
+    /// Shepard algorithm's parameter for a static number of nearest palette colors to consider
+    /// when weighting each interpolated value. 0 is unlimited.
+    #[arg(
+        long = "nearest",
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    num_nearest: Option<usize>,
+    /// Shepard algorithm's parameter for the percentage of nearest palette colors
+    /// to consider when weighting each interpolated value.
+    #[arg(
+        long = "percent",
+        default_value_t = 0.3,
+        conflicts_with = "nearest",
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations",
+        value_parser = percentage_parser
+    )]
+    #[clap(global = true)]
+    nearest_percent: f64,
+}
+
+#[derive(Subcommand, Debug)]
+enum Subcommands {
+    /// Correct an image using a hald clut, either generating it, or loading it externally.
+    Apply {
+        /// An external hald-clut to use. Conflicts with all lut generation related arguments.
+        #[arg(
+            long,
+            conflicts_with = "lutargs",
+            conflicts_with = "cache",
+            conflicts_with = "force"
+        )]
+        hald_clut: Option<PathBuf>,
+        /// Enable caching the generated LUT
+        #[arg(short, long, default_value_t = false)]
+        cache: bool,
+        /// Force overwriting the cached LUT.
+        #[arg(short, long, default_value_t = false, requires = "cache")]
+        force: bool,
+        /// Image to correct with a hald clut.
+        image: PathBuf,
+    },
+}
+
+#[derive(Default, Clone, Debug, ValueEnum)]
+enum Algorithm {
+    /// Shepard's method for interpolation based remapping
+    Shepard,
+    /// Fastest algorithm for gaussian interpolated remapping
+    #[default]
+    GaussianV1,
+    /// Original algorithm for gaussian interpolated remapping
+    GaussianV0,
+    /// Non-interpolated algorithm that remaps to the nearest neighbor
+    NearestNeighbor,
 }
 
 impl LutArgs {
@@ -69,6 +145,20 @@ impl LutArgs {
         let time = Instant::now();
 
         let lut = match self.algorithm {
+            Algorithm::Shepard => {
+                let palette = self.collect();
+                generate_lut::<ShepardRemapper<_>>(
+                    self.level,
+                    &palette,
+                    ShepardsV1Params {
+                        power: self.power,
+                        nearest: self.num_nearest.unwrap_or(
+                            (self.nearest_percent * palette.len() as f64).ceil() as usize,
+                        ),
+                        colorspace: SimpleColorSpace::default(),
+                    },
+                )
+            }
             Algorithm::GaussianV0 => generate_lut::<GaussianV0Remapper<_>>(
                 self.level,
                 &self.collect(),
@@ -151,48 +241,27 @@ impl LutArgs {
     }
 
     fn detail_string(&self) -> String {
-        format!(
-            "{}_{:?}_{}_{}_{}",
-            self.level, self.algorithm, self.mean, self.std_dev, self.iterations
-        )
+        let mut buf = format!("{}_{:?}", self.level, self.algorithm);
+        match self.algorithm {
+            Algorithm::Shepard => {
+                buf.push_str(&format!(
+                    "_{}_{}",
+                    self.power,
+                    self.num_nearest.unwrap_or({
+                        let len = self.collect().len() as f64;
+                        (len * self.nearest_percent).ceil() as usize
+                    })
+                ));
+            }
+            Algorithm::GaussianV1 | Algorithm::GaussianV0 => buf.push_str(&format!(
+                "_{}_{}_{}",
+                self.mean, self.std_dev, self.iterations
+            )),
+            Algorithm::NearestNeighbor => {}
+        }
+        buf
     }
 }
-
-#[derive(Subcommand, Debug)]
-enum Subcommands {
-    /// Correct an image using a hald clut, either generating it, or loading it externally.
-    Apply {
-        /// An external hald-clut to use. Conflicts with all lut generation related arguments.
-        #[arg(
-            long,
-            conflicts_with = "lutargs",
-            conflicts_with = "cache",
-            conflicts_with = "force"
-        )]
-        hald_clut: Option<PathBuf>,
-        /// Enable caching the generated LUT
-        #[arg(short, long, default_value_t = false)]
-        cache: bool,
-        /// Force overwriting the cached LUT.
-        #[arg(short, long, default_value_t = false, requires = "cache")]
-        force: bool,
-        /// Image to correct with a hald clut.
-        image: PathBuf,
-    },
-}
-
-#[derive(Default, Clone, Debug, ValueEnum)]
-enum Algorithm {
-    /// Fastest algorithm for gaussian interpolated remapping
-    #[default]
-    GaussianV1,
-    /// Original algorithm for gaussian interpolated remapping
-    GaussianV0,
-    /// Non-interpolated algorithm that remaps to the nearest neighbor
-    NearestNeighbor,
-}
-
-impl Algorithm {}
 
 fn main() {
     let total_time = Instant::now();
@@ -315,14 +384,32 @@ fn cache_image<P: AsRef<Path>>(path: P, image: &Image) {
     sp.stop_and_persist("✔", format!("Cached {path:?} in {:?}", time.elapsed()));
 }
 
+fn percentage_parser(value: &str) -> Result<f64, String> {
+    let float: f64 = value
+        .parse()
+        .map_err(|_| "Failed to parse float".to_string())?;
+    if float >= 0.0 && float <= 1.0 {
+        Ok(float)
+    } else {
+        Err("Percentage must be a float between 0 and 1".to_string())
+    }
+}
+
 fn min_colors_error() {
-    let mut err = clap::Error::new(ErrorKind::TooFewValues).with_cmd(&BinArgs::command());
+    let mut err = clap::Error::new(ErrorKind::InvalidValue).with_cmd(&BinArgs::command());
     err.insert(
         ContextKind::InvalidArg,
         ContextValue::String("COLORS".into()),
     );
-    err.insert(ContextKind::ActualNumValues, ContextValue::Number(0));
-    err.insert(ContextKind::MinValues, ContextValue::Number(1));
+    err.insert(ContextKind::InvalidValue, ContextValue::String("".into()));
+    err.insert(
+        ContextKind::ValidValue,
+        ContextValue::Strings(vec![
+            "-p PALETTE".to_string(),
+            "#123456".to_string(),
+            "#abcdef".to_string(),
+        ]),
+    );
     err.print().unwrap();
     exit(2);
 }

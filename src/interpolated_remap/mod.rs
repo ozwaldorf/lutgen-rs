@@ -11,6 +11,7 @@ use crate::Image;
 pub mod gaussian_v0;
 pub mod gaussian_v1;
 pub mod nearest_neighbor;
+pub mod shepard;
 
 /// Interpolated Remapper. Implements an algorithm with some initialization parameters.
 pub trait InterpolatedRemapper<'a>: Sync {
