@@ -22,6 +22,7 @@
 <details>
     <summary>Example Image (Original)</summary>
     <img src="docs/example-image.jpg" />
+</details>
 <details>
     <summary>Example Image (Corrected)</summary>
     <img src="docs/catppuccin-mocha.jpg" />
