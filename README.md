@@ -56,38 +56,63 @@ Options:
   -o, --output <OUTPUT>
           Path to write output to
 
-  -p <PALETTE>
+  -p, --palette <PALETTE>
           Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors
-
-  -a <ALGORITHM>
-          Remapping algorithm to generate the LUT with
-          
-          [default: gaussian-v1]
-
-          Possible values:
-          - gaussian-v1:      Fastest algorithm for gaussian interpolated remapping
-          - gaussian-v0:      Original algorithm for gaussian interpolated remapping
-          - nearest-neighbor: Non-interpolated algorithm that remaps to the nearest neighbor
 
   -l, --level <LEVEL>
           Hald level (ex: 8 = 512x512 image)
           
           [default: 8]
 
+  -a, --algorithm <ALGORITHM>
+          Algorithm to remap the LUT with
+          
+          [default: gaussian-rbf]
+
+          Possible values:
+          - shepards-method:
+            Shepard's method (RBF interpolation using the inverse distance function). 
+            Params: --power, --nearest
+          - gaussian-rbf:
+            Radial Basis Function interpolation using the Gaussian function. 
+            Params: --euclide, --nearest
+          - linear-rbf:
+            Radial Basis Function interpolation using a linear function. Params: --nearest
+          - gaussian-sampling:
+            Optimized version of the original ImageMagick approach which applies gaussian noise to each color and averages nearest neighbors together. 
+            Params: --mean, --std_dev, --iterations
+          - nearest-neighbor:
+            Simple, non-interpolated, nearest neighbor alorithm
+
   -m, --mean <MEAN>
-          Mean for gaussian distribution
+          Gaussian sampling algorithm's mean parameter
           
           [default: 0]
 
   -s, --std-dev <STD_DEV>
-          Standard deviation for gaussian distribution
+          Gaussian sampling algorithm's standard deviation parameter
           
           [default: 20]
 
   -i, --iterations <ITERATIONS>
-          Number of gaussian samples for each color to average together
+          Gaussian sampling algorithm's target number of samples to take for each color
           
           [default: 512]
+
+      --power <POWER>
+          Shepard algorithm's power parameter
+          
+          [default: 4]
+
+      --euclide <EUCLIDE>
+          Gaussian RBF's euclide parameter
+          
+          [default: 32]
+
+      --nearest <NUM_NEAREST>
+          Number of nearest palette colors to consider for RBF based algorithms. 0 uses unlimited (all) colors
+          
+          [default: 16]
 
   -h, --help
           Print help (see a summary with '-h')
@@ -104,13 +129,13 @@ Generating a LUT
 lutgen -p catppuccin-mocha -o mocha_lut.png
 ```
 
-Correcting an image with an ephimeral LUT
+Correcting an image with a LUT generated on the fly
 
 ```bash
 lutgen -p catppuccin-mocha apply assets/simon-berger-unsplash.jpg -o mocha_version.png
 ```
 
-Correcting an image with a prerendered LUT
+Correcting an image with a pre-generated LUT
 
 ```bash
 lutgen apply --hald-clut mocha_lut.png input.jpg
@@ -215,12 +240,12 @@ remapper.remap_image(&mut identity);
 ## Tasks
 
 - [x] Basic hald-clut identity generation
-- [x] Gaussian Sampling based identity remapping (thanks Gengeh for the original imagemagick strategy!)
+- [x] Gaussian Sampling interpolation for generating LUTs (thanks Gengeh for the original imagemagick strategy!)
 - [x] Support a bunch of popular base color palettes (thanks Wezterm!)
 - [x] Basic applying a lut to an image
-- [x] Radial basis function interpolation for remapping LUTs
+- [x] Radial basis function interpolation for generating LUTs
 - [ ] Interpolation for more accuracy when correcting with low level luts (<16)
-- [ ] Replace exoquant and kiddo with our own unified implementation of a k-d tree
+- [ ] Replace exoquant and kiddo with a unified implementation of a k-d tree
 
 ## Sources 
 
