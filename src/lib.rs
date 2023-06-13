@@ -1,13 +1,13 @@
 #![doc = include_str!("../README.md")]
 
 use image::{ImageBuffer, Rgb};
-use interpolated_remap::InterpolatedRemapper;
+use interpolation::InterpolatedRemapper;
 /// Predefined constant palettes for popular colorschemes.
 #[cfg(feature = "palettes")]
 pub use lutgen_palettes::Palette;
 
 pub mod identity;
-pub mod interpolated_remap;
+pub mod interpolation;
 
 /// Core image type (Rgb8)
 pub type Image = ImageBuffer<Rgb<u8>, Vec<u8>>;

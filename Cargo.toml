@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.4.3"
+version = "0.5.0"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes."
@@ -21,15 +21,15 @@ repository = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
 
 [workspace.dependencies]
-exoquant = "0.2.0"
 clap = { version = "4.2", features = ["derive"] }
 
 [dependencies]
-exoquant.workspace = true
+exoquant = "0.2.0"
 image = "0.24"
 rand = "0.8"
 rand_distr = "0.4"
 rayon = "1.7"
+kiddo = "2.1.1"
 
 # bin dependencies
 clap = { workspace = true, optional = true }

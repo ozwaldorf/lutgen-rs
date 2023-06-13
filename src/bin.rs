@@ -11,14 +11,7 @@ use clap::{
 };
 use dirs::cache_dir;
 use exoquant::SimpleColorSpace;
-use lutgen::{
-    generate_lut, identity,
-    interpolated_remap::{
-        shepard::{ShepardRemapper, ShepardsV1Params},
-        *,
-    },
-    Image, Palette,
-};
+use lutgen::{generate_lut, identity, interpolation::*, Image, Palette};
 use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
@@ -42,27 +35,28 @@ struct LutArgs {
     /// If `-p` is not used to specify a base palette, at least 1 color is required.
     #[clap(global = true)]
     custom_colors: Vec<String>,
-    /// Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors.
-    #[arg(short, value_enum, hide_possible_values = true)]
+    /// Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with
+    /// custom colors.
+    #[arg(short, long, value_enum, hide_possible_values = true)]
     #[clap(global = true)]
     palette: Option<Palette>,
     /// Hald level (ex: 8 = 512x512 image)
     #[arg(short, long, default_value_t = 8)]
     #[clap(global = true)]
     level: u8,
-    /// Remapping algorithm to generate the LUT with.
-    #[arg(short, value_enum, default_value = "gaussian-v1")]
+    /// Algorithm to remap the LUT with.
+    #[arg(short, long, value_enum, default_value = "gaussian-rbf")]
     #[clap(global = true)]
     algorithm: Algorithm,
-    /// Gaussian algorithm's mean parameter.
+    /// Gaussian sampling algorithm's mean parameter.
     #[arg(short, long, default_value_t = 0.0)]
     #[clap(global = true)]
     mean: f64,
-    /// Gaussian algorithm's standard deviation parameter.
+    /// Gaussian sampling algorithm's standard deviation parameter.
     #[arg(short, long, default_value_t = 20.0)]
     #[clap(global = true)]
     std_dev: f64,
-    /// Gaussian algorithm's target number of samples to take for each color.
+    /// Gaussian sampling algorithm's target number of samples to take for each color.
     #[arg(short, long, default_value_t = 512)]
     #[clap(global = true)]
     iterations: usize,
@@ -76,29 +70,27 @@ struct LutArgs {
     )]
     #[clap(global = true)]
     power: f64,
-    /// Shepard algorithm's parameter for a static number of nearest palette colors to consider
-    /// when weighting each interpolated value. 0 is unlimited.
+    /// Gaussian RBF's euclide parameter.
     #[arg(
-        long = "nearest",
+        long,
+        default_value_t = 32.0,
         conflicts_with = "mean",
         conflicts_with = "std_dev",
         conflicts_with = "iterations"
     )]
     #[clap(global = true)]
-    num_nearest: Option<usize>,
-    /// Shepard algorithm's parameter for the percentage of nearest palette colors
-    /// to consider when weighting each interpolated value.
+    euclide: f64,
+    /// Number of nearest palette colors to consider for RBF based algorithms.
+    /// 0 uses unlimited (all) colors.
     #[arg(
-        long = "percent",
-        default_value_t = 0.3,
-        conflicts_with = "nearest",
+        long = "nearest",
+        default_value_t = 16,
         conflicts_with = "mean",
         conflicts_with = "std_dev",
-        conflicts_with = "iterations",
-        value_parser = percentage_parser
+        conflicts_with = "iterations"
     )]
     #[clap(global = true)]
-    nearest_percent: f64,
+    num_nearest: usize,
 }
 
 #[derive(Subcommand, Debug)]
@@ -126,14 +118,21 @@ enum Subcommands {
 
 #[derive(Default, Clone, Debug, ValueEnum)]
 enum Algorithm {
-    /// Shepard's method for interpolation based remapping
-    Shepard,
-    /// Fastest algorithm for gaussian interpolated remapping
+    /// Shepard's method (RBF interpolation using the inverse distance function).
+    /// Params: --power, --nearest
+    ShepardsMethod,
+    /// Radial Basis Function interpolation using the Gaussian function.
+    /// Params: --euclide, --nearest
+    GaussianRBF,
+    /// Radial Basis Function interpolation using a linear function.
+    /// Params: --nearest
+    LinearRBF,
+    /// Optimized version of the original ImageMagick approach which applies gaussian noise
+    /// to each color and averages nearest neighbors together.
+    /// Params: --mean, --std_dev, --iterations
     #[default]
-    GaussianV1,
-    /// Original algorithm for gaussian interpolated remapping
-    GaussianV0,
-    /// Non-interpolated algorithm that remaps to the nearest neighbor
+    GaussianSampling,
+    /// Simple, non-interpolated, nearest neighbor alorithm.
     NearestNeighbor,
 }
 
@@ -145,35 +144,25 @@ impl LutArgs {
         let time = Instant::now();
 
         let lut = match self.algorithm {
-            Algorithm::Shepard => {
-                let palette = self.collect();
-                generate_lut::<ShepardRemapper<_>>(
-                    self.level,
-                    &palette,
-                    ShepardsV1Params {
-                        power: self.power,
-                        nearest: self.num_nearest.unwrap_or(
-                            (self.nearest_percent * palette.len() as f64).ceil() as usize,
-                        ),
-                        colorspace: SimpleColorSpace::default(),
-                    },
-                )
-            }
-            Algorithm::GaussianV0 => generate_lut::<GaussianV0Remapper<_>>(
+            Algorithm::ShepardsMethod => generate_lut::<ShepardRemapper<_>>(
                 self.level,
                 &self.collect(),
-                GaussianV0Params {
-                    mean: self.mean,
-                    std_dev: self.std_dev,
-                    iterations: self.iterations,
-                    seed,
-                    colorspace,
-                },
+                ShepardParams::new(self.power, self.num_nearest, colorspace),
             ),
-            Algorithm::GaussianV1 => generate_lut::<GaussianV1Remapper<_>>(
+            Algorithm::GaussianRBF => generate_lut::<GaussianRemapper<_>>(
                 self.level,
                 &self.collect(),
-                GaussianV1Params {
+                GaussianParams::new(self.euclide, self.num_nearest, colorspace),
+            ),
+            Algorithm::LinearRBF => generate_lut::<LinearRemapper<_>>(
+                self.level,
+                &self.collect(),
+                LinearParams::new(self.num_nearest, colorspace),
+            ),
+            Algorithm::GaussianSampling => generate_lut::<GaussianSamplingRemapper<_>>(
+                self.level,
+                &self.collect(),
+                GaussianSamplingParams {
                     mean: self.mean,
                     std_dev: self.std_dev,
                     iterations: self.iterations,
@@ -183,7 +172,7 @@ impl LutArgs {
             ),
             Algorithm::NearestNeighbor => {
                 generate_lut::<NearestNeighborRemapper<_>>(self.level, &self.collect(), colorspace)
-            }
+            },
         };
 
         sp.stop_and_persist(
@@ -243,21 +232,20 @@ impl LutArgs {
     fn detail_string(&self) -> String {
         let mut buf = format!("{}_{:?}", self.level, self.algorithm);
         match self.algorithm {
-            Algorithm::Shepard => {
-                buf.push_str(&format!(
-                    "_{}_{}",
-                    self.power,
-                    self.num_nearest.unwrap_or({
-                        let len = self.collect().len() as f64;
-                        (len * self.nearest_percent).ceil() as usize
-                    })
-                ));
-            }
-            Algorithm::GaussianV1 | Algorithm::GaussianV0 => buf.push_str(&format!(
+            Algorithm::GaussianSampling => buf.push_str(&format!(
                 "_{}_{}_{}",
                 self.mean, self.std_dev, self.iterations
             )),
-            Algorithm::NearestNeighbor => {}
+            Algorithm::ShepardsMethod => {
+                buf.push_str(&format!("_{}_{}", self.power, self.num_nearest));
+            },
+            Algorithm::GaussianRBF => {
+                buf.push_str(&format!("_{}_{}", self.euclide, self.num_nearest));
+            },
+            Algorithm::LinearRBF => {
+                buf.push_str(&format!("_{}", self.num_nearest));
+            },
+            Algorithm::NearestNeighbor => {},
         }
         buf
     }
@@ -289,7 +277,7 @@ fn main() {
                 ))),
                 &lutargs.generate(SEED),
             );
-        }
+        },
         Some(Subcommands::Apply {
             hald_clut,
             image,
@@ -329,7 +317,7 @@ fn main() {
                             }
                             (lutargs.generate(SEED), cache_name)
                         }
-                    }
+                    },
                 }
             };
 
@@ -350,7 +338,7 @@ fn main() {
                 ))),
                 &image_buf,
             )
-        }
+        },
     };
 
     println!("Finished in {:?}", total_time.elapsed());
@@ -382,17 +370,6 @@ fn cache_image<P: AsRef<Path>>(path: P, image: &Image) {
     let time = Instant::now();
     image.save(path).expect("failed to save cache image");
     sp.stop_and_persist("✔", format!("Cached {path:?} in {:?}", time.elapsed()));
-}
-
-fn percentage_parser(value: &str) -> Result<f64, String> {
-    let float: f64 = value
-        .parse()
-        .map_err(|_| "Failed to parse float".to_string())?;
-    if float >= 0.0 && float <= 1.0 {
-        Ok(float)
-    } else {
-        Err("Percentage must be a float between 0 and 1".to_string())
-    }
 }
 
 fn min_colors_error() {

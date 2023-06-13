@@ -35,8 +35,10 @@ pub fn generate(level: u8) -> Image {
     imgbuf
 }
 
-/// Correct a single pixel with a hald clut identity. Simple implementation that doesn't do any
-/// interpolation, so higher LUT sizes will be more accurate.
+/// Correct a single pixel with a hald clut identity.
+///
+/// Simple implementation that doesn't do any interpolation,
+/// so higher LUT sizes will prove to be more accurate.
 pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
     let level = level as f64;
     let cube_size = level * level;
@@ -52,17 +54,21 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
     hald_clut.get_pixel(x as u32, y as u32).0
 }
 
-/// Correct an image with a hald clut identity in place. Panics if the hald clut is invalid.
+/// Correct an image with a hald clut identity in place.
+/// Panics if the hald clut is invalid.
+///
+/// Simple implementation that doesn't do any interpolation,
+/// so higher LUT sizes will prove to be more accurate.
 pub fn correct_image(image: &mut Image, hald_clut: &Image) {
     let (width, height) = hald_clut.dimensions();
 
-    // Find the smallest level that fits inside the image
+    // Find the smallest level that fits inside the hald clut
     let mut level = 2;
     while level * level * level < width {
         level += 1;
     }
 
-    // Ensure the identity is valid for the calculated level
+    // Ensure the hald clut is valid for the calculated level
     assert_eq!(width, level * level * level);
     assert_eq!(width, height);
 
