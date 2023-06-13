@@ -17,12 +17,14 @@
 
 <details>
     <summary>Catppuccin Mocha Hald Clut</summary>
-    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/d7eee751-5a3d-407f-9052-d16e28369635" />
+    <img src="docs/catppuccin-mocha-hald-clut.png" />
 </details>
 <details>
-    <summary>Example Image: Original and Corrected</summary>
-    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/76d5beaa-6ef8-4dec-8188-eeb56612df52" />
-    <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/61a37d40-9423-419f-8199-5b24197e5485" />
+    <summary>Example Image (Original)</summary>
+    <img src="docs/example-image.jpg" />
+<details>
+    <summary>Example Image (Corrected)</summary>
+    <img src="docs/catppuccin-mocha.jpg" />
 </details>
 
 ## Usage
@@ -162,13 +164,10 @@ use lutgen::{
         GaussianRemapper, GaussianSamplingRemapper
     },
 };
+use lutgen_palettes::Palette;
 
-// Setup the palette to interpolate from
-let palette = vec![
-    [255, 0, 0],
-    [0, 255, 0],
-    [0, 0, 255],
-];
+// Get a premade palette
+let palette = Palette::CatppuccinMocha.get();
 
 // Setup the fast Gaussian RBF algorithm
 let (euclide, nearest) = (16.0, 0);
@@ -176,8 +175,16 @@ let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpac
 
 // Generate and remap a HALD:8 for the provided palette
 let hald_clut = remapper.generate_lut(8);
+
 // hald_clut.save("output.png").unwrap();
-    
+
+// Setup another palette to interpolate from, with custom colors
+let palette = vec![
+    [255, 0, 0],
+    [0, 255, 0],
+    [0, 0, 255],
+];
+
 // Setup the slower Gaussian Sampling algorithm
 let (mean, std_dev, iters, seed) = (0.0, 20.0, 512, 420);
 let remapper = GaussianSamplingRemapper::new(
@@ -189,22 +196,41 @@ let remapper = GaussianSamplingRemapper::new(
     SimpleColorSpace::default()
 );
 
-// Generate and remap a HALD:8 for the provided palette
+// Generate and remap a HALD:4 for the provided palette
 let hald_clut = remapper.generate_lut(4);
+
 // hald_clut.save("output.png").unwrap();
 ```
 
 Applying a LUT:
 
-```rust,ignore
-use lutgen::identity::{generate, correct_image};
+```rust
+use exoquant::SimpleColorSpace;
+use image::open;
 
-let identity = lutgen::identity::generate(8);
-let mut image = image::open("example-image.png").unwrap().to_rgb8();
+use lutgen::{
+    identity::correct_image,
+    interpolation::GaussianRemapper,
+    GenerateLut,
+};
+use lutgen_palettes::Palette;
 
-correct_image(&mut image, &identity);
+// Generate a hald clut
+let palette = Palette::CatppuccinMocha.get();
+let remapper = GaussianRemapper::new(&palette, 32.0, 0, SimpleColorSpace::default());
+let hald_clut = remapper.generate_lut(8);
 
-// image.save("output.png").unwrap()
+// Save the LUT for later
+hald_clut.save("docs/catppuccin-mocha-hald-clut.png").unwrap();
+
+// Open an image to correct
+let mut external_image = open("docs/example-image.jpg").unwrap().to_rgb8();
+
+// Correct the image using the hald clut we generated
+correct_image(&mut external_image, &hald_clut);
+
+// Save the edited image
+external_image.save("docs/catppuccin-mocha.jpg").unwrap()
 ```
 
 Remapping an image directly (advanced):
@@ -230,11 +256,12 @@ let (euclide, nearest) = (16.0, 0);
 let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpace::default());
 
 // Generate an image (generally an identity lut to use on other images)
-let mut identity = lutgen::identity::generate(8);
+let mut hald_clut = lutgen::identity::generate(8);
 
 // Remap the image
-remapper.remap_image(&mut identity);
-// identity.save("v1_hald_8.png").unwrap();
+remapper.remap_image(&mut hald_clut);
+
+// hald_clut.save("output.png").unwrap();
 ```
 
 ## Tasks
