@@ -7,7 +7,7 @@
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/publish.yml"><img alt="publish" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/publish.yml?label=Publish&style=for-the-badge" /></a>
     </p>
     <p align="center">
-        A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes.
+        A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes. Theme any image to your dekstop colorscheme!
     </p>
 </header>
 
@@ -38,7 +38,7 @@ cargo install lutgen
 Helptext
 
 ```text
-A blazingly fast interpolated LUT generator using gaussian distribution for arbitrary and popular color palettes.
+A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes.
 
 Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
 
