@@ -1,14 +1,10 @@
 //! Interpolated remapping algorithms.
 
-pub use gaussian_sample::{GaussianSamplingParams, GaussianSamplingRemapper};
+pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgb;
 pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
-pub use rbf::{
-    gaussian::{GaussianParams, GaussianRemapper},
-    linear::{LinearParams, LinearRemapper},
-    shepard::{ShepardParams, ShepardRemapper},
-};
+pub use rbf::{gaussian::GaussianRemapper, linear::LinearRemapper, shepard::ShepardRemapper};
 
 use crate::Image;
 
@@ -18,11 +14,6 @@ mod rbf;
 
 /// Interpolated Remapper. Implements an algorithm with some initialization parameters.
 pub trait InterpolatedRemapper<'a>: Sync {
-    /// Parameter for the algorithm
-    type Params;
-
-    fn new(palette: &'a [[u8; 3]], params: Self::Params) -> Self;
-
     /// Remap a single pixel in place
     fn remap_pixel(&self, pixel: &mut Rgb<u8>);
 

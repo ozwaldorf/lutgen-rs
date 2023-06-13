@@ -1,18 +1,18 @@
 use exoquant::ColorSpace;
 
-use super::{RBFParams, RBFRemapper, RadialBasisFn};
+use super::{RBFRemapper, RadialBasisFn};
 
 /// The Gaussian function. Accepts a f64 euclide.
-
-pub struct GaussianFn;
+pub struct GaussianFn {
+    euclide: f64,
+}
 impl RadialBasisFn for GaussianFn {
-    type Params = f64;
-    fn radial_basis(euclide: f64, distance: f64) -> f64 {
-        (-euclide * distance.powf(2.0)).exp()
+    fn radial_basis(&self, distance: f64) -> f64 {
+        (-self.euclide * distance.powf(2.0)).exp()
     }
 }
 
-/// RBF interpolating remapper using the [`GaussianFn`]
+/// RBF interpolating remapper using the [`GaussianFn`] between n nearest colors.
 ///
 /// Lower euclide values will have more of a gradient between colors,
 /// but with more washed out results. Higher euclide values will keep
@@ -20,13 +20,8 @@ impl RadialBasisFn for GaussianFn {
 /// the number of nearest neighbors can also mitigate washout, but
 /// may increase banding when using the LUT for corrections.
 pub type GaussianRemapper<'a, CS> = RBFRemapper<'a, GaussianFn, CS>;
-pub struct GaussianParams;
-impl GaussianParams {
-    pub fn new<CS: ColorSpace + Sync>(
-        euclide: f64,
-        nearest: usize,
-        colorspace: CS,
-    ) -> RBFParams<GaussianFn, CS> {
-        RBFParams::new(euclide, nearest, colorspace)
+impl<'a, CS: ColorSpace + Sync> GaussianRemapper<'a, CS> {
+    pub fn new(palette: &'a [[u8; 3]], euclide: f64, nearest: usize, colorspace: CS) -> Self {
+        RBFRemapper::with_function(palette, GaussianFn { euclide }, nearest, colorspace)
     }
 }

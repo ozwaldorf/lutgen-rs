@@ -1,22 +1,21 @@
-use std::{f64, marker::PhantomData};
+use std::f64;
 
 use exoquant::{Color, ColorSpace, Colorf};
 use kiddo::float::{kdtree::KdTree, neighbour::Neighbour};
 
 use super::InterpolatedRemapper;
+use crate::GenerateLut;
 
 pub mod gaussian;
 pub mod linear;
 pub mod shepard;
 
 pub trait RadialBasisFn: Sync {
-    type Params: Copy + Sync;
-    fn radial_basis(p: Self::Params, distance: f64) -> f64;
+    fn radial_basis(&self, distance: f64) -> f64;
 }
 
 pub struct RBFRemapper<'a, F: RadialBasisFn, CS: ColorSpace + Sync> {
-    rbf: PhantomData<F>,
-    rbf_params: F::Params,
+    rbf: F,
     ref_palette: TreeOrVec,
     true_palette: &'a [[u8; 3]],
     colorspace: CS,
@@ -28,19 +27,30 @@ enum TreeOrVec {
     Vec(Vec<Colorf>),
 }
 
-pub struct RBFParams<F: RadialBasisFn, CS: ColorSpace> {
-    p: PhantomData<F>,
-    pub params: F::Params,
-    pub nearest: usize,
-    pub colorspace: CS,
-}
+impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> GenerateLut<'a> for RBFRemapper<'a, F, CS> {}
+impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> RBFRemapper<'a, F, CS> {
+    fn with_function(palette: &'a [[u8; 3]], rbf: F, nearest: usize, colorspace: CS) -> Self {
+        let true_palette = palette;
+        let ref_palette = if nearest == 0 || palette.len() <= nearest {
+            TreeOrVec::Vec(
+                palette
+                    .iter()
+                    .map(|raw| colorspace.to_float(Color::new(raw[0], raw[1], raw[2], 255)))
+                    .collect(),
+            )
+        } else {
+            let mut kdtree = KdTree::with_capacity(palette.len());
+            for (i, &raw) in palette.iter().enumerate() {
+                let c = colorspace.to_float(Color::new(raw[0], raw[1], raw[2], 255));
+                kdtree.add(&[c.r, c.g, c.b], i as u16);
+            }
+            TreeOrVec::Tree(nearest, kdtree)
+        };
 
-impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> RBFParams<F, CS> {
-    pub fn new(params: F::Params, nearest: usize, colorspace: CS) -> Self {
         Self {
-            p: PhantomData::<F>,
-            params,
-            nearest,
+            true_palette,
+            rbf,
+            ref_palette,
             colorspace,
         }
     }
@@ -49,41 +59,6 @@ impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> RBFParams<F, CS> {
 impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> InterpolatedRemapper<'a>
     for RBFRemapper<'a, F, CS>
 {
-    type Params = RBFParams<F, CS>;
-
-    fn new(palette: &'a [[u8; 3]], params: Self::Params) -> Self {
-        let true_palette = palette;
-        let ref_palette = if params.nearest == 0 || palette.len() <= params.nearest {
-            TreeOrVec::Vec(
-                palette
-                    .iter()
-                    .map(|raw| {
-                        params
-                            .colorspace
-                            .to_float(Color::new(raw[0], raw[1], raw[2], 255))
-                    })
-                    .collect(),
-            )
-        } else {
-            let mut kdtree = KdTree::with_capacity(palette.len());
-            for (i, &raw) in palette.iter().enumerate() {
-                let c = params
-                    .colorspace
-                    .to_float(Color::new(raw[0], raw[1], raw[2], 255));
-                kdtree.add(&[c.r, c.g, c.b], i as u16);
-            }
-            TreeOrVec::Tree(params.nearest, kdtree)
-        };
-
-        Self {
-            true_palette,
-            rbf: PhantomData::<F>,
-            rbf_params: params.params,
-            ref_palette,
-            colorspace: params.colorspace,
-        }
-    }
-
     fn remap_pixel(&self, pixel: &mut image::Rgb<u8>) {
         let raw_color = &mut pixel.0;
         if self.true_palette.contains(raw_color) {
@@ -102,7 +77,7 @@ impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> InterpolatedRemapper<'a>
                 for (i, &p_colorf) in palette.iter().enumerate() {
                     let delta = colorf - p_colorf;
                     let distance = delta.dot(&delta).sqrt();
-                    let weight = F::radial_basis(self.rbf_params, distance);
+                    let weight = self.rbf.radial_basis(distance);
                     let c = self.true_palette[i];
 
                     numerator[0] += c[0] as f64 * weight;
@@ -119,7 +94,7 @@ impl<'a, F: RadialBasisFn, CS: ColorSpace + Sync> InterpolatedRemapper<'a>
                 ) {
                     // we have distance^2
                     let distance = distance.sqrt();
-                    let weight = F::radial_basis(self.rbf_params, distance);
+                    let weight = self.rbf.radial_basis(distance);
                     let color = self.true_palette[item as usize];
 
                     numerator[0] += color[0] as f64 * weight;

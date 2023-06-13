@@ -11,7 +11,7 @@ use clap::{
 };
 use dirs::cache_dir;
 use exoquant::SimpleColorSpace;
-use lutgen::{generate_lut, identity, interpolation::*, Image, Palette};
+use lutgen::{identity, interpolation::*, GenerateLut, Image, Palette};
 use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
@@ -137,41 +137,36 @@ enum Algorithm {
 }
 
 impl LutArgs {
-    fn generate(&self, seed: u64) -> Image {
+    fn generate(&self) -> Image {
         let colorspace = SimpleColorSpace::default();
         let name = self.name();
         let mut sp = Spinner::new(Spinners::Dots3, format!("Generating \"{name}\" LUT..."));
         let time = Instant::now();
 
         let lut = match self.algorithm {
-            Algorithm::ShepardsMethod => generate_lut::<ShepardRemapper<_>>(
-                self.level,
+            Algorithm::ShepardsMethod => {
+                ShepardRemapper::new(&self.collect(), self.power, self.num_nearest, colorspace)
+                    .generate_lut(self.level)
+            },
+            Algorithm::GaussianRBF => {
+                GaussianRemapper::new(&self.collect(), self.euclide, self.num_nearest, colorspace)
+                    .generate_lut(self.level)
+            },
+            Algorithm::LinearRBF => {
+                LinearRemapper::new(&self.collect(), self.num_nearest, colorspace)
+                    .generate_lut(self.level)
+            },
+            Algorithm::GaussianSampling => GaussianSamplingRemapper::new(
                 &self.collect(),
-                ShepardParams::new(self.power, self.num_nearest, colorspace),
-            ),
-            Algorithm::GaussianRBF => generate_lut::<GaussianRemapper<_>>(
-                self.level,
-                &self.collect(),
-                GaussianParams::new(self.euclide, self.num_nearest, colorspace),
-            ),
-            Algorithm::LinearRBF => generate_lut::<LinearRemapper<_>>(
-                self.level,
-                &self.collect(),
-                LinearParams::new(self.num_nearest, colorspace),
-            ),
-            Algorithm::GaussianSampling => generate_lut::<GaussianSamplingRemapper<_>>(
-                self.level,
-                &self.collect(),
-                GaussianSamplingParams {
-                    mean: self.mean,
-                    std_dev: self.std_dev,
-                    iterations: self.iterations,
-                    seed,
-                    colorspace,
-                },
-            ),
+                self.mean,
+                self.std_dev,
+                self.iterations,
+                SEED,
+                colorspace,
+            )
+            .generate_lut(self.level),
             Algorithm::NearestNeighbor => {
-                generate_lut::<NearestNeighborRemapper<_>>(self.level, &self.collect(), colorspace)
+                NearestNeighborRemapper::new(&self.collect(), colorspace).generate_lut(self.level)
             },
         };
 
@@ -263,8 +258,8 @@ fn main() {
     let colors = lutargs.collect();
 
     match subcommand {
+        // Generate and save a hald clut identity
         None => {
-            // Generate and save a hald clut identity
             if colors.is_empty() {
                 min_colors_error()
             }
@@ -275,17 +270,16 @@ fn main() {
                     lutargs.name(),
                     lutargs.detail_string(),
                 ))),
-                &lutargs.generate(SEED),
+                &lutargs.generate(),
             );
         },
+        // Correct an image using a hald clut identity
         Some(Subcommands::Apply {
             hald_clut,
             image,
             cache,
             force,
         }) => {
-            // Correct an image using a hald clut identity
-
             // load or generate the lut
             let (hald_clut, details) = {
                 match hald_clut {
@@ -307,7 +301,7 @@ fn main() {
                                 if colors.is_empty() {
                                     min_colors_error()
                                 }
-                                let lut = lutargs.generate(SEED);
+                                let lut = lutargs.generate();
                                 cache_image(path, &lut);
                                 (lut, cache_name)
                             }
@@ -315,7 +309,7 @@ fn main() {
                             if colors.is_empty() {
                                 min_colors_error()
                             }
-                            (lutargs.generate(SEED), cache_name)
+                            (lutargs.generate(), cache_name)
                         }
                     },
                 }

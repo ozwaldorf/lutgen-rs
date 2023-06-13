@@ -16,11 +16,11 @@
 ## Example
 
 <details>
-    <summary>Catppuccin Mocha Hald CLUT</summary>
+    <summary>Catppuccin Mocha Hald Clut</summary>
     <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/d7eee751-5a3d-407f-9052-d16e28369635" />
 </details>
 <details>
-    <summary>Original and Corrected Images</summary>
+    <summary>Example Image: Original and Corrected</summary>
     <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/76d5beaa-6ef8-4dec-8188-eeb56612df52" />
     <img src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/61a37d40-9423-419f-8199-5b24197e5485" />
 </details>
@@ -132,97 +132,99 @@ Generating a LUT (simple):
 ```rust
 use exoquant::SimpleColorSpace;
 use lutgen::{
+    GenerateLut,
     interpolation::{
-        GaussianParams, GaussianRemapper, GaussianSamplingParams, GaussianSamplingRemapper
+        GaussianRemapper, GaussianSamplingRemapper
     },
-    generate_lut,
 };
 
-// Setup the palette and colorspace for nearest neighbor lookups.
+// Setup the palette to interpolate from
 let palette = vec![
     [255, 0, 0],
     [0, 255, 0],
     [0, 0, 255],
 ];
-let colorspace = SimpleColorSpace::default();
 
-// Generate a lut using the fast Gaussian RBF algorithm
-let euclide = 16.0;
-let nearest = 13;
-let params = GaussianParams::new(euclide, nearest, SimpleColorSpace::default());
-let output = generate_lut::<GaussianRemapper<_>>(8, &palette, params);
-// output.save("hald_clut.png").unwrap();
+// Setup the fast Gaussian RBF algorithm
+let (euclide, nearest) = (16.0, 0);
+let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpace::default());
+
+// Generate and remap a HALD:8 for the provided palette
+let hald_clut = remapper.generate_lut(8);
+// hald_clut.save("output.png").unwrap();
     
-// Generate a lut using the slower Gaussian Sampling algorithm
-let params = GaussianSamplingParams {
-    mean: 4.0,
-    std_dev: 20.0,
-    iterations: 512,
-    seed: 80085,
-    colorspace: SimpleColorSpace::default(),
-};
-let output = generate_lut::<GaussianSamplingRemapper<_>>(8, &palette, params);
-// output.save("hald_clut.png").unwrap();
-```
+// Setup the slower Gaussian Sampling algorithm
+let (mean, std_dev, iters, seed) = (0.0, 20.0, 512, 420);
+let remapper = GaussianSamplingRemapper::new(
+    &palette, 
+    mean, 
+    std_dev, 
+    iters, 
+    seed, 
+    SimpleColorSpace::default()
+);
 
-Remapping an identity LUT directly (advanced):
-
-```rust
-use exoquant::{
-    Color,
-    SimpleColorSpace,
-};
-use lutgen::{
-    generate_lut,
-    interpolated_remap::{GaussianParams, GaussianRemapper, InterpolatedRemapper},
-};
-
-// Generate the base identity
-let mut identity = lutgen::identity::generate(8);
-
-// Setup the palette
-let palette = vec![
-    [255, 0, 0],
-    [0, 255, 0],
-    [0, 0, 255],
-];
-
-// Setup the remapper
-let params = GaussianParams::new(euclide, nearest, SimpleColorSpace::default());
-let remapper = GaussianRemapper::new(&palette, params);
-
-// Remap the identity
-remapper.remap_image(&mut identity);
-
-// identity.save("v1_hald_8.png").unwrap();
+// Generate and remap a HALD:8 for the provided palette
+let hald_clut = remapper.generate_lut(4);
+// hald_clut.save("output.png").unwrap();
 ```
 
 Applying a LUT:
-
 
 ```rust,ignore
 use lutgen::identity::{generate, correct_image};
 
 let identity = lutgen::identity::generate(8);
-let mut image = image::open("assets/simon-berger-unsplash.jpg").unwrap().to_rgb8();
+let mut image = image::open("example-image.png").unwrap().to_rgb8();
 
 correct_image(&mut image, &identity);
 
 // image.save("output.png").unwrap()
 ```
 
+Remapping an image directly (advanced):
+
+> Note: While the remappers can be used directly on an image, it's much faster to remap a LUT and correct an image with that.
+
+```rust
+use exoquant::SimpleColorSpace;
+use lutgen::{
+    GenerateLut,
+    interpolation::{GaussianRemapper, InterpolatedRemapper},
+};
+
+// Setup the palette to interpolate from
+let palette = vec![
+    [255, 0, 0],
+    [0, 255, 0],
+    [0, 0, 255],
+];
+
+// Setup a remapper
+let (euclide, nearest) = (16.0, 0);
+let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpace::default());
+
+// Generate an image (generally an identity lut to use on other images)
+let mut identity = lutgen::identity::generate(8);
+
+// Remap the image
+remapper.remap_image(&mut identity);
+// identity.save("v1_hald_8.png").unwrap();
+```
+
 ## Tasks
 
 - [x] Basic hald-clut identity generation
-- [x] Gaussian Sampling based identity remapping (thanks Gengeh for the imagemagick strategy!)
-- [x] Support a bunch of popular base color palettes (thanks wezterm!)
+- [x] Gaussian Sampling based identity remapping (thanks Gengeh for the original imagemagick strategy!)
+- [x] Support a bunch of popular base color palettes (thanks Wezterm!)
 - [x] Basic applying a lut to an image
 - [x] Radial basis function interpolation for remapping LUTs
-- [ ] Linear interpolation for applying a lut to an image
+- [ ] Interpolation for more accuracy when correcting with low level luts (<16)
+- [ ] Replace exoquant and kiddo with our own unified implementation of a k-d tree
 
 ## Sources 
 
-- https://www.quelsolaar.com/technology/clut.html
-- https://im.snibgo.com/sphaldcl.htm 
-- https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
-- https://en.wikipedia.org/wiki/Inverse_distance_weighting
+- Hald Cluts: https://www.quelsolaar.com/technology/clut.html
+- Sparse Hald Cluts: https://im.snibgo.com/sphaldcl.htm 
+- RBF Interpolation: https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
+- Shepard's method: https://en.wikipedia.org/wiki/Inverse_distance_weighting

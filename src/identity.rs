@@ -26,7 +26,6 @@ pub fn generate(level: u8) -> Image {
                 let y = (p - x) / image_size as f64;
 
                 imgbuf.put_pixel(x as u32, y as u32, pixel);
-
                 p += 1.0;
             }
         }

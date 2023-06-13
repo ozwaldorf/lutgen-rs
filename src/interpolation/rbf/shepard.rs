@@ -1,31 +1,26 @@
 use exoquant::ColorSpace;
 
-use super::{RBFParams, RBFRemapper, RadialBasisFn};
+use super::{RBFRemapper, RadialBasisFn};
 
 /// Inverse Distance Funciton. Accepts a f64 power parameter.
-pub struct InverseDistanceFn;
+pub struct InverseDistanceFn {
+    power: f64,
+}
 impl RadialBasisFn for InverseDistanceFn {
-    type Params = f64;
-    fn radial_basis(power: f64, distance: f64) -> f64 {
-        1.0 / distance.powf(power)
+    fn radial_basis(&self, distance: f64) -> f64 {
+        1.0 / distance.powf(self.power)
     }
 }
 
-/// Shepard's method for interpolation. A form of RBF interpolation using
-/// the inverse distance function.
+/// Shepard's method, a form of RBF interpolation using the [`InverseDistanceFn`]
+/// between n nearest colors.
 ///
-/// Lower power values will result in more gradient between
-/// the colors, but with more washed out results. Lowering the
-/// number of nearest colors can mitigate this, but may increase
-/// banding when using the LUT for corrections.
+/// Lower power values will result in a longer gradient between the colors, but with
+/// more washed out results. Lowering the number of nearest colors can mitigate
+/// this, but may increase banding when using the final LUT for corrections.
 pub type ShepardRemapper<'a, CS> = RBFRemapper<'a, InverseDistanceFn, CS>;
-pub struct ShepardParams;
-impl ShepardParams {
-    pub fn new<CS: ColorSpace + Sync>(
-        power: f64,
-        num_nearest: usize,
-        colorspace: CS,
-    ) -> RBFParams<InverseDistanceFn, CS> {
-        RBFParams::new(power, num_nearest, colorspace)
+impl<'a, CS: ColorSpace + Sync> ShepardRemapper<'a, CS> {
+    pub fn new(palette: &'a [[u8; 3]], power: f64, nearest: usize, colorspace: CS) -> Self {
+        RBFRemapper::with_function(palette, InverseDistanceFn { power }, nearest, colorspace)
     }
 }

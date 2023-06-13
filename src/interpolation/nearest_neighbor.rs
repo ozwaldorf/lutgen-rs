@@ -2,7 +2,7 @@ use exoquant::{Color, ColorMap, ColorSpace};
 use image::Rgb;
 
 use super::InterpolatedRemapper;
-use crate::Image;
+use crate::{GenerateLut, Image};
 
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
 /// algorithms.
@@ -12,10 +12,8 @@ pub struct NearestNeighborRemapper<'a, CS: ColorSpace + Sync> {
     pub colorspace: CS,
 }
 
-impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a, CS> {
-    type Params = CS;
-
-    fn new(palette: &'a [[u8; 3]], colorspace: Self::Params) -> Self {
+impl<'a, CS: ColorSpace + Sync> NearestNeighborRemapper<'a, CS> {
+    pub fn new(palette: &'a [[u8; 3]], colorspace: CS) -> Self {
         let color_map = ColorMap::from_float_colors(
             palette
                 .iter()
@@ -36,7 +34,10 @@ impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRema
             colorspace,
         }
     }
+}
 
+impl<'a, CS: ColorSpace + Sync> GenerateLut<'a> for NearestNeighborRemapper<'a, CS> {}
+impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a, CS> {
     fn remap_image(&self, image: &mut Image) {
         for pixel in image.pixels_mut() {
             self.remap_pixel(pixel)

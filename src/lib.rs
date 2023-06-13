@@ -12,14 +12,11 @@ pub mod interpolation;
 /// Core image type (Rgb8)
 pub type Image = ImageBuffer<Rgb<u8>, Vec<u8>>;
 
-/// Generic method to generate a lut using anything that implements [`InterpolatedRemapper`]
-pub fn generate_lut<'a, A: InterpolatedRemapper<'a>>(
-    level: u8,
-    palette: &'a [[u8; 3]],
-    params: A::Params,
-) -> Image {
-    let remapper = A::new(palette, params);
-    let mut identity = identity::generate(level);
-    remapper.remap_image(&mut identity);
-    identity
+pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
+    /// Helper method to generate a lut using an [`InterpolatedRemapper`].
+    fn generate_lut(&self, level: u8) -> Image {
+        let mut identity = identity::generate(level);
+        self.remap_image(&mut identity);
+        identity
+    }
 }
