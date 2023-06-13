@@ -1,2 +1,11 @@
+edition = "2021"
+version = "Two"
+
 imports_granularity = "Crate"
 group_imports = "StdExternalCrate"
+format_code_in_doc_comments = true
+
+comment_width = 100
+wrap_comments = true
+error_on_line_overflow = true
+match_block_trailing_comma = true
