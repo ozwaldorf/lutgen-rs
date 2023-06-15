@@ -82,13 +82,12 @@ struct LutArgs {
     )]
     #[clap(global = true)]
     power: f64,
-
     /// Gaussian sampling algorithm's mean parameter.
     #[arg(short, long, default_value_t = 0.0)]
     #[clap(global = true)]
     mean: f64,
     /// Gaussian sampling algorithm's standard deviation parameter.
-    #[arg(short, long, default_value_t = 20.0)]
+    #[arg(long, default_value_t = 20.0)]
     #[clap(global = true)]
     std_dev: f64,
     /// Gaussian sampling algorithm's target number of samples to take for each color.
