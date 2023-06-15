@@ -48,6 +48,41 @@ struct LutArgs {
     #[arg(short, long, value_enum, default_value = "gaussian-rbf")]
     #[clap(global = true)]
     algorithm: Algorithm,
+    /// Number of nearest palette colors to consider at any given time for RBF based algorithms.
+    /// 0 uses unlimited (all) colors.
+    #[arg(
+        short,
+        long,
+        default_value_t = 16,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    nearest: usize,
+    /// Gaussian RBF's shape parameter.
+    /// Higher means less gradient between colors, lower mean more.
+    #[arg(
+        short,
+        long,
+        default_value_t = 96.0,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    shape: f64,
+    /// Shepard algorithm's power parameter.
+    #[arg(
+        long,
+        default_value_t = 4.0,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    power: f64,
+
     /// Gaussian sampling algorithm's mean parameter.
     #[arg(short, long, default_value_t = 0.0)]
     #[clap(global = true)]
@@ -60,37 +95,6 @@ struct LutArgs {
     #[arg(short, long, default_value_t = 512)]
     #[clap(global = true)]
     iterations: usize,
-    /// Shepard algorithm's power parameter.
-    #[arg(
-        long,
-        default_value_t = 4.0,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    power: f64,
-    /// Gaussian RBF's euclide parameter.
-    #[arg(
-        long,
-        default_value_t = 32.0,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    euclide: f64,
-    /// Number of nearest palette colors to consider for RBF based algorithms.
-    /// 0 uses unlimited (all) colors.
-    #[arg(
-        long = "nearest",
-        default_value_t = 16,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    num_nearest: usize,
 }
 
 #[derive(Subcommand, Debug)]
@@ -122,7 +126,7 @@ enum Algorithm {
     /// Params: --power, --nearest
     ShepardsMethod,
     /// Radial Basis Function interpolation using the Gaussian function.
-    /// Params: --euclide, --nearest
+    /// Params: --shape, --nearest
     GaussianRBF,
     /// Radial Basis Function interpolation using a linear function.
     /// Params: --nearest
@@ -145,16 +149,15 @@ impl LutArgs {
 
         let lut = match self.algorithm {
             Algorithm::ShepardsMethod => {
-                ShepardRemapper::new(&self.collect(), self.power, self.num_nearest, colorspace)
+                ShepardRemapper::new(&self.collect(), self.power, self.nearest)
                     .generate_lut(self.level)
             },
             Algorithm::GaussianRBF => {
-                GaussianRemapper::new(&self.collect(), self.euclide, self.num_nearest, colorspace)
+                GaussianRemapper::new(&self.collect(), self.shape, self.nearest)
                     .generate_lut(self.level)
             },
             Algorithm::LinearRBF => {
-                LinearRemapper::new(&self.collect(), self.num_nearest, colorspace)
-                    .generate_lut(self.level)
+                LinearRemapper::new(&self.collect(), self.nearest).generate_lut(self.level)
             },
             Algorithm::GaussianSampling => GaussianSamplingRemapper::new(
                 &self.collect(),
@@ -232,13 +235,13 @@ impl LutArgs {
                 self.mean, self.std_dev, self.iterations
             )),
             Algorithm::ShepardsMethod => {
-                buf.push_str(&format!("_{}_{}", self.power, self.num_nearest));
+                buf.push_str(&format!("_{}_{}", self.power, self.nearest));
             },
             Algorithm::GaussianRBF => {
-                buf.push_str(&format!("_{}_{}", self.euclide, self.num_nearest));
+                buf.push_str(&format!("_{}_{}", self.shape, self.nearest));
             },
             Algorithm::LinearRBF => {
-                buf.push_str(&format!("_{}", self.num_nearest));
+                buf.push_str(&format!("_{}", self.nearest));
             },
             Algorithm::NearestNeighbor => {},
         }

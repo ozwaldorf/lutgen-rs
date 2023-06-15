@@ -171,8 +171,8 @@ use lutgen_palettes::Palette;
 let palette = Palette::CatppuccinMocha.get();
 
 // Setup the fast Gaussian RBF algorithm
-let (euclide, nearest) = (16.0, 0);
-let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpace::default());
+let (shape, nearest) = (96.0, 0);
+let remapper = GaussianRemapper::new(&palette, shape, nearest);
 
 // Generate and remap a HALD:8 for the provided palette
 let hald_clut = remapper.generate_lut(8);
@@ -206,7 +206,6 @@ let hald_clut = remapper.generate_lut(4);
 Applying a LUT:
 
 ```rust
-use exoquant::SimpleColorSpace;
 use image::open;
 
 use lutgen::{
@@ -218,7 +217,7 @@ use lutgen_palettes::Palette;
 
 // Generate a hald clut
 let palette = Palette::CatppuccinMocha.get();
-let remapper = GaussianRemapper::new(&palette, 32.0, 0, SimpleColorSpace::default());
+let remapper = GaussianRemapper::new(&palette, 96.0, 0);
 let hald_clut = remapper.generate_lut(8);
 
 // Save the LUT for later
@@ -239,7 +238,6 @@ Remapping an image directly (advanced):
 > Note: While the remappers can be used directly on an image, it's much faster to remap a LUT and correct an image with that.
 
 ```rust
-use exoquant::SimpleColorSpace;
 use lutgen::{
     GenerateLut,
     interpolation::{GaussianRemapper, InterpolatedRemapper},
@@ -253,8 +251,8 @@ let palette = vec![
 ];
 
 // Setup a remapper
-let (euclide, nearest) = (16.0, 0);
-let remapper = GaussianRemapper::new(&palette, euclide, nearest, SimpleColorSpace::default());
+let (shape, nearest) = (96.0, 0);
+let remapper = GaussianRemapper::new(&palette, shape, nearest);
 
 // Generate an image (generally an identity lut to use on other images)
 let mut hald_clut = lutgen::identity::generate(8);
