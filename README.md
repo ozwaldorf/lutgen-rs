@@ -46,82 +46,25 @@ A blazingly fast interpolated LUT generator and applicator for arbitrary and pop
 Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
 
 Commands:
-  apply
-          Correct an image using a hald clut, either generating it, or loading it externally
-  help
-          Print this message or the help of the given subcommand(s)
+  apply  Correct an image using a hald clut, either generating it, or loading it externally
+  help   Print this message or the help of the given subcommand(s)
 
 Arguments:
-  [CUSTOM_COLORS]...
-          Custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
+  [CUSTOM_COLORS]...  Custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
 
 Options:
-  -o, --output <OUTPUT>
-          Path to write output to
-
-  -p, --palette <PALETTE>
-          Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors
-
-  -l, --level <LEVEL>
-          Hald level (ex: 8 = 512x512 image)
-          
-          [default: 8]
-
-  -a, --algorithm <ALGORITHM>
-          Algorithm to remap the LUT with
-          
-          [default: gaussian-rbf]
-
-          Possible values:
-          - shepards-method:
-            Shepard's method (RBF interpolation using the inverse distance function). 
-            Params: --power, --nearest
-          - gaussian-rbf:
-            Radial Basis Function interpolation using the Gaussian function. 
-            Params: --euclide, --nearest
-          - linear-rbf:
-            Radial Basis Function interpolation using a linear function. Params: --nearest
-          - gaussian-sampling:
-            Optimized version of the original ImageMagick approach which applies gaussian noise to each color and averages nearest neighbors together. 
-            Params: --mean, --std_dev, --iterations
-          - nearest-neighbor:
-            Simple, non-interpolated, nearest neighbor alorithm
-
-  -m, --mean <MEAN>
-          Gaussian sampling algorithm's mean parameter
-          
-          [default: 0]
-
-  -s, --std-dev <STD_DEV>
-          Gaussian sampling algorithm's standard deviation parameter
-          
-          [default: 20]
-
-  -i, --iterations <ITERATIONS>
-          Gaussian sampling algorithm's target number of samples to take for each color
-          
-          [default: 512]
-
-      --power <POWER>
-          Shepard algorithm's power parameter
-          
-          [default: 4]
-
-      --euclide <EUCLIDE>
-          Gaussian RBF's euclide parameter
-          
-          [default: 32]
-
-      --nearest <NUM_NEAREST>
-          Number of nearest palette colors to consider for RBF based algorithms. 0 uses unlimited (all) colors
-          
-          [default: 16]
-
-  -h, --help
-          Print help (see a summary with '-h')
-
-  -V, --version
-          Print version
+  -o, --output <OUTPUT>          Path to write output to
+  -p, --palette <PALETTE>        Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors
+  -l, --level <LEVEL>            Hald level (ex: 8 = 512x512 image) [default: 8]
+  -a, --algorithm <ALGORITHM>    Algorithm to remap the LUT with [default: gaussian-rbf] [possible values: shepards-method, gaussian-rbf, linear-rbf, gaussian-sampling, nearest-neighbor]
+  -n, --nearest <NEAREST>        Number of nearest palette colors to consider at any given time for RBF based algorithms. 0 uses unlimited (all) colors [default: 16]
+  -s, --shape <SHAPE>            Gaussian RBF's shape parameter. Higher means less gradient between colors, lower mean more [default: 96]
+      --power <POWER>            Shepard algorithm's power parameter [default: 4]
+  -m, --mean <MEAN>              Gaussian sampling algorithm's mean parameter [default: 0]
+      --std-dev <STD_DEV>        Gaussian sampling algorithm's standard deviation parameter [default: 20]
+  -i, --iterations <ITERATIONS>  Gaussian sampling algorithm's target number of samples to take for each color [default: 512]
+  -h, --help                     Print help (see more with '--help')
+  -V, --version                  Print version
 ```
 
 #### Examples
