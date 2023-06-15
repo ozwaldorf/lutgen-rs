@@ -279,3 +279,4 @@ remapper.remap_image(&mut hald_clut);
 - Sparse Hald Cluts: https://im.snibgo.com/sphaldcl.htm 
 - RBF Interpolation: https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
 - Shepard's method: https://en.wikipedia.org/wiki/Inverse_distance_weighting
+- Oklab Colorspace: https://bottosson.github.io/posts/oklab/
