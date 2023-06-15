@@ -219,6 +219,7 @@ remapper.remap_image(&mut hald_clut);
 ## Sources 
 
 - Hald Cluts: https://www.quelsolaar.com/technology/clut.html
+- Editing with Hald Cluts: https://im.snibgo.com/edithald.htm
 - Sparse Hald Cluts: https://im.snibgo.com/sphaldcl.htm 
 - RBF Interpolation: https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
 - Shepard's method: https://en.wikipedia.org/wiki/Inverse_distance_weighting
