@@ -2,6 +2,7 @@
     <h1 align="center">lutgen-rs</h1>
     <p align="center">
         <a href="https://crates.io/crates/lutgen"><img alt="crate" src="https://img.shields.io/crates/v/lutgen?style=for-the-badge" /></a>
+        <a href="https://aur.archlinux.org/packages/lutgen-bin"><img alt="aur" src="https://img.shields.io/aur/version/lutgen-bin?&style=for-the-badge" /></a>
         <a href="./LICENSE.md"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/rust.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/rust.yml?label=CI&style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/publish.yml"><img alt="publish" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/publish.yml?label=Publish&style=for-the-badge" /></a>
@@ -34,13 +35,18 @@
 
 ### CLI
 
-Install
+#### Install
 
-```bash
-cargo install lutgen
-```
+- Crates.io (source):
+  ```bash
+  cargo install lutgen
+  ```
+- AUR:
+  ```bash
+  yay -S lutgen-bin
+  ```
 
-Helptext
+#### Helptext
 
 ```text
 A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes.
