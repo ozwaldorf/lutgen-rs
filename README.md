@@ -2,7 +2,6 @@
     <h1 align="center">lutgen-rs</h1>
     <p align="center">
         <a href="https://crates.io/crates/lutgen"><img alt="crate" src="https://img.shields.io/crates/v/lutgen?style=for-the-badge" /></a>
-        <a href="https://aur.archlinux.org/packages/lutgen-bin"><img alt="aur" src="https://img.shields.io/aur/version/lutgen-bin?&style=for-the-badge" /></a>
         <a href="./LICENSE.md"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/rust.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/rust.yml?label=CI&style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/publish.yml"><img alt="publish" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/publish.yml?label=Publish&style=for-the-badge" /></a>
@@ -35,16 +34,21 @@
 
 ### CLI
 
-#### Install
+#### Source
 
-- Crates.io (source):
-  ```bash
-  cargo install lutgen
-  ```
-- AUR:
-  ```bash
-  yay -S lutgen-bin
-  ```
+```
+git clone https://github.com/ozwaldorf/lutgen-rs
+cd lutgen-rs
+cargo install --path .
+```
+
+#### Releases
+
+| Packaging Status | Installation Command |
+|------------------|----------------------|
+| [![Crates.io](https://img.shields.io/crates/v/lutgen)](https://crates.io/crates/lutgen) | `cargo install lutgen` |
+| [![AUR](https://repology.org/badge/version-for-repo/aur/lutgen.svg?header=Arch%20Linux%20AUR)](https://aur.archlinux.org/packages/lutgen-bin) | `yay -S lutgen-bin` |
+| [![Alpine](https://repology.org/badge/version-for-repo/alpine_edge/lutgen.svg?header=Alpine%20Linux%20\(testing\))](https://pkgs.alpinelinux.org/package/edge/testing/x86_64/lutgen) | `apk add lutgen` |
 
 #### Helptext
 
@@ -232,3 +236,7 @@ remapper.remap_image(&mut hald_clut);
 - RBF Interpolation: https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
 - Shepard's method: https://en.wikipedia.org/wiki/Inverse_distance_weighting
 - Oklab Colorspace: https://bottosson.github.io/posts/oklab/
+
+## Special Thanks
+
+- [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
