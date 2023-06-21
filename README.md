@@ -36,7 +36,7 @@
 
 #### Source
 
-```
+```bash
 git clone https://github.com/ozwaldorf/lutgen-rs
 cd lutgen-rs
 cargo install --path .
