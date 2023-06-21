@@ -48,7 +48,11 @@ jobs:
           name: lutgen
           path: .
       - run: chmod +x lutgen
-      - run: ./lutgen -p catppuccin-mocha
+      - run: ./lutgen -p catppuccin-mocha -o mocha_hald_clut.png
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mocha_hald_clut.png
+          path: mocha_hald_clut.png
 
   fmt:
     name: Format
