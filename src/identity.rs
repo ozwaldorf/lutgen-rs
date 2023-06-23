@@ -39,16 +39,15 @@ pub fn generate(level: u8) -> Image {
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
 pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
-    let level = level as f64;
+    let level = level as u32;
     let cube_size = level * level;
 
-    let modulo = 255.0 / (cube_size - 1.0);
-    let r = (input[0] as f64 / modulo).floor();
-    let g = (input[1] as f64 / modulo).floor();
-    let b = (input[2] as f64 / modulo).floor();
+    let r = input[0] as u32 * (cube_size - 1) / 255;
+    let g = input[1] as u32 * (cube_size - 1) / 255;
+    let b = input[2] as u32 * (cube_size - 1) / 255;
 
-    let x = ((r % cube_size) + (g % level) * cube_size).floor();
-    let y = ((b * level) + (g / level)).floor();
+    let x = (r % cube_size) + (g % level) * cube_size;
+    let y = (b * level) + (g / level);
 
     hald_clut.get_pixel(x as u32, y as u32).0
 }
