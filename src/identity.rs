@@ -13,20 +13,20 @@ pub fn generate(level: u8) -> Image {
 
     let mut imgbuf = ImageBuffer::new(image_size, image_size);
 
-    let mut p = 0.0;
+    let mut p = 0u32;
     for blue in 0..cube_size {
         for green in 0..cube_size {
             for red in 0..cube_size {
-                let r = ((red as f64) / (cube_size - 1) as f64) * 255.0;
-                let g = ((green as f64) / (cube_size - 1) as f64) * 255.0;
-                let b = ((blue as f64) / (cube_size - 1) as f64) * 255.0;
+                let r = red * 255 / (cube_size - 1);
+                let g = green * 255 / (cube_size - 1);
+                let b = blue * 255 / (cube_size - 1);
                 let pixel = image::Rgb([r as u8, g as u8, b as u8]);
 
-                let x = p % image_size as f64;
-                let y = (p - x) / image_size as f64;
+                let x = p % image_size;
+                let y = (p - x) / image_size;
 
-                imgbuf.put_pixel(x as u32, y as u32, pixel);
-                p += 1.0;
+                imgbuf.put_pixel(x, y, pixel);
+                p += 1;
             }
         }
     }
@@ -39,18 +39,17 @@ pub fn generate(level: u8) -> Image {
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
 pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
-    let level = level as f64;
+    let level = level as u32;
     let cube_size = level * level;
 
-    let modulo = 255.0 / (cube_size - 1.0);
-    let r = (input[0] as f64 / modulo).floor();
-    let g = (input[1] as f64 / modulo).floor();
-    let b = (input[2] as f64 / modulo).floor();
+    let r = input[0] as u32 * (cube_size - 1) / 255;
+    let g = input[1] as u32 * (cube_size - 1) / 255;
+    let b = input[2] as u32 * (cube_size - 1) / 255;
 
-    let x = ((r % cube_size) + (g % level) * cube_size).floor();
-    let y = ((b * level) + (g / level)).floor();
+    let x = (r % cube_size) + (g % level) * cube_size;
+    let y = (b * level) + (g / level);
 
-    hald_clut.get_pixel(x as u32, y as u32).0
+    hald_clut.get_pixel(x, y).0
 }
 
 /// Correct an image with a hald clut identity in place.
