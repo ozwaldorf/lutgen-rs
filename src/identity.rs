@@ -49,7 +49,7 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
     let x = (r % cube_size) + (g % level) * cube_size;
     let y = (b * level) + (g / level);
 
-    hald_clut.get_pixel(x as u32, y as u32).0
+    hald_clut.get_pixel(x, y).0
 }
 
 /// Correct an image with a hald clut identity in place.
