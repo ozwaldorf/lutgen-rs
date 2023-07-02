@@ -40,8 +40,7 @@ lutgen-palettes = { version = "0.2", path = "palettes", optional = true }
 
 [features]
 default = ["bin"]
-palettes = ["lutgen-palettes"]
-bin = ["clap", "spinners", "dirs", "palettes"]
+bin = ["clap", "spinners", "dirs", "lutgen-palettes"]
 
 [[bin]]
 name = "lutgen"
