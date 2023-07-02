@@ -11,7 +11,8 @@ use clap::{
 };
 use dirs::cache_dir;
 use exoquant::SimpleColorSpace;
-use lutgen::{identity, interpolation::*, GenerateLut, Image, Palette};
+use lutgen::{identity, interpolation::*, GenerateLut, Image};
+use lutgen_palettes::Palette;
 use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
