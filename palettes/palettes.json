@@ -3963,23 +3963,26 @@
     "#ff9966",
     "#ffffff"
   ],
-  "Everbl sh": [
+  "Everblush": [ 
+    "#141b1e",
     "#232a2d",
     "#2d3437",
-    "#67b0e8",
-    "#67cbe7",
-    "#6cbfbf",
-    "#71baf2",
-    "#8ccf7e",
-    "#96d988",
+    "#404749"
     "#b3b9b8",
     "#bdc3c2",
+    "#dadada",
+    "#e57474",
+    "#ef7e7e",
+    "#8ccf7e",
+    "#96d988",
+    "#e5c76b",
+    "#f4d67a",
+    "#67b0e8",
+    "#67cbe7",
     "#c47fd5",
     "#ce89df",
-    "#e57474",
-    "#e5c76b",
-    "#ef7e7e",
-    "#f4d67a"
+    "#6cbfbf",
+    "#71baf2"
   ],
   "Everforest Dark (Gogh)": [
     "#35a77c",
