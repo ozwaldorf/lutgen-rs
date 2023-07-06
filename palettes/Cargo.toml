@@ -4,11 +4,11 @@ version = "0.2.5"
 documentation = "https://docs.rs/lutgen-palettes"
 keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
 description = "Popular linux colorscheme palettes"
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
-repository.workspace = true
-categories.workspace = true
+edition = "2021"
+license = "MIT"
+authors = ["Ossian Mapes <self@ossian.dev>"]
+repository = "https://github.com/ozwaldorf/lutgen-rs"
+categories = ["multimedia::images"]
 
 [dependencies]
 clap.workspace = true

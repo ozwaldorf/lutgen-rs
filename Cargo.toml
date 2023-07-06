@@ -4,21 +4,15 @@ version = "0.6.2"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes."
-edition.workspace = true
-license.workspace = true
-authors.workspace = true
-repository.workspace = true
-categories.workspace = true
-
-[workspace]
-members = ["palettes"]
-
-[workspace.package]
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
+homepage = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
+
+[workspace]
+members = ["palettes"]
 
 [workspace.dependencies]
 clap = { version = "4.2", features = ["derive"] }
@@ -31,6 +25,7 @@ rand_distr = "0.4"
 rayon = "1.7"
 kiddo = "2.1.1"
 oklab = "1.0.0"
+num-traits = "0.2"
 
 # bin dependencies
 clap = { workspace = true, optional = true }
