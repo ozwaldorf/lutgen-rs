@@ -13,7 +13,7 @@ impl RadialBasisFn for LinearFn {
 /// Higher numbers of neighbors will produce smoother, but more washed out results.
 pub type LinearRemapper = RBFRemapper<LinearFn>;
 impl LinearRemapper {
-    pub fn new(palette: &[[u8; 3]], nearest: usize) -> Self {
-        RBFRemapper::with_function(palette, LinearFn, nearest)
+    pub fn new(palette: &[[u8; 3]], nearest: usize, lum_factor: f64) -> Self {
+        RBFRemapper::with_function(palette, LinearFn, nearest, lum_factor)
     }
 }

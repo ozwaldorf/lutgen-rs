@@ -27,10 +27,11 @@ impl<'a> GaussianSamplingRemapper<'a> {
         mean: f64,
         std_dev: f64,
         iterations: usize,
+        lum_factor: f64,
         seed: u64,
     ) -> Self {
         let normal = Normal::new(mean, std_dev).unwrap();
-        let nearest_neighbor = NearestNeighborRemapper::new(palette);
+        let nearest_neighbor = NearestNeighborRemapper::new(palette, lum_factor);
 
         Self {
             iterations,
@@ -54,7 +55,7 @@ impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
                 *c = (*c as f64 + self.normal.sample(&mut rng)).round() as u8
             }
 
-            // find the nearest nearest_neighbor
+            // find the nearest neighbor
             self.nearest_neighbor.remap_pixel(&mut pixel);
 
             // Incremental average

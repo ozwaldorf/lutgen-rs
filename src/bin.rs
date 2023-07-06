@@ -63,6 +63,17 @@ struct LutArgs {
     )]
     #[clap(global = true)]
     nearest: usize,
+    /// Luminocity factor for RBF based algorithms. Used for weighting luminocity when computing
+    /// color distances and weights.
+    #[arg(
+        long = "lum",
+        default_value_t = 1.0,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    #[clap(global = true)]
+    luminocity: f64,
     /// Gaussian RBF's shape parameter.
     /// Higher means less gradient between colors, lower mean more.
     #[arg(
@@ -158,26 +169,29 @@ impl LutArgs {
 
         let lut = match self.algorithm {
             Algorithm::ShepardsMethod => {
-                ShepardRemapper::new(&self.collect(), self.power, self.nearest)
+                ShepardRemapper::new(&self.collect(), self.power, self.nearest, self.luminocity)
                     .generate_lut(self.level)
             },
             Algorithm::GaussianRBF => {
-                GaussianRemapper::new(&self.collect(), self.shape, self.nearest)
+                GaussianRemapper::new(&self.collect(), self.shape, self.nearest, self.luminocity)
                     .generate_lut(self.level)
             },
             Algorithm::LinearRBF => {
-                LinearRemapper::new(&self.collect(), self.nearest).generate_lut(self.level)
+                LinearRemapper::new(&self.collect(), self.nearest, self.luminocity)
+                    .generate_lut(self.level)
             },
             Algorithm::GaussianSampling => GaussianSamplingRemapper::new(
                 &self.collect(),
                 self.mean,
                 self.std_dev,
                 self.iterations,
+                self.luminocity,
                 SEED,
             )
             .generate_lut(self.level),
             Algorithm::NearestNeighbor => {
-                NearestNeighborRemapper::new(&self.collect()).generate_lut(self.level)
+                NearestNeighborRemapper::new(&self.collect(), self.luminocity)
+                    .generate_lut(self.level)
             },
         };
 

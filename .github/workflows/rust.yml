@@ -2,14 +2,9 @@ name: Rust
 on:
   push:
     branches: ["*"]
-    paths-ignore:
-      - "**.md"
-      - "pages/**"
   pull_request:
     branches: [main]
-    paths-ignore:
-      - "**.md"
-      - "pages/**"
+
 env:
   TERM: xterm
   TOOLCHAIN: nightly

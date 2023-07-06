@@ -19,7 +19,7 @@ impl RadialBasisFn for GaussianFn {
 /// may increase banding when using the LUT for corrections.
 pub type GaussianRemapper = RBFRemapper<GaussianFn>;
 impl GaussianRemapper {
-    pub fn new(palette: &[[u8; 3]], shape: f64, nearest: usize) -> Self {
-        RBFRemapper::with_function(palette, GaussianFn { shape }, nearest)
+    pub fn new(palette: &[[u8; 3]], shape: f64, nearest: usize, lum_factor: f64) -> Self {
+        RBFRemapper::with_function(palette, GaussianFn { shape }, nearest, lum_factor)
     }
 }

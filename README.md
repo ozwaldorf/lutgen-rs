@@ -134,8 +134,8 @@ use lutgen_palettes::Palette;
 let palette = Palette::CatppuccinMocha.get();
 
 // Setup the fast Gaussian RBF algorithm
-let (shape, nearest) = (96.0, 0);
-let remapper = GaussianRemapper::new(&palette, shape, nearest);
+let (shape, nearest, lum_factor) = (96.0, 0, 1.0);
+let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor);
 
 // Generate and remap a HALD:8 for the provided palette
 let hald_clut = remapper.generate_lut(8);
@@ -150,12 +150,13 @@ let palette = vec![
 ];
 
 // Setup the slower Gaussian Sampling algorithm
-let (mean, std_dev, iters, seed) = (0.0, 20.0, 512, 420);
+let (mean, std_dev, iters, lum_factor, seed) = (0.0, 20.0, 512, 1.0, 420);
 let remapper = GaussianSamplingRemapper::new(
     &palette,
     mean,
     std_dev,
     iters,
+    lum_factor,
     seed
 );
 
@@ -179,7 +180,7 @@ use lutgen_palettes::Palette;
 
 // Generate a hald clut
 let palette = Palette::CatppuccinMocha.get();
-let remapper = GaussianRemapper::new(&palette, 96.0, 0);
+let remapper = GaussianRemapper::new(&palette, 96.0, 0, 1.0);
 let hald_clut = remapper.generate_lut(8);
 
 // Save the LUT for later
@@ -213,8 +214,8 @@ let palette = vec![
 ];
 
 // Setup a remapper
-let (shape, nearest) = (96.0, 0);
-let remapper = GaussianRemapper::new(&palette, shape, nearest);
+let (shape, nearest, lum_factor) = (96.0, 0, 1.0);
+let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor);
 
 // Generate an image (generally an identity lut to use on other images)
 let mut hald_clut = lutgen::identity::generate(8);

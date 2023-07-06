@@ -18,7 +18,7 @@ impl RadialBasisFn for InverseDistanceFn {
 /// this, but may increase banding when using the final LUT for corrections.
 pub type ShepardRemapper = RBFRemapper<InverseDistanceFn>;
 impl ShepardRemapper {
-    pub fn new(palette: &[[u8; 3]], power: f64, nearest: usize) -> Self {
-        RBFRemapper::with_function(palette, InverseDistanceFn { power }, nearest)
+    pub fn new(palette: &[[u8; 3]], power: f64, nearest: usize, lum_factor: f64) -> Self {
+        RBFRemapper::with_function(palette, InverseDistanceFn { power }, nearest, lum_factor)
     }
 }
