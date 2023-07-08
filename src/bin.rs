@@ -63,8 +63,10 @@ struct LutArgs {
     )]
     #[clap(global = true)]
     nearest: usize,
-    /// Luminocity factor for RBF based algorithms. Used for weighting luminocity when computing
-    /// color distances and weights.
+    /// Luminocity factor. Used for weighting luminocity vs color when computing color distances.
+    ///
+    /// Factors greater than 1 will result in more "greyscale" colors, and factors less than 1
+    /// gives a more colorful hald clut.
     #[arg(
         long = "lum",
         default_value_t = 1.0,
