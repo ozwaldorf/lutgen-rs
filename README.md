@@ -47,7 +47,8 @@ cargo install --path .
 | Packaging Status | Installation Command |
 |------------------|----------------------|
 | [![Crates.io](https://img.shields.io/crates/v/lutgen)](https://crates.io/crates/lutgen) | `cargo install lutgen` |
-| [![AUR](https://repology.org/badge/version-for-repo/aur/lutgen.svg?header=Arch%20Linux%20AUR)](https://aur.archlinux.org/packages/lutgen-bin) | `yay -S lutgen-bin` |
+| [![AUR](https://repology.org/badge/version-for-repo/aur/lutgen.svg?header=AUR%20(bin))](https://aur.archlinux.org/packages/lutgen-bin) | `yay -S lutgen-bin` |
+| [![AUR](https://img.shields.io/aur/version/lutgen-git?label=AUR%20(git))](https://aur.archlinux.org/packages/lutgen-git) | `yay -S lutgen-git` |
 | [![Alpine](https://repology.org/badge/version-for-repo/alpine_edge/lutgen.svg?header=Alpine%20Linux%20\(testing\))](https://pkgs.alpinelinux.org/package/edge/testing/x86_64/lutgen) | `apk add lutgen` |
 
 #### Helptext
