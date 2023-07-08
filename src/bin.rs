@@ -7,7 +7,7 @@ use std::{
 use clap::{
     arg, command,
     error::{ContextKind, ContextValue, ErrorKind},
-    ArgGroup, Args, CommandFactory, Parser, Subcommand, ValueEnum,
+    Args, CommandFactory, Parser, Subcommand, ValueEnum,
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
