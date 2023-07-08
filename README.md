@@ -122,7 +122,6 @@ sudo mv _lutgen /usr/local/share/zsh/site-functions/
 Generating a LUT (simple):
 
 ```rust
-use exoquant::SimpleColorSpace;
 use lutgen::{
     GenerateLut,
     interpolation::{
@@ -153,12 +152,11 @@ let palette = vec![
 // Setup the slower Gaussian Sampling algorithm
 let (mean, std_dev, iters, seed) = (0.0, 20.0, 512, 420);
 let remapper = GaussianSamplingRemapper::new(
-    &palette, 
-    mean, 
-    std_dev, 
-    iters, 
-    seed, 
-    SimpleColorSpace::default()
+    &palette,
+    mean,
+    std_dev,
+    iters,
+    seed
 );
 
 // Generate and remap a HALD:4 for the provided palette

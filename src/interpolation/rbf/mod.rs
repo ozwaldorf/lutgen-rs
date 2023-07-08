@@ -2,7 +2,7 @@ use std::f64;
 
 use kiddo::float::{kdtree::KdTree, neighbour::Neighbour};
 
-use super::InterpolatedRemapper;
+use super::{ColorTree, InterpolatedRemapper};
 use crate::GenerateLut;
 
 pub mod gaussian;
@@ -18,8 +18,6 @@ pub struct RBFRemapper<F: RadialBasisFn> {
     tree: Option<(usize, ColorTree)>,
     palette: Vec<[f64; 3]>,
 }
-
-type ColorTree = KdTree<f64, u16, 3, 4, u16>;
 
 impl<'a, F: RadialBasisFn> GenerateLut<'a> for RBFRemapper<F> {}
 impl<'a, F: RadialBasisFn> RBFRemapper<F> {

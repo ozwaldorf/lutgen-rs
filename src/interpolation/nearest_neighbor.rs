@@ -1,43 +1,31 @@
-use exoquant::{Color, ColorMap, ColorSpace};
 use image::Rgb;
+use kiddo::float::distance::squared_euclidean;
+use oklab::{srgb_to_oklab, Oklab};
 
-use super::InterpolatedRemapper;
+use super::{ColorTree, InterpolatedRemapper};
 use crate::{GenerateLut, Image};
 
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
 /// algorithms.
-pub struct NearestNeighborRemapper<'a, CS: ColorSpace + Sync> {
+pub struct NearestNeighborRemapper<'a> {
     palette: &'a [[u8; 3]],
-    color_map: ColorMap,
-    pub colorspace: CS,
+    tree: ColorTree,
 }
 
-impl<'a, CS: ColorSpace + Sync> NearestNeighborRemapper<'a, CS> {
-    pub fn new(palette: &'a [[u8; 3]], colorspace: CS) -> Self {
-        let color_map = ColorMap::from_float_colors(
-            palette
-                .iter()
-                .map(|c| {
-                    colorspace.to_float(Color {
-                        r: c[0],
-                        g: c[1],
-                        b: c[2],
-                        a: 255,
-                    })
-                })
-                .collect(),
-        );
-
-        Self {
-            palette,
-            color_map,
-            colorspace,
+impl<'a> NearestNeighborRemapper<'a> {
+    pub fn new(palette: &'a [[u8; 3]]) -> Self {
+        let mut tree = ColorTree::new();
+        for (i, &color) in palette.iter().enumerate() {
+            let Oklab { l, a, b } = srgb_to_oklab(color.into());
+            tree.add(&[l as f64, a as f64, b as f64], i as u16);
         }
+
+        Self { palette, tree }
     }
 }
 
-impl<'a, CS: ColorSpace + Sync> GenerateLut<'a> for NearestNeighborRemapper<'a, CS> {}
-impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a, CS> {
+impl<'a> GenerateLut<'a> for NearestNeighborRemapper<'a> {}
+impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
     fn remap_image(&self, image: &mut Image) {
         for pixel in image.pixels_mut() {
             self.remap_pixel(pixel)
@@ -45,10 +33,10 @@ impl<'a, CS: ColorSpace + Sync> InterpolatedRemapper<'a> for NearestNeighborRema
     }
 
     fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
-        let colorf = self
-            .colorspace
-            .to_float(Color::new(pixel.0[0], pixel.0[1], pixel.0[2], 255));
-        let idx = self.color_map.find_nearest(colorf);
-        *pixel = Rgb(self.palette[idx]);
+        let Oklab { l, a, b } = srgb_to_oklab(pixel.0.into());
+        let (_, nearest) = self
+            .tree
+            .nearest_one(&[l as f64, a as f64, b as f64], &squared_euclidean);
+        *pixel = Rgb(self.palette[nearest as usize]);
     }
 }

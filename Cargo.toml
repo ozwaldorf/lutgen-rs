@@ -18,7 +18,6 @@ members = ["palettes"]
 clap = { version = "4.2", features = ["derive"] }
 
 [dependencies]
-exoquant = "0.2.0"
 image = "0.24"
 rand = "0.8"
 rand_distr = "0.4"

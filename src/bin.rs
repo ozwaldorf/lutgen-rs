@@ -11,7 +11,6 @@ use clap::{
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
-use exoquant::SimpleColorSpace;
 use lutgen::{identity, interpolation::*, GenerateLut, Image};
 use lutgen_palettes::Palette;
 use spinners::{Spinner, Spinners};
@@ -153,7 +152,6 @@ enum Algorithm {
 
 impl LutArgs {
     fn generate(&self) -> Image {
-        let colorspace = SimpleColorSpace::default();
         let name = self.name();
         let mut sp = Spinner::new(Spinners::Dots3, format!("Generating \"{name}\" LUT..."));
         let time = Instant::now();
@@ -176,11 +174,10 @@ impl LutArgs {
                 self.std_dev,
                 self.iterations,
                 SEED,
-                colorspace,
             )
             .generate_lut(self.level),
             Algorithm::NearestNeighbor => {
-                NearestNeighborRemapper::new(&self.collect(), colorspace).generate_lut(self.level)
+                NearestNeighborRemapper::new(&self.collect()).generate_lut(self.level)
             },
         };
 
