@@ -7,8 +7,9 @@ use std::{
 use clap::{
     arg, command,
     error::{ContextKind, ContextValue, ErrorKind},
-    Args, CommandFactory, Parser, Subcommand, ValueEnum,
+    ArgGroup, Args, CommandFactory, Parser, Subcommand, ValueEnum,
 };
+use clap_complete::{generate, Shell};
 use dirs::cache_dir;
 use exoquant::SimpleColorSpace;
 use lutgen::{identity, interpolation::*, GenerateLut, Image};
@@ -28,6 +29,8 @@ struct BinArgs {
     subcommand: Option<Subcommands>,
     #[command(flatten)]
     lutargs: LutArgs,
+    #[arg(long, value_name = "SHELL")]
+    completions: Option<Shell>,
 }
 
 #[derive(Args, Debug)]
@@ -104,7 +107,15 @@ enum Subcommands {
         /// An external hald-clut to use. Conflicts with all lut generation related arguments.
         #[arg(
             long,
-            conflicts_with = "lutargs",
+            conflicts_with = "palette",
+            conflicts_with = "level",
+            conflicts_with = "algorithm",
+            conflicts_with = "nearest",
+            conflicts_with = "shape",
+            conflicts_with = "power",
+            conflicts_with = "mean",
+            conflicts_with = "std_dev",
+            conflicts_with = "iterations",
             conflicts_with = "cache",
             conflicts_with = "force"
         )]
@@ -256,7 +267,17 @@ fn main() {
         subcommand,
         output,
         lutargs,
+        completions,
     } = BinArgs::parse();
+
+    if let Some(shell) = completions {
+        // Generate the completions and exit immediately
+        let mut cmd = BinArgs::command();
+        let name = cmd.get_name().to_string();
+        eprintln!("Generating completions for {shell}");
+        generate(shell, &mut cmd, name, &mut std::io::stdout());
+        std::process::exit(0);
+    }
 
     let colors = lutargs.collect();
 

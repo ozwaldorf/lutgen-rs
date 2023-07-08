@@ -205,6 +205,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "clap_complete"
+version = "4.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fc443334c81a804575546c5a8a79b4913b50e28d69232903604cada1de817ce"
+dependencies = [
+ "clap",
+]
+
+[[package]]
 name = "clap_derive"
 version = "4.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -692,11 +701,13 @@ name = "lutgen"
 version = "0.6.2"
 dependencies = [
  "clap",
+ "clap_complete",
  "dirs",
  "exoquant",
  "image",
  "kiddo",
  "lutgen-palettes",
+ "num-traits",
  "oklab",
  "rand",
  "rand_distr",
@@ -706,7 +717,7 @@ dependencies = [
 
 [[package]]
 name = "lutgen-palettes"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "clap",
  "regex",

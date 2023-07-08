@@ -75,6 +75,7 @@ Options:
   -m, --mean <MEAN>              Gaussian sampling algorithm's mean parameter [default: 0]
       --std-dev <STD_DEV>        Gaussian sampling algorithm's standard deviation parameter [default: 20]
   -i, --iterations <ITERATIONS>  Gaussian sampling algorithm's target number of samples to take for each color [default: 512]
+      --completions <SHELL>      [possible values: bash, elvish, fish, powershell, zsh]
   -h, --help                     Print help (see more with '--help')
   -V, --version                  Print version
 ```
@@ -99,10 +100,17 @@ Correcting an image with a pre-generated LUT
 lutgen apply --hald-clut mocha_lut.png input.jpg
 ```
 
-Correcting Videos (using ffmpeg):
+Correcting videos (using ffmpeg):
 
 ```bash
 ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
+```
+
+Zsh Completions
+
+```bash
+lutgen --completions zsh > _lutgen
+sudo mv _lutgen /usr/local/share/zsh/site-functions/
 ```
 
 ### Library
