@@ -45,11 +45,11 @@ jobs:
       - run: |
           chmod +x lutgen
           mkdir output
-          ./lutgen -p catppuccin-mocha -a gaussian-rbf -o output/mocha_gaussian_rbf.png
-          ./lutgen -p catppuccin-mocha -a shepards-method -o output/mocha_shepards_method.png
-          ./lutgen -p catppuccin-mocha -a linear-rbf -o output/mocha_linear_rbf.png
-          ./lutgen -p catppuccin-mocha -a gaussian-sampling -o output/mocha_gaussian_sampling.png
-          ./lutgen -p catppuccin-mocha -a nearest-neighbor -o output/mocha_nearest_neighbor.png
+          ./lutgen generate -p catppuccin-mocha -a gaussian-rbf -o output/mocha_gaussian_rbf.png
+          ./lutgen generate -p catppuccin-mocha -a shepards-method -o output/mocha_shepards_method.png
+          ./lutgen generate -p catppuccin-mocha -a linear-rbf -o output/mocha_linear_rbf.png
+          ./lutgen generate -p catppuccin-mocha -a gaussian-sampling -o output/mocha_gaussian_sampling.png
+          ./lutgen generate -p catppuccin-mocha -a nearest-neighbor -o output/mocha_nearest_neighbor.png
       - uses: actions/upload-artifact@v3
         with:
           name: catppuccin_mocha_hald_cluts

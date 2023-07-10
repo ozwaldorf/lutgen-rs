@@ -7,7 +7,7 @@ use std::{
 use clap::{
     arg, command,
     error::{ContextKind, ContextValue, ErrorKind},
-    Args, CommandFactory, Parser, Subcommand, ValueEnum,
+    CommandFactory, Parser, Subcommand, ValueEnum,
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
@@ -20,103 +20,27 @@ const SEED: u64 = u64::from_be_bytes(*b"42080085");
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct BinArgs {
-    /// Path to write output to.
-    #[arg(short, long)]
-    #[clap(global = true)]
-    output: Option<PathBuf>,
     #[command(subcommand)]
-    subcommand: Option<Subcommands>,
-    #[command(flatten)]
-    lutargs: LutArgs,
-    #[arg(long, value_name = "SHELL")]
-    completions: Option<Shell>,
-}
-
-#[derive(Args, Debug)]
-struct LutArgs {
-    /// Custom hexidecimal colors to add to the palette.
-    /// If `-p` is not used to specify a base palette, at least 1 color is required.
-    #[clap(global = true)]
-    custom_colors: Vec<String>,
-    /// Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with
-    /// custom colors.
-    #[arg(short, long, value_enum, hide_possible_values = true)]
-    #[clap(global = true)]
-    palette: Option<Palette>,
-    /// Hald level (ex: 8 = 512x512 image)
-    #[arg(short, long, default_value_t = 8)]
-    #[clap(global = true)]
-    level: u8,
-    /// Algorithm to remap the LUT with.
-    #[arg(short, long, value_enum, default_value = "gaussian-rbf")]
-    #[clap(global = true)]
-    algorithm: Algorithm,
-    /// Luminosity factor for all algorithms. Used for weighting the luminocity vs color channels
-    /// when computing color distances.
-    ///
-    /// Factors greater than 1 will result in more "greyscale" colors, and factors less than 1
-    /// gives a more colorful hald clut.
-    #[arg(
-        long = "lum",
-        default_value_t = 1.0,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    luminosity: f64,
-    /// Number of nearest palette colors to consider at any given time for RBF based algorithms.
-    /// 0 uses unlimited (all) colors.
-    #[arg(
-        short,
-        long,
-        default_value_t = 16,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    nearest: usize,
-    /// Gaussian RBF's shape parameter.
-    /// Higher means less gradient between colors, lower mean more.
-    #[arg(
-        short,
-        long,
-        default_value_t = 96.0,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    shape: f64,
-    /// Shepard algorithm's power parameter.
-    #[arg(
-        long,
-        default_value_t = 4.0,
-        conflicts_with = "mean",
-        conflicts_with = "std_dev",
-        conflicts_with = "iterations"
-    )]
-    #[clap(global = true)]
-    power: f64,
-    /// Gaussian sampling algorithm's mean parameter.
-    #[arg(short, long, default_value_t = 0.0)]
-    #[clap(global = true)]
-    mean: f64,
-    /// Gaussian sampling algorithm's standard deviation parameter.
-    #[arg(long, default_value_t = 20.0)]
-    #[clap(global = true)]
-    std_dev: f64,
-    /// Gaussian sampling algorithm's target number of samples to take for each color.
-    #[arg(short, long, default_value_t = 512)]
-    #[clap(global = true)]
-    iterations: usize,
+    subcommand: Subcommands,
 }
 
 #[derive(Subcommand, Debug)]
 enum Subcommands {
+    /// Generate a hald clut for external or manual usage
+    Generate {
+        #[clap(flatten)]
+        lut_args: LutArgs,
+        /// Path to write output to.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
     /// Correct an image using a hald clut, either generating it, or loading it externally.
     Apply {
+        /// Image to correct with a hald clut.
+        image: PathBuf,
+        /// Optional path to write output to.
+        #[arg(short, long)]
+        output: Option<PathBuf>,
         /// An external hald-clut to use. Conflicts with all lut generation related arguments.
         #[arg(
             long,
@@ -139,28 +63,118 @@ enum Subcommands {
         /// Force overwriting the cached LUT.
         #[arg(short, long, default_value_t = false, requires = "cache")]
         force: bool,
-        /// Image to correct with a hald clut.
-        image: PathBuf,
+        #[clap(flatten)]
+        lut_args: LutArgs,
     },
+    /// Generate shell completions.
+    Completions { shell: Shell },
+}
+
+#[derive(Parser, Debug)]
+struct LutArgs {
+    /// Custom hexidecimal colors to add to the palette.
+    /// If `-p` is not used to specify a base palette, at least 1 color is required.
+    #[arg(last = true)]
+    custom_colors: Vec<String>,
+    /// Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with
+    /// custom colors.
+    #[arg(short, long, value_enum, hide_possible_values = true)]
+    palette: Option<Palette>,
+    /// Hald level (ex: 8 = 512x512 image)
+    #[arg(short, long, default_value_t = 8)]
+    level: u8,
+    /// Algorithm to remap the LUT with.
+    #[arg(short, long, value_enum, default_value = "gaussian-rbf")]
+    algorithm: Algorithm,
+    /// Luminosity factor for all algorithms. Used for weighting the luminocity vs color channels
+    /// when computing color distances.
+    ///
+    /// Factors greater than 1 will result in more "greyscale" colors, and factors less than 1
+    /// gives a more colorful hald clut.
+    #[arg(long = "lum", default_value_t = 1.0)]
+    luminosity: f64,
+    /// Number of nearest palette colors to consider at any given time for RBF based algorithms.
+    /// 0 uses unlimited (all) colors.
+    #[arg(
+        short,
+        long,
+        default_value_t = 16,
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    nearest: usize,
+    /// Gaussian RBF's shape parameter.
+    /// Higher means less gradient between colors, lower mean more.
+    #[arg(
+        short,
+        long,
+        default_value_t = 96.0,
+        conflicts_with = "power",
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    shape: f64,
+    /// Shepard algorithm's power parameter.
+    #[arg(
+        long,
+        default_value_t = 4.0,
+        conflicts_with = "shape",
+        conflicts_with = "mean",
+        conflicts_with = "std_dev",
+        conflicts_with = "iterations"
+    )]
+    power: f64,
+    /// Gaussian sampling algorithm's mean parameter.
+    #[arg(
+        short,
+        long,
+        default_value_t = 0.0,
+        conflicts_with = "shape",
+        conflicts_with = "power",
+        conflicts_with = "nearest"
+    )]
+    mean: f64,
+    /// Gaussian sampling algorithm's standard deviation parameter.
+    #[arg(
+        long,
+        default_value_t = 20.0,
+        conflicts_with = "shape",
+        conflicts_with = "power",
+        conflicts_with = "nearest"
+    )]
+    std_dev: f64,
+    /// Gaussian sampling algorithm's target number of samples to take for each color.
+    #[arg(
+        short,
+        long,
+        default_value_t = 512,
+        conflicts_with = "shape",
+        conflicts_with = "power",
+        conflicts_with = "nearest"
+    )]
+    iterations: usize,
 }
 
 #[derive(Default, Clone, Debug, ValueEnum)]
 enum Algorithm {
     /// Shepard's method (RBF interpolation using the inverse distance function).
-    /// Params: --power, --nearest
+    /// Params: --power, --nearest, --lum
     ShepardsMethod,
     /// Radial Basis Function interpolation using the Gaussian function.
-    /// Params: --shape, --nearest
+    /// Params: --shape, --nearest, --lum
     GaussianRBF,
     /// Radial Basis Function interpolation using a linear function.
-    /// Params: --nearest
+    /// Params: --nearest, --lum
     LinearRBF,
     /// Optimized version of the original ImageMagick approach which applies gaussian noise
     /// to each color and averages nearest neighbors together.
-    /// Params: --mean, --std_dev, --iterations
+    /// Params: --mean, --std_dev, --iterations, --lum
     #[default]
     GaussianSampling,
     /// Simple, non-interpolated, nearest neighbor alorithm.
+    /// Params: --lum
     NearestNeighbor,
 }
 
@@ -253,20 +267,23 @@ impl LutArgs {
     }
 
     fn detail_string(&self) -> String {
-        let mut buf = format!("{}_{:?}", self.level, self.algorithm);
+        let mut buf = format!(
+            "hald{}_{:?}_lum{}",
+            self.level, self.algorithm, self.luminosity
+        );
         match self.algorithm {
             Algorithm::GaussianSampling => buf.push_str(&format!(
                 "_{}_{}_{}",
                 self.mean, self.std_dev, self.iterations
             )),
             Algorithm::ShepardsMethod => {
-                buf.push_str(&format!("_{}_{}", self.power, self.nearest));
+                buf.push_str(&format!("_pow{}_near{}", self.power, self.nearest));
             },
             Algorithm::GaussianRBF => {
-                buf.push_str(&format!("_{}_{}", self.shape, self.nearest));
+                buf.push_str(&format!("_shape{}_near{}", self.shape, self.nearest));
             },
             Algorithm::LinearRBF => {
-                buf.push_str(&format!("_{}", self.nearest));
+                buf.push_str(&format!("_near{}", self.nearest));
             },
             Algorithm::NearestNeighbor => {},
         }
@@ -277,53 +294,44 @@ impl LutArgs {
 fn main() {
     let total_time = Instant::now();
 
-    let BinArgs {
-        subcommand,
-        output,
-        lutargs,
-        completions,
-    } = BinArgs::parse();
-
-    if let Some(shell) = completions {
-        // Generate the completions and exit immediately
-        let mut cmd = BinArgs::command();
-        let name = cmd.get_name().to_string();
-        eprintln!("Generating completions for {shell}");
-        generate(shell, &mut cmd, name, &mut std::io::stdout());
-        std::process::exit(0);
-    }
-
-    let colors = lutargs.collect();
+    let BinArgs { subcommand } = BinArgs::parse();
 
     match subcommand {
         // Generate and save a hald clut identity
-        None => {
+        Subcommands::Generate { lut_args, output } => {
+            let colors = lut_args.collect();
             if colors.is_empty() {
                 min_colors_error()
             }
 
             save_image(
                 output.unwrap_or(PathBuf::from(format!(
-                    "{}_hald_clut_{}.png",
-                    lutargs.name(),
-                    lutargs.detail_string(),
+                    "{}_{}.png",
+                    lut_args.name(),
+                    lut_args.detail_string(),
                 ))),
-                &lutargs.generate(),
+                &lut_args.generate(),
             );
+
+            println!("Finished in {:?}", total_time.elapsed());
         },
         // Correct an image using a hald clut identity
-        Some(Subcommands::Apply {
+        Subcommands::Apply {
+            output,
+            lut_args,
             hald_clut,
             image,
             cache,
             force,
-        }) => {
+        } => {
+            let colors = lut_args.collect();
             // load or generate the lut
             let (hald_clut, details) = {
                 match hald_clut {
                     Some(path) => (load_image(path), "custom".into()),
                     None => {
-                        let cache_name = format!("{}_{}", lutargs.name(), lutargs.detail_string());
+                        let cache_name =
+                            format!("{}_{}", lut_args.name(), lut_args.detail_string());
 
                         if cache {
                             let path = cache_dir().unwrap_or(".cache/".into()).join("lutgen");
@@ -339,7 +347,7 @@ fn main() {
                                 if colors.is_empty() {
                                     min_colors_error()
                                 }
-                                let lut = lutargs.generate();
+                                let lut = lut_args.generate();
                                 cache_image(path, &lut);
                                 (lut, cache_name)
                             }
@@ -347,7 +355,7 @@ fn main() {
                             if colors.is_empty() {
                                 min_colors_error()
                             }
-                            (lutargs.generate(), cache_name)
+                            (lut_args.generate(), cache_name)
                         }
                     },
                 }
@@ -369,11 +377,19 @@ fn main() {
                     image.with_extension("").display()
                 ))),
                 &image_buf,
-            )
+            );
+
+            println!("Finished in {:?}", total_time.elapsed());
+        },
+        Subcommands::Completions { shell } => {
+            // Generate the completions and exit immediately
+            let mut cmd = BinArgs::command();
+            let name = cmd.get_name().to_string();
+            eprintln!("Generating completions for {shell}");
+            generate(shell, &mut cmd, name, &mut std::io::stdout());
+            std::process::exit(0);
         },
     };
-
-    println!("Finished in {:?}", total_time.elapsed());
 }
 
 fn load_image<P: AsRef<Path>>(path: P) -> Image {
