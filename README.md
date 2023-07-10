@@ -56,29 +56,17 @@ cargo install --path .
 ```text
 A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes.
 
-Usage: lutgen [OPTIONS] [CUSTOM_COLORS]... [COMMAND]
+Usage: lutgen <COMMAND>
 
 Commands:
-  apply  Correct an image using a hald clut, either generating it, or loading it externally
-  help   Print this message or the help of the given subcommand(s)
-
-Arguments:
-  [CUSTOM_COLORS]...  Custom hexidecimal colors to add to the palette. If `-p` is not used to specify a base palette, at least 1 color is required
+  generate     Generate a hald clut for external or manual usage
+  apply        Correct an image using a hald clut, either generating it, or loading it externally
+  completions  Generate shell completions
+  help         Print this message or the help of the given subcommand(s)
 
 Options:
-  -o, --output <OUTPUT>          Path to write output to
-  -p, --palette <PALETTE>        Predefined popular color palettes. Use `lutgen -p` to view all options. Compatible with custom colors
-  -l, --level <LEVEL>            Hald level (ex: 8 = 512x512 image) [default: 8]
-  -a, --algorithm <ALGORITHM>    Algorithm to remap the LUT with [default: gaussian-rbf] [possible values: shepards-method, gaussian-rbf, linear-rbf, gaussian-sampling, nearest-neighbor]
-  -n, --nearest <NEAREST>        Number of nearest palette colors to consider at any given time for RBF based algorithms. 0 uses unlimited (all) colors [default: 16]
-  -s, --shape <SHAPE>            Gaussian RBF's shape parameter. Higher means less gradient between colors, lower mean more [default: 96]
-      --power <POWER>            Shepard algorithm's power parameter [default: 4]
-  -m, --mean <MEAN>              Gaussian sampling algorithm's mean parameter [default: 0]
-      --std-dev <STD_DEV>        Gaussian sampling algorithm's standard deviation parameter [default: 20]
-  -i, --iterations <ITERATIONS>  Gaussian sampling algorithm's target number of samples to take for each color [default: 512]
-      --completions <SHELL>      [possible values: bash, elvish, fish, powershell, zsh]
-  -h, --help                     Print help (see more with '--help')
-  -V, --version                  Print version
+  -h, --help     Print help
+  -V, --version  Print version
 ```
 
 #### Examples
@@ -110,7 +98,7 @@ ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp
 Zsh Completions
 
 ```bash
-lutgen --completions zsh > _lutgen
+lutgen completions zsh > _lutgen
 sudo mv _lutgen /usr/local/share/zsh/site-functions/
 ```
 
