@@ -1,5 +1,10 @@
+
 <header>
-    <h1 align="center">lutgen-rs</h1>
+    <br>
+    <div align="center">
+        <img width="30%" src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/b3505cbc-0f87-4d49-8b47-752ad53607ad" />
+    </div>
+    <h2 align="center">lutgen-rs</h2>
     <p align="center">
         <a href="https://crates.io/crates/lutgen"><img alt="crate" src="https://img.shields.io/crates/v/lutgen?style=for-the-badge" /></a>
         <a href="./LICENSE.md"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
