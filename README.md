@@ -54,8 +54,6 @@ cargo install --path .
 #### Helptext
 
 ```text
-A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes.
-
 Usage: lutgen <COMMAND>
 
 Commands:
@@ -74,13 +72,21 @@ Options:
 Generating a LUT
 
 ```bash
-lutgen -p catppuccin-mocha -o mocha_lut.png
+# Builtin palette
+lutgen generate -p catppuccin-mocha -o mocha_lut.png
+
+# Custom colors
+lutgen generate -o custom.png -- "#ABCDEF" ffffff
+ 000000
+
+# Custom palette file with hex codes
+lutgen generate -o custom.png -- $(cat palette.txt)
 ```
 
 Correcting an image with a LUT generated on the fly
 
 ```bash
-lutgen -p catppuccin-mocha apply assets/simon-berger-unsplash.jpg -o mocha_version.png
+lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
 ```
 
 Correcting an image with a pre-generated LUT
