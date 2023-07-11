@@ -76,8 +76,7 @@ Generating a LUT
 lutgen generate -p catppuccin-mocha -o mocha_lut.png
 
 # Custom colors
-lutgen generate -o custom.png -- "#ABCDEF" ffffff
- 000000
+lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
 
 # Custom palette file with hex codes
 lutgen generate -o custom.png -- $(cat palette.txt)
