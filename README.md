@@ -2,11 +2,11 @@
 <header>
     <br>
     <div align="center">
-        <img width="30%" src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/b3505cbc-0f87-4d49-8b47-752ad53607ad" />
+        <img width="30%" src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/4163e179-ee73-4b24-8ad8-6c373e1d8711" />
     </div>
     <h2 align="center">lutgen-rs</h2>
     <p align="center">
-        <a href="https://crates.io/crates/lutgen"><img alt="crate" src="https://img.shields.io/crates/v/lutgen?style=for-the-badge" /></a>
+        <a href="https://github.com/ozwaldorf/lutgen-rs/releases/latest"><img alt="crate" src="https://img.shields.io/github/v/release/ozwaldorf/lutgen-rs?style=for-the-badge" /></a>
         <a href="./LICENSE.md"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/rust.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/rust.yml?label=CI&style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/publish.yml"><img alt="publish" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/publish.yml?label=Publish&style=for-the-badge" /></a>
@@ -18,19 +18,40 @@
 
 ---
 
-## Example
+## Example Output
+
+### Hald Cluts
 
 <details>
-    <summary>Catppuccin Mocha Hald Clut</summary>
+    <summary>Catppuccin Mocha</summary>
     <img src="docs/catppuccin-mocha-hald-clut.png" />
 </details>
 <details>
-    <summary>Example Image (Original)</summary>
+    <summary>Gruvbox Dark</summary>
+    <img src="docs/gruvbox-dark-hald-clut.png" />
+</details>
+<details>
+    <summary>Nord</summary>
+    <img src="docs/nord-hald-clut.png" />
+</details>
+
+### Color Corrections
+
+<details>
+    <summary>Original Image</summary>
     <img src="docs/example-image.jpg" />
 </details>
 <details>
-    <summary>Example Image (Corrected)</summary>
+    <summary>Catppuccin Mocha</summary>
     <img src="docs/catppuccin-mocha.jpg" />
+</details>
+<details>
+    <summary>Gruvbox Dark</summary>
+    <img src="docs/gruvbox-dark.jpg" />
+</details>
+<details>
+    <summary>Nord</summary>
+    <img src="docs/nord.png" />
 </details>
 
 ## Usage
@@ -51,9 +72,9 @@ cargo install --path .
 
 | Packaging Status | Installation Command |
 |------------------|----------------------|
-| [![Crates.io](https://img.shields.io/crates/v/lutgen)](https://crates.io/crates/lutgen) | `cargo install lutgen` |
+| [![Crates.io](https://repology.org/badge/version-for-repo/crates_io/rust:lutgen.svg?header=crates.io)](https://crates.io/crates/lutgen) | `cargo install lutgen` |
 | [![AUR](https://repology.org/badge/version-for-repo/aur/lutgen.svg?header=AUR%20(bin))](https://aur.archlinux.org/packages/lutgen-bin) | `yay -S lutgen-bin` |
-| [![AUR](https://img.shields.io/aur/version/lutgen-git?label=AUR%20(git))](https://aur.archlinux.org/packages/lutgen-git) | `yay -S lutgen-git` |
+| [![AUR](https://img.shields.io/badge/any_text-rolling-lightgrey?label=AUR%20(git))](https://aur.archlinux.org/packages/lutgen-git) | `yay -S lutgen-git` |
 | [![Alpine](https://repology.org/badge/version-for-repo/alpine_edge/lutgen.svg?header=Alpine%20Linux%20\(testing\))](https://pkgs.alpinelinux.org/package/edge/testing/x86_64/lutgen) | `apk add lutgen` |
 
 #### Helptext
