@@ -2,7 +2,7 @@ use std::f64;
 
 use kiddo::float::{kdtree::KdTree, neighbour::Neighbour};
 
-use super::{euclidean, ColorTree, InterpolatedRemapper};
+use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
 use crate::GenerateLut;
 
 pub mod gaussian;
@@ -70,7 +70,7 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
         match &self.tree {
             None => {
                 for p_color in self.palette.iter() {
-                    let distance = euclidean(&color, p_color);
+                    let distance = squared_euclidean(&color, p_color);
                     let weight = self.rbf.radial_basis(distance);
 
                     numerator[0] += p_color[0] * weight;
@@ -80,7 +80,9 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
                 }
             },
             Some((nearest, tree)) => {
-                for Neighbour { item, distance } in tree.nearest_n(&color, *nearest, &euclidean) {
+                for Neighbour { item, distance } in
+                    tree.nearest_n(&color, *nearest, &squared_euclidean)
+                {
                     let weight = self.rbf.radial_basis(distance);
                     let p_color = self.palette[item as usize];
 

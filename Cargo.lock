@@ -700,7 +700,6 @@ dependencies = [
  "image",
  "kiddo",
  "lutgen-palettes",
- "num-traits",
  "oklab",
  "rand",
  "rand_distr",

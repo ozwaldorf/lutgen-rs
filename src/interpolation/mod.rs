@@ -4,7 +4,6 @@ pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgb;
 use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
-use num_traits::Float;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 pub use rbf::{gaussian::GaussianRemapper, linear::LinearRemapper, shepard::ShepardRemapper};
 
@@ -32,12 +31,10 @@ pub trait InterpolatedRemapper<'a>: Sync {
     }
 }
 
-// Tree and distance function
 type ColorTree = KdTree<f64, u16, 3, 4, u16>;
-fn euclidean<T: Float, const K: usize>(a: &[T; K], b: &[T; K]) -> T {
-    a.iter()
-        .zip(b.iter())
-        .map(|(x, y)| ((*x) - (*y)) * ((*x) - (*y)))
-        .fold(T::zero(), ::std::ops::Add::add)
-        .sqrt()
+fn squared_euclidean(a: &[f64; 3], b: &[f64; 3]) -> f64 {
+    let dl = (a[0] - b[0]).powi(2);
+    let da = (a[1] - b[1]).powi(2);
+    let db = (a[2] - b[2]).powi(2);
+    dl + da + db
 }

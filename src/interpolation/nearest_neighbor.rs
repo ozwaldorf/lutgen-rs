@@ -1,7 +1,7 @@
 use image::Rgb;
 use oklab::{srgb_to_oklab, Oklab};
 
-use super::{euclidean, ColorTree, InterpolatedRemapper};
+use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
 use crate::{GenerateLut, Image};
 
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
@@ -40,7 +40,7 @@ impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
         let Oklab { l, a, b } = srgb_to_oklab(pixel.0.into());
         let (_, nearest) = self.tree.nearest_one(
             &[l as f64 * self.lum_factor, a as f64, b as f64],
-            &euclidean,
+            &squared_euclidean,
         );
         *pixel = Rgb(self.palette[nearest as usize]);
     }
