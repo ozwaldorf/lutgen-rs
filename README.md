@@ -95,7 +95,26 @@ Options:
 
 #### Examples
 
-Generating a LUT
+Correcting an image
+
+```bash
+# Builtin palette
+lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
+
+# Custom colors 
+lutgen apply docs/example-image.jpg -- "#ABCDEF" ffffff 000000
+
+# Custom palette file 
+lutgen apply docs/example-image.jpg -- $(cat palette.txt)
+
+# Multiple images
+lutgen apply image1.png image2.png *.jpg -p catppuccin-mocha
+
+# Using an external LUT 
+lutgen apply --hald-clut mocha_lut.png docs/example-image.jpg
+```
+
+Generating a standalone LUT for external or manual usage
 
 ```bash
 # Builtin palette
@@ -106,18 +125,6 @@ lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
 
 # Custom palette file with hex codes
 lutgen generate -o custom.png -- $(cat palette.txt)
-```
-
-Correcting an image with a LUT generated on the fly
-
-```bash
-lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
-```
-
-Correcting an image with a pre-generated LUT
-
-```bash
-lutgen apply --hald-clut mocha_lut.png input.jpg
 ```
 
 Correcting videos (using ffmpeg):
