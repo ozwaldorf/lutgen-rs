@@ -1,4 +1,5 @@
 use std::{
+    fs::create_dir_all,
     path::{Path, PathBuf},
     process::exit,
     time::Instant,
@@ -7,7 +8,7 @@ use std::{
 use clap::{
     arg, command,
     error::{ContextKind, ContextValue, ErrorKind},
-    CommandFactory, Parser, Subcommand, ValueEnum,
+    CommandFactory, Parser, ValueEnum,
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
@@ -24,7 +25,7 @@ struct BinArgs {
     subcommand: Subcommands,
 }
 
-#[derive(Subcommand, Debug)]
+#[derive(Parser, Debug)]
 enum Subcommands {
     /// Generate a hald clut for external or manual usage
     Generate {
@@ -36,9 +37,11 @@ enum Subcommands {
     },
     /// Correct an image using a hald clut, either generating it, or loading it externally.
     Apply {
-        /// Image to correct with a hald clut.
-        image: PathBuf,
-        /// Optional path to write output to.
+        /// Image(s) to correct with a hald clut.
+        #[arg(required = true)]
+        images: Vec<PathBuf>,
+        /// Optional path to write output to. For multiple files, the output will be under a
+        /// folder.
         #[arg(short, long)]
         output: Option<PathBuf>,
         /// An external hald-clut to use. Conflicts with all lut generation related arguments.
@@ -320,7 +323,7 @@ fn main() {
             output,
             lut_args,
             hald_clut,
-            image,
+            images,
             cache,
             force,
         } => {
@@ -361,23 +364,37 @@ fn main() {
                 }
             };
 
-            let mut image_buf = load_image(&image);
+            for image_path in &images {
+                let mut image_buf = load_image(image_path);
 
-            let mut sp = Spinner::new(Spinners::Dots3, format!("Applying LUT to {image:?}..."));
-            let time = Instant::now();
-            identity::correct_image(&mut image_buf, &hald_clut);
-            sp.stop_and_persist(
-                "✔",
-                format!("Applied LUT to {image:?} in {:?}", time.elapsed()),
-            );
+                let mut sp = Spinner::new(
+                    Spinners::Dots3,
+                    format!("Applying LUT to {image_path:?}..."),
+                );
+                let time = Instant::now();
+                identity::correct_image(&mut image_buf, &hald_clut);
+                sp.stop_and_persist(
+                    "✔",
+                    format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
+                );
 
-            save_image(
-                output.unwrap_or(PathBuf::from(format!(
-                    "{}_{details}.png",
-                    image.with_extension("").display()
-                ))),
-                &image_buf,
-            );
+                let output = match images.len() {
+                    1 => output.clone().unwrap_or(PathBuf::from(format!(
+                        "{:?}_{details}.png",
+                        image_path.with_extension("")
+                    ))),
+                    _ => {
+                        let folder = output
+                            .clone()
+                            .unwrap_or(PathBuf::from(format!("{}", lut_args.name())));
+                        if !folder.exists() {
+                            create_dir_all(&folder).expect("failed to create output directory");
+                        }
+                        folder.join(image_path.file_name().unwrap())
+                    },
+                };
+                save_image(output, &image_buf);
+            }
 
             println!("Finished in {:?}", total_time.elapsed());
         },
