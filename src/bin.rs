@@ -384,9 +384,7 @@ fn main() {
                         image_path.with_extension("")
                     ))),
                     _ => {
-                        let folder = output
-                            .clone()
-                            .unwrap_or(PathBuf::from(format!("{}", lut_args.name())));
+                        let folder = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
                         if !folder.exists() {
                             create_dir_all(&folder).expect("failed to create output directory");
                         }
