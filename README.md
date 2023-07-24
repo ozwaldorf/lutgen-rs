@@ -274,3 +274,13 @@ remapper.remap_image(&mut hald_clut);
 ## Special Thanks
 
 - [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
+
+## Star History
+
+<a href="https://star-history.com/#ozwaldorf/lutgen-rs&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date" />
+  </picture>
+</a>
