@@ -380,8 +380,11 @@ fn main() {
 
                 let output = match images.len() {
                     1 => output.clone().unwrap_or(PathBuf::from(format!(
-                        "{:?}_{details}.png",
-                        image_path.with_extension("")
+                        "{}_{details}.png",
+                        image_path
+                            .with_extension("")
+                            .to_str()
+                            .expect("failed to encode path string")
                     ))),
                     _ => {
                         let folder = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
