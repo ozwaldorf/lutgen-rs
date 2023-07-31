@@ -7,7 +7,7 @@ pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 pub use rbf::{gaussian::GaussianRemapper, linear::LinearRemapper, shepard::ShepardRemapper};
 
-use crate::Image;
+use crate::LutImage;
 
 mod gaussian_sample;
 mod nearest_neighbor;
@@ -20,7 +20,7 @@ pub trait InterpolatedRemapper<'a>: Sync {
 
     /// Remap an image in place. Default implementation uses `rayon` to iterate in parallel over
     /// the pixels.
-    fn remap_image(&self, image: &mut Image) {
+    fn remap_image(&self, image: &mut LutImage) {
         image
             .pixels_mut()
             .collect::<Vec<_>>()

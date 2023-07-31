@@ -2,7 +2,7 @@ use image::Rgb;
 use oklab::{srgb_to_oklab, Oklab};
 
 use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
-use crate::{GenerateLut, Image};
+use crate::{GenerateLut, LutImage};
 
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
 /// algorithms.
@@ -30,7 +30,7 @@ impl<'a> NearestNeighborRemapper<'a> {
 
 impl<'a> GenerateLut<'a> for NearestNeighborRemapper<'a> {}
 impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
-    fn remap_image(&self, image: &mut Image) {
+    fn remap_image(&self, image: &mut LutImage) {
         for pixel in image.pixels_mut() {
             self.remap_pixel(pixel)
         }

@@ -1,12 +1,12 @@
 //! Hald clut identity creation and application
 
-use image::{ImageBuffer, Rgb};
+use image::{ImageBuffer, Pixel};
 
-use crate::Image;
+use crate::{Image, LutImage};
 
 /// Hald clut base identity generator.
 /// Algorithm derived from: <https://www.quelsolaar.com/technology/clut.html>
-pub fn generate(level: u8) -> Image {
+pub fn generate(level: u8) -> LutImage {
     let level = level as u32;
     let cube_size = level * level;
     let image_size = cube_size * level;
@@ -38,18 +38,22 @@ pub fn generate(level: u8) -> Image {
 ///
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
-pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
+pub fn correct_pixel<P: Pixel<Subpixel = u8>>(input: &mut P, hald_clut: &LutImage, level: u8) {
     let level = level as u32;
     let cube_size = level * level;
 
-    let r = input[0] as u32 * (cube_size - 1) / 255;
-    let g = input[1] as u32 * (cube_size - 1) / 255;
-    let b = input[2] as u32 * (cube_size - 1) / 255;
+    let [r, g, b, ..] = input.channels_mut() else {
+        panic!("pixel must have 3 channels")
+    };
 
-    let x = (r % cube_size) + (g % level) * cube_size;
-    let y = (b * level) + (g / level);
+    let rs = *r as u32 * (cube_size - 1) / 255;
+    let gs = *g as u32 * (cube_size - 1) / 255;
+    let bs = *b as u32 * (cube_size - 1) / 255;
 
-    hald_clut.get_pixel(x, y).0
+    let x = (rs % cube_size) + (gs % level) * cube_size;
+    let y = (bs * level) + (gs / level);
+
+    [*r, *g, *b] = hald_clut.get_pixel(x, y).0;
 }
 
 /// Correct an image with a hald clut identity in place.
@@ -57,7 +61,11 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
 ///
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
-pub fn correct_image(image: &mut Image, hald_clut: &Image) {
+///
+/// # Panics
+///
+/// If the hald clut is not a square or valid size for the level
+pub fn correct_image<P: Pixel<Subpixel = u8>>(image: &mut Image<P>, hald_clut: &LutImage) {
     let (width, height) = hald_clut.dimensions();
 
     // Find the smallest level that fits inside the hald clut
@@ -72,6 +80,6 @@ pub fn correct_image(image: &mut Image, hald_clut: &Image) {
 
     // Correct the original pixels
     for pixel in image.pixels_mut() {
-        *pixel = Rgb(correct_pixel(&pixel.0, hald_clut, level as u8));
+        correct_pixel(pixel, hald_clut, level as u8);
     }
 }

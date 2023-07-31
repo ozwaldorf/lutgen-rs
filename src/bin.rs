@@ -12,7 +12,8 @@ use clap::{
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
-use lutgen::{identity, interpolation::*, GenerateLut, Image};
+use image::DynamicImage;
+use lutgen::{identity, interpolation::*, GenerateLut, LutImage};
 use lutgen_palettes::Palette;
 use spinners::{Spinner, Spinners};
 
@@ -60,6 +61,9 @@ enum Subcommands {
             conflicts_with = "force"
         )]
         hald_clut: Option<PathBuf>,
+        /// Enable image transparency
+        #[arg(short, long, default_value_t = false)]
+        transparency: bool,
         /// Enable caching the generated LUT
         #[arg(short, long, default_value_t = false)]
         cache: bool,
@@ -182,7 +186,7 @@ enum Algorithm {
 }
 
 impl LutArgs {
-    fn generate(&self) -> Image {
+    fn generate(&self) -> LutImage {
         let name = self.name();
         let mut sp = Spinner::new(Spinners::Dots3, format!("Generating \"{name}\" LUT..."));
         let time = Instant::now();
@@ -313,7 +317,7 @@ fn main() {
                     lut_args.name(),
                     lut_args.detail_string(),
                 ))),
-                &lut_args.generate(),
+                &lut_args.generate().into(),
             );
 
             println!("Finished in {:?}", total_time.elapsed());
@@ -324,6 +328,7 @@ fn main() {
             lut_args,
             hald_clut,
             images,
+            transparency,
             cache,
             force,
         } => {
@@ -331,7 +336,7 @@ fn main() {
             // load or generate the lut
             let (hald_clut, details) = {
                 match hald_clut {
-                    Some(path) => (load_image(path), "custom".into()),
+                    Some(path) => (load_image(path).to_rgb8(), "custom".into()),
                     None => {
                         let cache_name =
                             format!("{}_{}", lut_args.name(), lut_args.detail_string());
@@ -345,13 +350,13 @@ fn main() {
 
                             let path = path.join(&cache_name).with_extension("png");
                             if path.exists() && !force {
-                                (load_image(path), cache_name)
+                                (load_image(path).to_rgb8(), cache_name)
                             } else {
                                 if colors.is_empty() {
                                     min_colors_error()
                                 }
                                 let lut = lut_args.generate();
-                                cache_image(path, &lut);
+                                cache_image(path, &lut.clone().into());
                                 (lut, cache_name)
                             }
                         } else {
@@ -365,19 +370,6 @@ fn main() {
             };
 
             for image_path in &images {
-                let mut image_buf = load_image(image_path);
-
-                let mut sp = Spinner::new(
-                    Spinners::Dots3,
-                    format!("Applying LUT to {image_path:?}..."),
-                );
-                let time = Instant::now();
-                identity::correct_image(&mut image_buf, &hald_clut);
-                sp.stop_and_persist(
-                    "✔",
-                    format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
-                );
-
                 let output = match images.len() {
                     1 => output.clone().unwrap_or(PathBuf::from(format!(
                         "{}_{details}.png",
@@ -394,7 +386,31 @@ fn main() {
                         folder.join(image_path.file_name().unwrap())
                     },
                 };
-                save_image(output, &image_buf);
+
+                let image = load_image(image_path);
+                let mut sp = Spinner::new(
+                    Spinners::Dots3,
+                    format!("Applying LUT to {image_path:?}..."),
+                );
+                let time = Instant::now();
+
+                if transparency {
+                    let mut image_buf = image.to_rgba8();
+                    identity::correct_image(&mut image_buf, &hald_clut);
+                    sp.stop_and_persist(
+                        "✔",
+                        format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
+                    );
+                    save_image(output, &image_buf.into());
+                } else {
+                    let mut image_buf = image.to_rgb8();
+                    identity::correct_image(&mut image_buf, &hald_clut);
+                    sp.stop_and_persist(
+                        "✔",
+                        format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
+                    );
+                    save_image(output, &image_buf.into());
+                }
             }
 
             println!("Finished in {:?}", total_time.elapsed());
@@ -410,16 +426,16 @@ fn main() {
     };
 }
 
-fn load_image<P: AsRef<Path>>(path: P) -> Image {
+fn load_image<P: AsRef<Path>>(path: P) -> DynamicImage {
     let path = path.as_ref();
     let mut sp = Spinner::new(Spinners::Dots3, format!("Loading {path:?}..."));
     let time = Instant::now();
-    let lut = image::open(path).expect("failed to open image").to_rgb8();
+    let lut = image::open(path).expect("failed to open image");
     sp.stop_and_persist("✔", format!("Loaded {path:?} in {:?}", time.elapsed()));
     lut
 }
 
-fn save_image<P: AsRef<Path>>(path: P, image: &Image) {
+fn save_image<P: AsRef<Path>>(path: P, image: &DynamicImage) {
     let path = path.as_ref();
     let mut sp = Spinner::new(Spinners::Dots3, format!("Saving output to {path:?}..."));
     let time = Instant::now();
@@ -430,7 +446,7 @@ fn save_image<P: AsRef<Path>>(path: P, image: &Image) {
     );
 }
 
-fn cache_image<P: AsRef<Path>>(path: P, image: &Image) {
+fn cache_image<P: AsRef<Path>>(path: P, image: &DynamicImage) {
     let path = path.as_ref();
     let mut sp = Spinner::new(Spinners::Dots3, format!("Caching {path:?}..."));
     let time = Instant::now();
