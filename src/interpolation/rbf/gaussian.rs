@@ -6,7 +6,7 @@ pub struct GaussianFn {
 }
 impl RadialBasisFn for GaussianFn {
     fn radial_basis(&self, distance: f64) -> f64 {
-        (-self.shape * distance.powf(2.0)).exp()
+        (-self.shape * distance).exp()
     }
 }
 

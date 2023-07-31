@@ -6,7 +6,7 @@ pub struct InverseDistanceFn {
 }
 impl RadialBasisFn for InverseDistanceFn {
     fn radial_basis(&self, distance: f64) -> f64 {
-        1.0 / distance.powf(self.power)
+        1.0 / distance.sqrt().powf(self.power)
     }
 }
 
