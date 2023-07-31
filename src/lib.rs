@@ -2,9 +2,6 @@
 
 use image::{ImageBuffer, Rgb};
 use interpolation::InterpolatedRemapper;
-/// Predefined constant palettes for popular colorschemes.
-#[cfg(feature = "palettes")]
-pub use lutgen_palettes::Palette;
 
 pub mod identity;
 pub mod interpolation;
