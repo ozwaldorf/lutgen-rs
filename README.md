@@ -55,7 +55,7 @@
 
 ## Usage
 
-> Note: The binary and library are still in a fairly experimental state, and breaking changes are made quite often. Any release that does make any changes as such, are bumped to 0.X.0
+> Note: The binary and library usages are fairly stable, but any release that does make any breaking changes as such, are bumped to 0.X.0
 
 ### CLI
 
