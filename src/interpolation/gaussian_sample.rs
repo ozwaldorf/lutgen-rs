@@ -11,7 +11,7 @@ use crate::GenerateLut;
 /// Interpolated remapper using a gaussian distribution set to sample and mix colors.
 /// Slow, compared to the RBF algorithms.
 ///
-/// All combinations of a the pixel channels (up to sample_count^3) is computed,
+/// For N iterations, a variation of the pixel channels are computed using additive Gaussian noise (up to sample_count^3),
 /// remapped to the nearest neighbor, and averaged together to get an interpolated color.
 pub struct GaussianSamplingRemapper<'a> {
     iterations: usize,
@@ -50,7 +50,7 @@ impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
         let mut rng: StdRng = SeedableRng::seed_from_u64(self.seed);
         for _ in 0..self.iterations {
             let mut pixel = *pixel;
-            // apply gaussian noise to channels
+            // apply Gaussian noise to channels
             for c in pixel.channels_mut() {
                 *c = (*c as f64 + self.normal.sample(&mut rng)).round() as u8
             }
