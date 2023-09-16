@@ -98,8 +98,8 @@ struct LutArgs {
     /// provide a more colorful hald clut.
     #[arg(long = "lum", default_value_t = 1.0)]
     luminosity: f64,
-    /// Preserve the original luminosity values for the output colors for RBF based algorithms. The luminosity factor is
-    /// still used for distance computations.
+    /// Preserve the original luminosity values for the output colors for RBF based algorithms. The
+    /// luminosity factor is still used for distance computations.
     #[arg(long, default_value_t = false)]
     preserve: bool,
     /// Number of nearest palette colors to consider at any given time for RBF based algorithms.

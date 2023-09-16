@@ -151,20 +151,29 @@ macro_rules! impl_rbf {
 }
 
 impl_rbf!(
-    "RBF remapper using a linear function on N nearest neighbors.",
+    "RBF remapper using a linear function on N nearest neighbors. 
+
+It's recommended to use a low number of neighbors for this method, otherwise the results will be extremely washed out.",
     LinearRemapper<LinearFn>,
     |_, d| d
 );
 
 impl_rbf!(
-    "Shepards Method, aka an RBF remapper using the inverse distance function on N nearest neighbors.",
+    "Shepards Method, aka an RBF remapper using the inverse distance function on N nearest neighbors.
+
+Lower power values will result in a longer gradient between the colors, but with more washed out results.
+Lowering the number of nearest colors can also mitigate washout, but may increase banding when using the LUT for corrections.",
     ShepardRemapper<InverseDistanceFn>,
     |s, d| { 1.0 / d.sqrt().powf(s.power) },
     { power: f64 }
 );
 
 impl_rbf!(
-    "RBF remapper using the Gaussian function on N nearest neighbors.",
+    "RBF remapper using the Gaussian function on N nearest neighbors.
+
+Lower shape values will have more of a gradient between colors, but with more washed out results.
+Higher shape values will keep the colors more true, but with less gradient between them. 
+Lowering the number of nearest neighbors can also mitigate washout, but may increase banding when using the LUT for corrections.",
     GaussianRemapper<GaussianFn>,
     |s, d| (-s.shape * d).exp(),
     { shape: f64 }
