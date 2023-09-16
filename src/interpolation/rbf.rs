@@ -111,6 +111,7 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
     }
 }
 
+#[macro_export]
 macro_rules! impl_rbf {
     (
         $($doc:expr,)?
@@ -150,20 +151,20 @@ macro_rules! impl_rbf {
 }
 
 impl_rbf!(
-    "Linear radial basis function remapper.",
+    "RBF remapper using a linear function on N nearest neighbors.",
     LinearRemapper<LinearFn>,
     |_, d| d
 );
 
 impl_rbf!(
-    "Shepards Method, aka inverse distance radial basis function.",
+    "Shepards Method, aka an RBF remapper using the inverse distance function on N nearest neighbors.",
     ShepardRemapper<InverseDistanceFn>,
     |s, d| { 1.0 / d.sqrt().powf(s.power) },
     { power: f64 }
 );
 
 impl_rbf!(
-    "Gaussian radial basis function remapper.",
+    "RBF remapper using the Gaussian function on N nearest neighbors.",
     GaussianRemapper<GaussianFn>,
     |s, d| (-s.shape * d).exp(),
     { shape: f64 }
