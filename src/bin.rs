@@ -176,6 +176,7 @@ enum Algorithm {
     ShepardsMethod,
     /// Radial Basis Function interpolation using the Gaussian function.
     /// Params: --shape, --nearest, --lum
+    #[default]
     GaussianRBF,
     /// Radial Basis Function interpolation using a linear function.
     /// Params: --nearest, --lum
@@ -183,7 +184,6 @@ enum Algorithm {
     /// Optimized version of the original ImageMagick approach which applies gaussian noise
     /// to each color and averages nearest neighbors together.
     /// Params: --mean, --std_dev, --iterations, --lum
-    #[default]
     GaussianSampling,
     /// Simple, non-interpolated, nearest neighbor alorithm.
     /// Params: --lum
@@ -471,6 +471,7 @@ fn min_colors_error() {
             "-p PALETTE".to_string(),
             "#123456".to_string(),
             "#abcdef".to_string(),
+            "ABC123".to_string(),
         ]),
     );
     err.print().unwrap();
