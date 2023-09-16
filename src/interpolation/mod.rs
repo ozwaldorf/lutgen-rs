@@ -5,7 +5,7 @@ use image::Rgb;
 use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
-pub use rbf::{gaussian::GaussianRemapper, linear::LinearRemapper, shepard::ShepardRemapper};
+pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
 
 use crate::Image;
 

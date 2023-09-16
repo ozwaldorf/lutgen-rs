@@ -5,10 +5,6 @@ use kiddo::float::{kdtree::KdTree, neighbour::Neighbour};
 use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
 use crate::GenerateLut;
 
-pub mod gaussian;
-pub mod linear;
-pub mod shepard;
-
 pub trait RadialBasisFn: Sync {
     fn radial_basis(&self, distance: f64) -> f64;
 }
@@ -18,11 +14,18 @@ pub struct RBFRemapper<F: RadialBasisFn> {
     tree: Option<(usize, ColorTree)>,
     palette: Vec<[f64; 3]>,
     lum_factor: f64,
+    preserve_lum: bool,
 }
 
 impl<'a, F: RadialBasisFn> GenerateLut<'a> for RBFRemapper<F> {}
 impl<'a, F: RadialBasisFn> RBFRemapper<F> {
-    fn with_function(palette: &'a [[u8; 3]], rbf: F, nearest: usize, lum_factor: f64) -> Self {
+    pub fn with_function(
+        palette: &'a [[u8; 3]],
+        rbf: F,
+        nearest: usize,
+        lum_factor: f64,
+        preserve_lum: bool,
+    ) -> Self {
         let palette: Vec<_> = palette
             .iter()
             .map(|raw| {
@@ -46,6 +49,7 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
             tree,
             palette,
             lum_factor,
+            preserve_lum,
         }
     }
 }
@@ -95,10 +99,72 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
         }
 
         *raw_color = oklab::oklab_to_srgb(oklab::Oklab {
-            l: (numerator[0] / denominator / self.lum_factor) as f32,
+            l: if self.preserve_lum {
+                (color[0] / self.lum_factor) as f32
+            } else {
+                (numerator[0] / denominator / self.lum_factor) as f32
+            },
             a: (numerator[1] / denominator) as f32,
             b: (numerator[2] / denominator) as f32,
         })
         .into();
     }
 }
+
+macro_rules! impl_rbf {
+    (
+        $($doc:expr,)?
+        $name:ident<$fn_name:ident>,
+        $fn:expr
+        $(, { $($param:ident: $param_ty:ty),* })?
+
+    ) => {
+        $(#[doc = $doc])?
+        pub type $name = RBFRemapper<$fn_name>;
+        impl $name {
+            pub fn new(
+                palette: &[[u8; 3]],
+                $($($param: $param_ty,)*)?
+                nearest: usize,
+                lum_factor: f64,
+                preserve_lum: bool
+            ) -> Self {
+                RBFRemapper::with_function(
+                    palette,
+                    $fn_name { $($($param),*)? },
+                    nearest,
+                    lum_factor,
+                    preserve_lum
+                )
+            }
+        }
+
+        pub struct $fn_name { $($($param: $param_ty,)*)? }
+        impl RadialBasisFn for $fn_name {
+            fn radial_basis(&self, distance: f64) -> f64 {
+                let rbf: fn(&Self, f64) -> f64 = $fn;
+                rbf(self, distance)
+            }
+        }
+    };
+}
+
+impl_rbf!(
+    "Linear radial basis function remapper.",
+    LinearRemapper<LinearFn>,
+    |_, d| d
+);
+
+impl_rbf!(
+    "Shepards Method, aka inverse distance radial basis function.",
+    ShepardRemapper<InverseDistanceFn>,
+    |s, d| { 1.0 / d.sqrt().powf(s.power) },
+    { power: f64 }
+);
+
+impl_rbf!(
+    "Gaussian radial basis function remapper.",
+    GaussianRemapper<GaussianFn>,
+    |s, d| (-s.shape * d).exp(),
+    { shape: f64 }
+);
