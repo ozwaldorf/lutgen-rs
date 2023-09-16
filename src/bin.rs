@@ -57,7 +57,9 @@ enum Subcommands {
             conflicts_with = "std_dev",
             conflicts_with = "iterations",
             conflicts_with = "cache",
-            conflicts_with = "force"
+            conflicts_with = "force",
+            conflicts_with = "luminosity",
+            conflicts_with = "preserve"
         )]
         hald_clut: Option<PathBuf>,
         /// Enable caching the generated LUT
@@ -75,7 +77,7 @@ enum Subcommands {
 
 #[derive(Parser, Debug)]
 struct LutArgs {
-    /// Custom hexidecimal colors to add to the palette.
+    /// Custom hexadecimal colors to add to the palette.
     /// If `-p` is not used to specify a base palette, at least 1 color is required.
     #[arg(last = true)]
     custom_colors: Vec<String>,
@@ -89,13 +91,17 @@ struct LutArgs {
     /// Algorithm to remap the LUT with.
     #[arg(short, long, value_enum, default_value = "gaussian-rbf")]
     algorithm: Algorithm,
-    /// Luminosity factor for all algorithms. Used for weighting the luminocity vs color channels
+    /// Luminosity factor for all algorithms. Used for weighting the luminosity vs color channels
     /// when computing color distances.
     ///
     /// Factors greater than 1 will result in more "greyscale" colors, and factors less than 1
-    /// gives a more colorful hald clut.
+    /// provide a more colorful hald clut.
     #[arg(long = "lum", default_value_t = 1.0)]
     luminosity: f64,
+    /// Preserve the original luminosity values for the output colors for RBF based algorithms. The luminosity factor is
+    /// still used for distance computations.
+    #[arg(long, default_value_t = false)]
+    preserve: bool,
     /// Number of nearest palette colors to consider at any given time for RBF based algorithms.
     /// 0 uses unlimited (all) colors.
     #[arg(
@@ -136,7 +142,8 @@ struct LutArgs {
         default_value_t = 0.0,
         conflicts_with = "shape",
         conflicts_with = "power",
-        conflicts_with = "nearest"
+        conflicts_with = "nearest",
+        conflicts_with = "preserve"
     )]
     mean: f64,
     /// Gaussian sampling algorithm's standard deviation parameter.
@@ -145,7 +152,8 @@ struct LutArgs {
         default_value_t = 20.0,
         conflicts_with = "shape",
         conflicts_with = "power",
-        conflicts_with = "nearest"
+        conflicts_with = "nearest",
+        conflicts_with = "preserve"
     )]
     std_dev: f64,
     /// Gaussian sampling algorithm's target number of samples to take for each color.
@@ -155,7 +163,8 @@ struct LutArgs {
         default_value_t = 512,
         conflicts_with = "shape",
         conflicts_with = "power",
-        conflicts_with = "nearest"
+        conflicts_with = "nearest",
+        conflicts_with = "preserve"
     )]
     iterations: usize,
 }
@@ -188,18 +197,29 @@ impl LutArgs {
         let time = Instant::now();
 
         let lut = match self.algorithm {
-            Algorithm::ShepardsMethod => {
-                ShepardRemapper::new(&self.collect(), self.power, self.nearest, self.luminosity)
-                    .generate_lut(self.level)
-            },
-            Algorithm::GaussianRBF => {
-                GaussianRemapper::new(&self.collect(), self.shape, self.nearest, self.luminosity)
-                    .generate_lut(self.level)
-            },
-            Algorithm::LinearRBF => {
-                LinearRemapper::new(&self.collect(), self.nearest, self.luminosity)
-                    .generate_lut(self.level)
-            },
+            Algorithm::ShepardsMethod => ShepardRemapper::new(
+                &self.collect(),
+                self.power,
+                self.nearest,
+                self.luminosity,
+                self.preserve,
+            )
+            .generate_lut(self.level),
+            Algorithm::GaussianRBF => GaussianRemapper::new(
+                &self.collect(),
+                self.shape,
+                self.nearest,
+                self.luminosity,
+                self.preserve,
+            )
+            .generate_lut(self.level),
+            Algorithm::LinearRBF => LinearRemapper::new(
+                &self.collect(),
+                self.nearest,
+                self.luminosity,
+                self.preserve,
+            )
+            .generate_lut(self.level),
             Algorithm::GaussianSampling => GaussianSamplingRemapper::new(
                 &self.collect(),
                 self.mean,
