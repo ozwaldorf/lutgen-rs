@@ -36,6 +36,7 @@ impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
         }
     }
 
+    #[inline(always)]
     fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
         let Oklab { l, a, b } = srgb_to_oklab(pixel.0.into());
         let (_, nearest) = self.tree.nearest_one(

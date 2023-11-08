@@ -45,6 +45,7 @@ impl<'a> GaussianSamplingRemapper<'a> {
 
 impl<'a> GenerateLut<'a> for GaussianSamplingRemapper<'a> {}
 impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
+    #[inline(always)]
     fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
         let mut mean = [0f64; 3];
 

@@ -55,6 +55,7 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
 }
 
 impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
+    #[inline(always)]
     fn remap_pixel(&self, pixel: &mut image::Rgb<u8>) {
         let raw_color = &mut pixel.0;
         let color = oklab::srgb_to_oklab((*raw_color).into());
