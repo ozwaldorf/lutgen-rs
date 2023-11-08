@@ -40,7 +40,7 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
                 // let g = ((g << 8) - g) / cube_size_minus_one;
                 //
                 // let b = (i >> cube_sqr_log2) & cube_size_minus_one;
-                // let b = ((b << 8) - b) / cube_size_minus_one; 
+                // let b = ((b << 8) - b) / cube_size_minus_one;
 
                 let r = (i % cube_size) * 255 / cube_size_minus_one;
                 let g = ((i / cube_size) % cube_size) * 255 / cube_size_minus_one;
