@@ -1,6 +1,6 @@
 //! Hald clut identity creation and application
 
-use image::{ImageBuffer, Rgb};
+use image::Rgb;
 
 use crate::Image;
 
@@ -11,27 +11,27 @@ pub fn generate(level: u8) -> Image {
     let cube_size = level * level;
     let image_size = cube_size * level;
 
-    let mut imgbuf = ImageBuffer::new(image_size, image_size);
+    let mut buffer = vec![0; (image_size * image_size * 3) as usize];
 
-    let mut p = 0u32;
+    let mut i = 0;
     for blue in 0..cube_size {
+        let b = (blue * 255 / (cube_size - 1)) as u8;
         for green in 0..cube_size {
+            let g = (green * 255 / (cube_size - 1)) as u8;
             for red in 0..cube_size {
-                let r = red * 255 / (cube_size - 1);
-                let g = green * 255 / (cube_size - 1);
-                let b = blue * 255 / (cube_size - 1);
-                let pixel = image::Rgb([r as u8, g as u8, b as u8]);
+                let r = (red * 255 / (cube_size - 1)) as u8;
 
-                let x = p % image_size;
-                let y = (p - x) / image_size;
-
-                imgbuf.put_pixel(x, y, pixel);
-                p += 1;
+                buffer[i] = r;
+                i += 1;
+                buffer[i] = g;
+                i += 1;
+                buffer[i] = b;
+                i += 1;
             }
         }
     }
 
-    imgbuf
+    Image::from_vec(image_size, image_size, buffer).expect("failed to create identity from buffer")
 }
 
 /// Correct a single pixel with a hald clut identity.
