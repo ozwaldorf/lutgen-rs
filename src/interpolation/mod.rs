@@ -2,7 +2,7 @@
 
 pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgb;
-use kiddo::float::kdtree::KdTree;
+use kiddo::immutable::float::kdtree::ImmutableKdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
@@ -31,10 +31,5 @@ pub trait InterpolatedRemapper<'a>: Sync {
     }
 }
 
-type ColorTree = KdTree<f64, u16, 3, 4, u16>;
-fn squared_euclidean(a: &[f64; 3], b: &[f64; 3]) -> f64 {
-    let dl = (a[0] - b[0]).powi(2);
-    let da = (a[1] - b[1]).powi(2);
-    let db = (a[2] - b[2]).powi(2);
-    dl + da + db
-}
+/// Type alias for our internal color tree for NN lookups
+type ColorTree = ImmutableKdTree<f64, u32, 3, 4>;

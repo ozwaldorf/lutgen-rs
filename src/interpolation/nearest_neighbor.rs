@@ -1,7 +1,8 @@
 use image::Rgb;
+use kiddo::{NearestNeighbour, SquaredEuclidean};
 use oklab::{srgb_to_oklab, Oklab};
 
-use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
+use super::{ColorTree, InterpolatedRemapper};
 use crate::{GenerateLut, Image};
 
 /// Simple remapper that doesn't do any interpolation. Mostly used internally by the other
@@ -14,11 +15,15 @@ pub struct NearestNeighborRemapper<'a> {
 
 impl<'a> NearestNeighborRemapper<'a> {
     pub fn new(palette: &'a [[u8; 3]], lum_factor: f64) -> Self {
-        let mut tree = ColorTree::new();
-        for (i, &color) in palette.iter().enumerate() {
-            let Oklab { l, a, b } = srgb_to_oklab(color.into());
-            tree.add(&[l as f64 * lum_factor, a as f64, b as f64], i as u16);
-        }
+        let tree = ColorTree::new_from_slice(
+            &palette
+                .iter()
+                .map(|&color| {
+                    let Oklab { l, a, b } = srgb_to_oklab(color.into());
+                    [l as f64 * lum_factor, a as f64, b as f64]
+                })
+                .collect::<Vec<_>>(),
+        );
 
         Self {
             palette,
@@ -38,10 +43,11 @@ impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
 
     fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
         let Oklab { l, a, b } = srgb_to_oklab(pixel.0.into());
-        let (_, nearest) = self.tree.nearest_one(
-            &[l as f64 * self.lum_factor, a as f64, b as f64],
-            &squared_euclidean,
-        );
-        *pixel = Rgb(self.palette[nearest as usize]);
+        let NearestNeighbour { item, .. } = self.tree.nearest_one::<SquaredEuclidean>(&[
+            l as f64 * self.lum_factor,
+            a as f64,
+            b as f64,
+        ]);
+        *pixel = Rgb(self.palette[item as usize]);
     }
 }

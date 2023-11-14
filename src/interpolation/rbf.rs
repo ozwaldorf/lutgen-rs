@@ -1,8 +1,8 @@
 use std::f64;
 
-use kiddo::float::{kdtree::KdTree, neighbour::Neighbour};
+use kiddo::{distance_metric::DistanceMetric, NearestNeighbour, SquaredEuclidean};
 
-use super::{squared_euclidean, ColorTree, InterpolatedRemapper};
+use super::{ColorTree, InterpolatedRemapper};
 use crate::GenerateLut;
 
 pub trait RadialBasisFn: Sync {
@@ -34,14 +34,10 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
             })
             .collect();
 
-        let mut tree = None;
-
-        if nearest > 0 && palette.len() < nearest {
-            let mut kdtree = KdTree::with_capacity(palette.len());
-            for (i, color) in palette.iter().enumerate() {
-                kdtree.add(color, i as u16);
-            }
-            tree = Some((nearest, kdtree));
+        let tree = if nearest > 0 && palette.len() < nearest {
+            Some((nearest, ColorTree::new_from_slice(&palette)))
+        } else {
+            None
         };
 
         Self {
@@ -74,7 +70,7 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
         match &self.tree {
             None => {
                 for p_color in self.palette.iter() {
-                    let distance = squared_euclidean(&color, p_color);
+                    let distance = SquaredEuclidean::dist(&color, p_color);
                     let weight = self.rbf.radial_basis(distance);
 
                     numerator[0] += p_color[0] * weight;
@@ -84,8 +80,8 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
                 }
             },
             Some((nearest, tree)) => {
-                for Neighbour { item, distance } in
-                    tree.nearest_n(&color, *nearest, &squared_euclidean)
+                for NearestNeighbour { item, distance } in
+                    tree.nearest_n::<SquaredEuclidean>(&color, *nearest)
                 {
                     let weight = self.rbf.radial_basis(distance);
                     let p_color = self.palette[item as usize];
