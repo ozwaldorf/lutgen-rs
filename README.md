@@ -159,7 +159,7 @@ use lutgen_palettes::Palette;
 let palette = Palette::CatppuccinMocha.get();
 
 // Setup the fast Gaussian RBF algorithm
-let (shape, nearest, lum_factor, preserve) = (96.0, 0, 1.0, false);
+let (shape, nearest, lum_factor, preserve) = (128.0, 0, 1.0, false);
 let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor, preserve);
 
 // Generate and remap a HALD:8 for the provided palette
@@ -265,7 +265,6 @@ remapper.remap_image(&mut hald_clut);
 - [x] Basic applying a lut to an image
 - [x] Radial basis function interpolation for generating LUTs
 - [ ] Interpolation for more accuracy when correcting with low level luts (<16)
-- [ ] Replace exoquant and kiddo with a unified implementation of a k-d tree
 
 ## Sources 
 

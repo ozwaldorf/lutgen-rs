@@ -114,11 +114,11 @@ struct LutArgs {
     )]
     nearest: usize,
     /// Gaussian RBF's shape parameter.
-    /// Higher means less gradient between colors, lower mean more.
+    /// Higher values will mix colors less, lower values mix colors more.
     #[arg(
         short,
         long,
-        default_value_t = 96.0,
+        default_value_t = 128.0,
         conflicts_with = "power",
         conflicts_with = "mean",
         conflicts_with = "std_dev",
