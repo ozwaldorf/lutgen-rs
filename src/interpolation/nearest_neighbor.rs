@@ -15,15 +15,11 @@ pub struct NearestNeighborRemapper<'a> {
 
 impl<'a> NearestNeighborRemapper<'a> {
     pub fn new(palette: &'a [[u8; 3]], lum_factor: f64) -> Self {
-        let tree = ColorTree::new_from_slice(
-            &palette
-                .iter()
-                .map(|&color| {
-                    let Oklab { l, a, b } = srgb_to_oklab(color.into());
-                    [l as f64 * lum_factor, a as f64, b as f64]
-                })
-                .collect::<Vec<_>>(),
-        );
+        let mut tree = ColorTree::new();
+        for (i, &color) in palette.iter().enumerate() {
+            let Oklab { l, a, b } = srgb_to_oklab(color.into());
+            tree.add(&[l as f64 * lum_factor, a as f64, b as f64], i as u32);
+        }
 
         Self {
             palette,

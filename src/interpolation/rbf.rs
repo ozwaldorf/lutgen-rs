@@ -35,7 +35,12 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
             .collect();
 
         let tree = if nearest > 0 && palette.len() < nearest {
-            Some((nearest, ColorTree::new_from_slice(&palette)))
+            let mut tree = ColorTree::with_capacity(palette.len());
+            for (i, color) in palette.iter().enumerate() {
+                tree.add(color, i as u32);
+            }
+
+            Some((nearest, tree))
         } else {
             None
         };

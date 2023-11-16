@@ -2,7 +2,7 @@
 
 pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgb;
-use kiddo::immutable::float::kdtree::ImmutableKdTree;
+use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
 pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
@@ -32,4 +32,4 @@ pub trait InterpolatedRemapper<'a>: Sync {
 }
 
 /// Type alias for our internal color tree for NN lookups
-type ColorTree = ImmutableKdTree<f64, u32, 3, 4>;
+type ColorTree = KdTree<f64, u32, 3, 4, u32>;
