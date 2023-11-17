@@ -7,7 +7,7 @@ on:
 
 env:
   TERM: xterm
-  TOOLCHAIN: nightly
+  TOOLCHAIN: stable
 
 permissions:
   checks: write
