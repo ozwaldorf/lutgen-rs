@@ -349,9 +349,9 @@ fn main() {
         } => {
             let colors = lut_args.collect();
             // load or generate the lut
-            let (hald_clut, details) = {
+            let hald_clut = {
                 match hald_clut {
-                    Some(path) => (load_image(path), "custom".into()),
+                    Some(path) => load_image(path),
                     None => {
                         let cache_name =
                             format!("{}_{}", lut_args.name(), lut_args.detail_string());
@@ -363,22 +363,22 @@ fn main() {
                                     .expect("failed to create cache directory");
                             }
 
-                            let path = path.join(&cache_name).with_extension("png");
+                            let path = path.join(cache_name).with_extension("png");
                             if path.exists() && !force {
-                                (load_image(path), cache_name)
+                                load_image(path)
                             } else {
                                 if colors.is_empty() {
                                     min_colors_error()
                                 }
                                 let lut = lut_args.generate();
                                 cache_image(path, &lut);
-                                (lut, cache_name)
+                                lut
                             }
                         } else {
                             if colors.is_empty() {
                                 min_colors_error()
                             }
-                            (lut_args.generate(), cache_name)
+                            lut_args.generate()
                         }
                     },
                 }
@@ -398,23 +398,12 @@ fn main() {
                     format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
                 );
 
-                let output = match images.len() {
-                    1 => output.clone().unwrap_or(PathBuf::from(format!(
-                        "{}_{details}.png",
-                        image_path
-                            .with_extension("")
-                            .to_str()
-                            .expect("failed to encode path string")
-                    ))),
-                    _ => {
-                        let folder = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
-                        if !folder.exists() {
-                            create_dir_all(&folder).expect("failed to create output directory");
-                        }
-                        folder.join(image_path.file_name().unwrap())
-                    },
-                };
-                save_image(output, &image_buf);
+                let folder = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
+                if !folder.exists() {
+                    create_dir_all(&folder).expect("failed to create output directory");
+                }
+
+                save_image(folder.join(image_path.file_name().unwrap()), &image_buf);
             }
 
             println!("Finished in {:?}", total_time.elapsed());
