@@ -39,8 +39,15 @@
             cargoClippyExtraArgs =
               "--all-targets --all-features -- -Dclippy::all -Dwarnings";
           });
-          nextest =
-            craneLib.cargoNextest (commonArgs // { inherit cargoArtifacts; });
+          nextest = craneLib.cargoNextest (commonArgs // {
+            inherit cargoArtifacts;
+            cargoNextestExtraArgs = "--all-targets --all-features --all";
+          });
+          doctest = craneLib.cargoTest (commonArgs // {
+            inherit cargoArtifacts;
+            pnameSuffix = "-doctest";
+            cargoTextArgs = "--doc";
+          });
         };
         packages = { default = lutgen; };
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
