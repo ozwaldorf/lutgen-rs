@@ -67,6 +67,16 @@ cd lutgen-rs
 cargo install --path .
 ```
 
+### Nix
+
+A nix flake is available and can be run easily with:
+
+```bash
+nix run github:ozwaldorf/lutgen-rs
+```
+
+Cache is provided via https://garnix.io
+
 #### Releases
 
 | Packaging Status | Installation Command |
