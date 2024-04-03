@@ -59,6 +59,8 @@
 
 ### CLI
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen.svg)](https://repology.org/project/lutgen/versions)
+
 #### Source
 
 ```bash
@@ -67,7 +69,7 @@ cd lutgen-rs
 cargo install --path .
 ```
 
-### Nix
+#### Nix flake
 
 A nix flake is available and can be run easily with:
 
@@ -76,15 +78,6 @@ nix run github:ozwaldorf/lutgen-rs
 ```
 
 Cache is provided via https://garnix.io
-
-#### Releases
-
-| Packaging Status | Installation Command |
-|------------------|----------------------|
-| [![Crates.io](https://repology.org/badge/version-for-repo/crates_io/rust:lutgen.svg?header=crates.io)](https://crates.io/crates/lutgen) | `cargo install lutgen` |
-| [![AUR](https://repology.org/badge/version-for-repo/aur/lutgen.svg?header=AUR%20(bin))](https://aur.archlinux.org/packages/lutgen-bin) | `yay -S lutgen-bin` |
-| [![AUR](https://img.shields.io/badge/any_text-rolling-lightgrey?label=AUR%20(git))](https://aur.archlinux.org/packages/lutgen-git) | `yay -S lutgen-git` |
-| [![Alpine](https://repology.org/badge/version-for-repo/alpine_edge/lutgen.svg?header=Alpine%20Linux%20\(testing\))](https://pkgs.alpinelinux.org/package/edge/testing/x86_64/lutgen) | `apk add lutgen` |
 
 #### Helptext
 
