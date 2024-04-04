@@ -65,9 +65,7 @@
             }
           );
         };
-        packages = {
-          default = lutgen;
-        };
+        packages.default = lutgen;
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
         devShells.default = craneLib.devShell {
           # Inherit inputs from checks.
@@ -75,5 +73,8 @@
         };
         formatter = pkgs.nixfmt-rfc-style;
       }
-    );
+    )
+    // {
+      overlays.default = _: prev: { lutgen = self.packages.${prev.system}.default; };
+    };
 }
