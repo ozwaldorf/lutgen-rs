@@ -413,7 +413,7 @@ fn main() {
                             // Create the parent directory if needed
                             if let Some(parent) = path.parent() {
                                 if !path.exists() {
-                                    create_dir_all(&parent)
+                                    create_dir_all(parent)
                                         .expect("failed to create output directory");
                                 }
                             }
