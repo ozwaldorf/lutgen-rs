@@ -398,12 +398,44 @@ fn main() {
                     format!("Applied LUT to {image_path:?} in {:?}", time.elapsed()),
                 );
 
-                let folder = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
-                if !folder.exists() {
-                    create_dir_all(&folder).expect("failed to create output directory");
-                }
+                let path = if images.len() > 1 {
+                    // For multiple images, the output path is always treated as a directory
+                    let path = output.clone().unwrap_or(PathBuf::from(lut_args.name()));
+                    if !path.exists() {
+                        create_dir_all(&path).expect("failed to create output directory");
+                    }
+                    path.join(image_path.file_name().unwrap())
+                } else {
+                    // For single images
+                    match &output {
+                        // If user provided a path
+                        Some(path) => {
+                            // Create the parent directory if needed
+                            if let Some(parent) = path.parent() {
+                                if !path.exists() {
+                                    create_dir_all(&parent)
+                                        .expect("failed to create output directory");
+                                }
+                            }
 
-                save_image(folder.join(image_path.file_name().unwrap()), &image_buf);
+                            if path.is_dir() {
+                                path.join(image_path.file_name().unwrap())
+                            } else {
+                                path.clone()
+                            }
+                        },
+                        // No path, so save the file under a palette name directory
+                        None => {
+                            let path = PathBuf::from(lut_args.name());
+                            if !path.exists() {
+                                create_dir_all(&path).expect("failed to create output directory");
+                            }
+                            path.join(image_path.file_name().unwrap())
+                        },
+                    }
+                };
+
+                save_image(path, &image_buf);
             }
 
             println!("Finished in {:?}", total_time.elapsed());
