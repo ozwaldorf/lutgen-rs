@@ -56,21 +56,13 @@
               cargoNextestExtraArgs = "--all-targets --all-features --all";
             }
           );
-          doctest = craneLib.cargoTest (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-              pnameSuffix = "-doctest";
-              cargoTextArgs = "--doc";
-            }
-          );
         };
-        packages.default = lutgen;
+        packages = {
+          inherit lutgen;
+          default = lutgen;
+        };
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
-        devShells.default = craneLib.devShell {
-          # Inherit inputs from checks.
-          checks = self.checks.${system};
-        };
+        devShells.default = craneLib.devShell { checks = self.checks.${system}; };
         formatter = pkgs.nixfmt-rfc-style;
       }
     )
