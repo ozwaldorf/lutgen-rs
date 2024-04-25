@@ -244,32 +244,10 @@ impl LutArgs {
     }
 
     fn collect(&self) -> Vec<[u8; 3]> {
-        let mut colors = self
-            .custom_colors
-            .iter()
-            .map(|s| {
-                // parse hex string into rgb
-                let hex = (*s).trim_start_matches('#');
-                if hex.len() != 6 {
-                    parse_hex_error(s);
-                    exit(2);
-                }
-                if let Ok(channel_bytes) = u32::from_str_radix(hex, 16) {
-                    let r = ((channel_bytes >> 16) & 0xFF) as u8;
-                    let g = ((channel_bytes >> 8) & 0xFF) as u8;
-                    let b = (channel_bytes & 0xFF) as u8;
-                    [r, g, b]
-                } else {
-                    parse_hex_error(s);
-                    exit(2);
-                }
-            })
-            .collect::<Vec<_>>();
-
+        let mut colors = parse_hex(&self.custom_colors);
         if let Some(palette) = self.palette {
             colors.append(&mut palette.get().to_vec());
         }
-
         colors
     }
 
@@ -449,6 +427,37 @@ fn main() {
             std::process::exit(0);
         },
     };
+}
+
+fn parse_one_hex(code: &str) -> [u8; 3] {
+    // parse hex string into rgb
+    let mut hex = (*code).trim_start_matches('#').to_string();
+
+    match hex.len() {
+        3 => {
+            // Extend 3 character hex colors
+            hex = hex.chars().flat_map(|a| [a, a]).collect();
+        },
+        6 => {},
+        _ => {
+            parse_hex_error(code);
+            exit(2);
+        },
+    }
+
+    if let Ok(channel_bytes) = u32::from_str_radix(&hex, 16) {
+        let r = ((channel_bytes >> 16) & 0xFF) as u8;
+        let g = ((channel_bytes >> 8) & 0xFF) as u8;
+        let b = (channel_bytes & 0xFF) as u8;
+        [r, g, b]
+    } else {
+        parse_hex_error(code);
+        exit(2);
+    }
+}
+
+fn parse_hex(codes: &[String]) -> Vec<[u8; 3]> {
+    codes.iter().map(|code| parse_one_hex(code)).collect()
 }
 
 fn load_image<P: AsRef<Path>>(path: P) -> Image {
