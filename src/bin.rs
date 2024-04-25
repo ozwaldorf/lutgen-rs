@@ -193,7 +193,11 @@ enum Algorithm {
 impl LutArgs {
     fn generate(&self) -> Image {
         let name = self.name();
-        let mut sp = Spinner::new(Spinners::Dots3, format!("Generating \"{name}\" LUT..."));
+        let mut sp = Spinner::with_timer_and_stream(
+            Spinners::Dots3,
+            format!("Generating \"{name}\" LUT..."),
+            spinners::Stream::Stderr,
+        );
         let time = Instant::now();
 
         let lut = match self.algorithm {
@@ -235,10 +239,7 @@ impl LutArgs {
             },
         };
 
-        sp.stop_and_persist(
-            "✔",
-            format!("Generated \"{name}\" LUT in {:?}", time.elapsed()),
-        );
+        sp.stop_and_persist("✔", format!("Generated {name} LUT in {:?}", time.elapsed()));
 
         lut
     }
@@ -365,9 +366,10 @@ fn main() {
             for image_path in &images {
                 let mut image_buf = load_image(image_path);
 
-                let mut sp = Spinner::new(
+                let mut sp = Spinner::with_stream(
                     Spinners::Dots3,
                     format!("Applying LUT to {image_path:?}..."),
+                    spinners::Stream::Stderr,
                 );
                 let time = Instant::now();
                 identity::correct_image(&mut image_buf, &hald_clut);
@@ -462,7 +464,11 @@ fn parse_hex(codes: &[String]) -> Vec<[u8; 3]> {
 
 fn load_image<P: AsRef<Path>>(path: P) -> Image {
     let path = path.as_ref();
-    let mut sp = Spinner::new(Spinners::Dots3, format!("Loading {path:?}..."));
+    let mut sp = Spinner::with_stream(
+        Spinners::Dots3,
+        format!("Loading {path:?}..."),
+        spinners::Stream::Stderr,
+    );
     let time = Instant::now();
     let lut = image::open(path).expect("failed to open image").to_rgb8();
     sp.stop_and_persist("✔", format!("Loaded {path:?} in {:?}", time.elapsed()));
@@ -471,7 +477,11 @@ fn load_image<P: AsRef<Path>>(path: P) -> Image {
 
 fn save_image<P: AsRef<Path>>(path: P, image: &Image) {
     let path = path.as_ref();
-    let mut sp = Spinner::new(Spinners::Dots3, format!("Saving output to {path:?}..."));
+    let mut sp = Spinner::with_stream(
+        Spinners::Dots3,
+        format!("Saving output to {path:?}..."),
+        spinners::Stream::Stderr,
+    );
     let time = Instant::now();
     image.save(path).expect("failed to save image");
     sp.stop_and_persist(
@@ -482,7 +492,11 @@ fn save_image<P: AsRef<Path>>(path: P, image: &Image) {
 
 fn cache_image<P: AsRef<Path>>(path: P, image: &Image) {
     let path = path.as_ref();
-    let mut sp = Spinner::new(Spinners::Dots3, format!("Caching {path:?}..."));
+    let mut sp = Spinner::with_stream(
+        Spinners::Dots3,
+        format!("Caching {path:?}..."),
+        spinners::Stream::Stderr,
+    );
     let time = Instant::now();
     image.save(path).expect("failed to save cache image");
     sp.stop_and_persist("✔", format!("Cached {path:?} in {:?}", time.elapsed()));
