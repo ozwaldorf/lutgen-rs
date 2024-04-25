@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.10.0"
+version = "0.10.1"
 documentation = "https://docs.rs/lutgen"
 keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
 description = "A blazingly fast interpolated LUT generator and applicator for arbitrary and popular color palettes."
@@ -26,18 +26,20 @@ kiddo = "4.2.0"
 oklab = "1.0.0"
 
 # bin dependencies
+lutgen-palettes = { version = "0.3", path = "palettes", optional = true }
 clap = { workspace = true, optional = true }
 clap_complete = { version = "4.3.2", optional = true }
-spinners = { version = "4.1.0", optional = true }
+spinners = { version = "4.1.1", optional = true }
 dirs = { version = "5.0.1", optional = true }
-lutgen-palettes = { version = "0.3", path = "palettes", optional = true }
+regex = { version = "1.10", optional = true }
+imara-diff = { version = "0.1.5", optional = true }
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
 
 [features]
 default = ["bin"]
-bin = ["clap", "clap_complete", "spinners", "dirs", "lutgen-palettes"]
+bin = ["lutgen-palettes", "clap", "clap_complete", "spinners", "dirs", "regex", "imara-diff"]
 
 [[bin]]
 name = "lutgen"

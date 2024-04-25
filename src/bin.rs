@@ -1,5 +1,6 @@
 use std::{
     fs::create_dir_all,
+    io::{stdout, Write},
     path::{Path, PathBuf},
     process::exit,
     time::Instant,
@@ -12,11 +13,17 @@ use clap::{
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
-use lutgen::{identity, interpolation::*, GenerateLut, Image};
+use lutgen::{
+    identity::{self, correct_pixel},
+    interpolation::*,
+    GenerateLut, Image,
+};
 use lutgen_palettes::Palette;
+use regex::{Captures, Regex};
 use spinners::{Spinner, Spinners};
 
 const SEED: u64 = u64::from_be_bytes(*b"42080085");
+const REGEX: &str = r"(#)([0-9a-fA-F]{3}){1,2}|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -68,6 +75,17 @@ enum Subcommands {
         /// Force overwriting the cached LUT.
         #[arg(short, long, default_value_t = false, requires = "cache")]
         force: bool,
+        #[clap(flatten)]
+        lut_args: LutArgs,
+    },
+    /// Generate a patch for rgb colors inside text files
+    Patch {
+        /// Text files to replace rgb colors in
+        #[arg(required = true)]
+        files: Vec<PathBuf>,
+        /// Write output directly instead of generating a diff
+        #[arg(short, long, default_value_t = false)]
+        write: bool,
         #[clap(flatten)]
         lut_args: LutArgs,
     },
@@ -420,13 +438,93 @@ fn main() {
 
             println!("Finished in {:?}", total_time.elapsed());
         },
+        Subcommands::Patch {
+            files,
+            write,
+            lut_args,
+        } => {
+            let time = Instant::now();
+            let lut = lut_args.generate();
+            let len = files.len();
+            let mut buffer = vec![];
+
+            let re = Regex::new(REGEX).expect("failed to build regex");
+            for file in files {
+                let time = Instant::now();
+                let contents = std::fs::read_to_string(&file).expect("not a text file");
+
+                let counter = &mut 0u32;
+                let replaced = re.replace_all(&contents, |caps: &Captures| {
+                    *counter += 1;
+                    if caps.get(1).is_some() {
+                        let rgb = parse_one_hex(&caps[2]);
+                        let [r, g, b] = correct_pixel(&rgb, &lut, lut_args.level);
+                        format!("#{r:02x}{g:02x}{b:02x}")
+                    } else if caps.get(3).is_some() {
+                        let inner: Vec<u8> = caps[4]
+                            .split(',')
+                            .map(|s| s.trim().parse().expect("invalid rgb code"))
+                            .collect();
+                        let [r, g, b] =
+                            correct_pixel(&[inner[0], inner[1], inner[2]], &lut, lut_args.level);
+                        format!("rgb({r}, {g}, {b})")
+                    } else if caps.get(5).is_some() {
+                        let inner: Vec<u8> = caps[6]
+                            .split(',')
+                            .map(|s| s.trim().parse().expect("invalid rgb point"))
+                            .collect();
+                        let [r, g, b] =
+                            correct_pixel(&[inner[0], inner[1], inner[2]], &lut, lut_args.level);
+                        format!("rgba({r}, {g}, {b}, {})", &caps[7].trim())
+                    } else {
+                        unreachable!()
+                    }
+                });
+
+                eprintln!(
+                    "✔ Replaced {counter} colors in {file:?} in {:?}",
+                    time.elapsed()
+                );
+
+                if *counter > 0 {
+                    let replaced = replaced.to_string();
+                    if write {
+                        std::fs::write(&file, &replaced).expect("failed to write file");
+                    }
+
+                    // Compute diff for the file
+                    let input = imara_diff::intern::InternedInput::new(
+                        contents.as_str(),
+                        replaced.as_str(),
+                    );
+                    let diff = imara_diff::diff(
+                        imara_diff::Algorithm::Histogram,
+                        &input,
+                        imara_diff::UnifiedDiffBuilder::new(&input),
+                    );
+                    buffer.push(format!(
+                        "--- a/{file}\n+++ b/{file}\n{diff}",
+                        file = file.to_string_lossy()
+                    ));
+                }
+            }
+
+            eprintln!(
+                "Finished generating patch for {len} file{} in {:?}\n",
+                if len > 1 { "s" } else { "" },
+                time.elapsed()
+            );
+
+            // Print the patches
+            print!("{}", buffer.join("\n"));
+            stdout().flush().expect("failed to print diff");
+        },
         Subcommands::Completions { shell } => {
             // Generate the completions and exit immediately
             let mut cmd = BinArgs::command();
             let name = cmd.get_name().to_string();
             eprintln!("Generating completions for {shell}");
             generate(shell, &mut cmd, name, &mut std::io::stdout());
-            std::process::exit(0);
         },
     };
 }
