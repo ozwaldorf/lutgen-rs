@@ -34,15 +34,16 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
             })
             .collect();
 
-        let tree = if nearest > 0 && palette.len() < nearest {
+        // If we have to go through everything in the palette, skip creating the tree.
+        let tree = if nearest == 0 || palette.len() < nearest {
+            None
+        } else {
             let mut tree = ColorTree::with_capacity(palette.len());
             for (i, color) in palette.iter().enumerate() {
                 tree.add(color, i as u32);
             }
 
             Some((nearest, tree))
-        } else {
-            None
         };
 
         Self {
@@ -152,7 +153,7 @@ macro_rules! impl_rbf {
 }
 
 impl_rbf!(
-    "RBF remapper using a linear function on N nearest neighbors. 
+    "RBF remapper using a linear function on N nearest neighbors.
 
 It's recommended to use a low number of neighbors for this method, otherwise the results will be extremely washed out.",
     LinearRemapper<LinearFn>,
@@ -173,7 +174,7 @@ impl_rbf!(
     "RBF remapper using the Gaussian function on N nearest neighbors.
 
 Lower shape values will have more of a gradient between colors, but with more washed out results.
-Higher shape values will keep the colors more true, but with less gradient between them. 
+Higher shape values will keep the colors more true, but with less gradient between them.
 Lowering the number of nearest neighbors can also mitigate washout, but may increase banding when using the LUT for corrections.",
     GaussianRemapper<GaussianFn>,
     |s, d| (-s.shape * d).exp(),
