@@ -260,14 +260,10 @@ remapper.remap_image(&mut hald_clut);
 // hald_clut.save("output.png").unwrap();
 ```
 
-## Tasks
+## Planned features
 
-- [x] Basic hald-clut identity generation
-- [x] Gaussian Sampling interpolation for generating LUTs (thanks Gengeh for the original imagemagick strategy!)
-- [x] Support a bunch of popular base color palettes (thanks Wezterm!)
-- [x] Basic applying a lut to an image
-- [x] Radial basis function interpolation for generating LUTs
 - [ ] Interpolation for more accuracy when correcting with low level luts (<16)
+- [ ] Hardware acceleration for applying luts to images
 
 ## Sources 
 
