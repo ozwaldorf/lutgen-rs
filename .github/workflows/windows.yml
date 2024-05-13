@@ -1,0 +1,26 @@
+name: Windows binary
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build binary (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build Binary
+        shell: powershell
+        run: |
+          & cargo build --locked --release
+      - name: Upload Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: lutgen-windows
+          path: target/release/lutgen.exe
+          
