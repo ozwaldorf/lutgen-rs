@@ -46,6 +46,10 @@ name = "lutgen"
 path = "src/bin.rs"
 required-features=["bin"]
 
+[[bench]]
+name = "main"
+harness = false
+
 [profile.release]
 opt-level = 3
 lto = true
@@ -54,6 +58,14 @@ panic = "abort"
 [profile.test]
 inherits = "release"
 
-[[bench]]
-name = "main"
-harness = false
+[package.metadata.aur]
+custom = [
+  "# Generate and install shell completions",
+  "mkdir completions",
+  "./lutgen completions bash > completions/$_pkgname",
+  "./lutgen completions zsh > completions/_$_pkgname",
+  "./lutgen completions fish > completions/$_pkgname.fish",
+  "install -Dm644 completions/$_pkgname -t \"$pkgdir/usr/share/bash-completion/completions\"",
+  "install -Dm644 completions/_$_pkgname -t \"$pkgdir/usr/share/zsh/site-functions\"",
+  "install -Dm644 completions/$_pkgname.fish -t \"$pkgdir/usr/share/fish/vendor_completions.d\""
+]

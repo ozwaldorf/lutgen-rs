@@ -1,0 +1,47 @@
+name: Release Builds
+on: workflow_dispatch
+
+jobs:
+  release-windows:
+    name: Build Windows release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build Binary
+        shell: powershell
+        run: |
+          & cargo build --locked --release
+      - name: Upload Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: lutgen-x86_64-windows
+          path: target/release/lutgen.exe
+
+  release-aur:
+    name: Build AUR release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build aur release
+        run: |
+          cargo install --git https://github.com/fosskers/cargo-aur --branch colin/custom-commands
+          cargo aur -o aur
+      - name: Upload Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: lutgen-aur
+          path: aur
