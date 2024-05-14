@@ -3,7 +3,7 @@ on: workflow_dispatch
 
 jobs:
   release-windows:
-    name: Build Windows release
+    name: Build Windows (10+) release
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,6 +22,29 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lutgen-x86_64-windows
+          path: target/release/lutgen.exe
+
+  release-legacy-windows:
+    name: Build legacy Windows (7+) release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+      - uses: actions-rs/toolchain@v1
+        with:
+          # 1.78 disables windows 7 support: https://blog.rust-lang.org/2024/02/26/Windows-7.html
+          toolchain: 1.77.2
+          override: true
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Build Binary
+        shell: powershell
+        run: |
+          & cargo build --locked --release
+      - name: Upload Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: lutgen-x86_64-legacy-windows
           path: target/release/lutgen.exe
 
   release-aur:
