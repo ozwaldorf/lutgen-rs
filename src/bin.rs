@@ -13,6 +13,7 @@ use clap::{
 };
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
+use image::io::Reader;
 use lutgen::{
     identity::{self, correct_pixel},
     interpolation::*,
@@ -568,7 +569,14 @@ fn load_image<P: AsRef<Path>>(path: P) -> Image {
         spinners::Stream::Stderr,
     );
     let time = Instant::now();
-    let lut = image::open(path).expect("failed to open image").to_rgb8();
+    let lut = Reader::open(path)
+        .expect("failed to open image")
+        .with_guessed_format()
+        .expect("failed to guess image format")
+        .decode()
+        .expect("failed to decode image")
+        .to_rgb8();
+
     sp.stop_and_persist("✔", format!("Loaded {path:?} in {:?}", time.elapsed()));
     lut
 }
