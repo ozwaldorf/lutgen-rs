@@ -4,7 +4,7 @@ pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgb;
 use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
-use rayon::prelude::{IntoParallelRefMutIterator, ParallelIterator};
+use rayon::prelude::*;
 pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
 
 use crate::Image;
@@ -21,13 +21,9 @@ pub trait InterpolatedRemapper<'a>: Sync {
     /// Remap an image in place. Default implementation uses `rayon` to iterate in parallel over
     /// the pixels.
     fn remap_image(&self, image: &mut Image) {
-        image
-            .pixels_mut()
-            .collect::<Vec<_>>()
-            .par_iter_mut()
-            .for_each(|pixel| {
-                self.remap_pixel(pixel);
-            });
+        image.par_pixels_mut().for_each(|pixel| {
+            self.remap_pixel(pixel);
+        });
     }
 }
 
