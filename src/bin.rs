@@ -434,7 +434,6 @@ fn main() {
                 };
 
                 save_image(path, &image_buf);
-                println!("{:?}", total_time.elapsed());
             }
 
             println!("Finished in {:?}", total_time.elapsed());
