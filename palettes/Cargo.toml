@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-palettes"
-version = "0.3.0"
+version = "0.3.1"
 documentation = "https://docs.rs/lutgen-palettes"
 keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
 description = "Popular linux colorscheme palettes"
@@ -14,8 +14,8 @@ categories = ["multimedia::images"]
 clap.workspace = true
 
 [build-dependencies]
-regex = "1"
-serde_json = "1"
+regex.workspace = true
+toml = "0.8"
 tera = { version = "1", default-features = false }
 
 [features]

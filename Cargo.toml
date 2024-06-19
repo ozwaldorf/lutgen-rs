@@ -16,6 +16,7 @@ members = ["palettes"]
 
 [workspace.dependencies]
 clap = { version = "4.2", features = ["derive"] }
+regex = "1.10"
 
 [dependencies]
 image = { version = "0.25", features = ["rayon"] }
@@ -33,7 +34,7 @@ spinners = { version = "4.1.1", optional = true }
 dirs = { version = "5.0", optional = true }
 
 # Patch bin deps
-regex = { version = "1.10", optional = true }
+regex = { workspace = true, optional = true }
 imara-diff = { version = "0.1", optional = true }
 
 [dev-dependencies]

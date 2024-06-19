@@ -942,12 +942,12 @@ dependencies = [
 
 [[package]]
 name = "lutgen-palettes"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "clap",
  "regex",
- "serde_json",
  "tera",
+ "toml",
 ]
 
 [[package]]

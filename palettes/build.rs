@@ -5,11 +5,10 @@ use std::{
     path::Path,
 };
 
-use serde_json::{from_reader, json, to_value};
-use tera::{try_get_value, Context, Tera};
+use tera::{try_get_value, Context, Map, Tera};
 
 fn main() -> Result<(), Box<dyn Error>> {
-    println!("cargo:rerun-if-changed=palettes.json");
+    println!("cargo:rerun-if-changed=palettes.toml");
     println!("cargo:rerun-if-changed=src/lib.tera");
 
     let out_dir = std::env::var("OUT_DIR")?;
@@ -17,13 +16,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     tera.register_filter("hex_to_rgb", hex_to_rgb_filter);
     tera.register_filter("pascal_case", pascal_case);
 
-    let data: serde_json::Value = from_reader(read_to_string("palettes.json")?.as_bytes())?;
+    let mut context = Context::new();
+    let data: tera::Value = toml::from_str(&read_to_string("palettes.toml")?)?;
+    context.insert("palettes", &data);
 
-    let rust_code = tera.render_str(
-        &read_to_string("src/lib.tera")?,
-        &Context::from_value(json!({ "palettes": data }))?,
-    )?;
-
+    let rust_code = tera.render_str(&read_to_string("src/lib.tera")?, &context)?;
     write(Path::new(&out_dir).join("lib.rs"), rust_code)?;
 
     Ok(())
@@ -47,7 +44,7 @@ pub fn pascal_case(
             buf.push_str(&(f.to_uppercase().collect::<String>() + &chars.as_str().to_lowercase()))
         }
     }
-    Ok(to_value(&buf).unwrap())
+    Ok(buf.into())
 }
 
 fn hex_to_rgb_filter(
@@ -66,13 +63,11 @@ fn hex_to_rgb_filter(
         Ok(n) => n,
         Err(_) => return Err(tera::Error::msg("expected a valid hex string")),
     };
-    let r = (channel_bytes >> 16) & 0xFF;
-    let g = (channel_bytes >> 8) & 0xFF;
-    let b = channel_bytes & 0xFF;
 
-    Ok(json!({
-        "r": r,
-        "g": g,
-        "b": b,
-    }))
+    let mut map = Map::new();
+    map.insert("r".to_string(), ((channel_bytes >> 16) & 0xFF).into());
+    map.insert("g".to_string(), ((channel_bytes >> 8) & 0xFF).into());
+    map.insert("b".to_string(), (channel_bytes & 0xFF).into());
+
+    Ok(map.into())
 }
