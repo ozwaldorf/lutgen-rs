@@ -32,12 +32,11 @@ pub fn pascal_case(
 ) -> tera::Result<tera::Value> {
     let s = try_get_value!("pascal_case", "value", String, value);
 
-    // cleanup special chars
-    let reg = regex::Regex::new(r"[\-./!@)(+]").unwrap();
-    let s = reg.replace_all(&s, "").replace(' ', "_");
-
     let sections: Vec<_> = s.split('_').collect();
     let mut buf = String::new();
+    if s.starts_with('_') {
+        buf.push('_');
+    }
     for str in sections {
         let mut chars = str.chars();
         if let Some(f) = chars.next() {
