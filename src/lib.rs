@@ -66,7 +66,7 @@
 //! correct_image(&mut external_image, &hald_clut);
 //!
 //! // Save the edited image
-//! external_image.save("docs/catppuccin-mocha.jpg").unwrap()
+//! external_image.save("docs/carburetor.jpg").unwrap()
 //! ```
 //!
 //! #### Remapping an image directly

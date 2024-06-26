@@ -39,12 +39,24 @@
         };
 
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
-        lutgen = craneLib.buildPackage (commonArgs // { inherit cargoArtifacts; });
+        lutgen = craneLib.buildPackage (
+          commonArgs
+          // {
+            inherit cargoArtifacts;
+            doCheck = false;
+          }
+        );
       in
       {
         checks = {
           fmt = craneLib.cargoFmt (commonArgs // { inherit cargoArtifacts; });
-          doc = craneLib.cargoDoc (commonArgs // { inherit cargoArtifacts; });
+          doc = craneLib.cargoDoc (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              RUSTFLAGS = "-Dwarnings";
+            }
+          );
           clippy = craneLib.cargoClippy (
             commonArgs
             // {
@@ -57,6 +69,13 @@
             // {
               inherit cargoArtifacts;
               cargoNextestExtraArgs = "--all-targets --all-features --all";
+            }
+          );
+          doctest = craneLib.cargoTest (
+            commonArgs
+            // {
+              inherit cargoArtifacts;
+              cargoTextExtraArgs = "--doc";
             }
           );
         };
