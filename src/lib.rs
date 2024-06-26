@@ -1,6 +1,6 @@
 //! # Lutgen (Library)
 //!
-//! > Note: For documentation on the cli application, see the [readme](https://github.com/ozwaldorf/lutgen-rs).
+//! > For documentation on the cli application, see the [repository](https://github.com/ozwaldorf/lutgen-rs#usage).
 //!
 //! ## Default Features
 //!
@@ -8,7 +8,9 @@
 //! When used as a library, it's recommended to use `default-features = false` to minimize the
 //! dependency tree and build times.
 //!
-//! ## Generating a LUT
+//! ## Examples
+//!
+//! #### Generating a LUT
 //!
 //! ```rust
 //! use lutgen::{
@@ -42,7 +44,7 @@
 //! // hald_clut.save("output.png").unwrap();
 //! ```
 //!
-//! ## Applying a LUT
+//! #### Applying a LUT
 //!
 //! ```rust
 //! use image::open;
@@ -67,7 +69,7 @@
 //! external_image.save("docs/catppuccin-mocha.jpg").unwrap()
 //! ```
 //!
-//! ## Remapping an image directly
+//! #### Remapping an image directly
 //!
 //! > Note: While the remappers *can* be used directly on any image, it's much
 //! > faster to remap a LUT and correct an image with that.
