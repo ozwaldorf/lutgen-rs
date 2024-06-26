@@ -36,7 +36,7 @@ struct BinArgs {
 
 #[derive(Parser, Debug)]
 enum Subcommands {
-    /// Generate a hald clut for external or manual usage
+    /// Generate a hald clut for external or manual usage.
     Generate {
         #[clap(flatten)]
         lut_args: LutArgs,
@@ -71,7 +71,7 @@ enum Subcommands {
             conflicts_with = "preserve"
         )]
         hald_clut: Option<PathBuf>,
-        /// Enable caching the generated LUT
+        /// Enable caching the generated LUT.
         #[arg(short, long, default_value_t = false)]
         cache: bool,
         /// Force overwriting the cached LUT.
@@ -80,19 +80,18 @@ enum Subcommands {
         #[clap(flatten)]
         lut_args: LutArgs,
     },
-    /// Generate a patch for rgb colors inside text files
+    /// Generate a patch for rgb colors inside text files.
     Patch {
-        /// Text files to replace rgb colors in
+        /// Text files to replace rgb colors in.
         #[arg(required = true)]
         files: Vec<PathBuf>,
-        /// Write output directly instead of generating a diff
+        /// Write output directly instead of generating a diff.
         #[arg(short, long, default_value_t = false)]
         write: bool,
         #[clap(flatten)]
         lut_args: LutArgs,
     },
-    /// Generate shell completions.
-    Completions { shell: Shell },
+    /// Print palette colors and names.
     Palette {
         /// Palette to print. If none, all palettes will be printed.
         palette: Option<Palette>,
@@ -101,6 +100,8 @@ enum Subcommands {
         #[arg(short, long)]
         name_only: bool,
     },
+    /// Generate shell completions.
+    Completions { shell: Shell },
 }
 
 #[derive(Parser, Debug)]

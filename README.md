@@ -55,7 +55,7 @@
 
 ## Usage
 
-> Note: The binary and library usages are fairly stable, but any release that does make any breaking changes as such, are bumped to 0.X.0
+> Note: The binary usages are fairly stable, but any release that does make any breaking changes as such, are bumped to 0.X.0
 
 ### CLI
 
@@ -87,6 +87,8 @@ Usage: lutgen <COMMAND>
 Commands:
   generate     Generate a hald clut for external or manual usage
   apply        Correct an image using a hald clut, either generating it, or loading it externally
+  patch        Generate a patch for rgb colors inside text files
+  palette      Print palette colors and names
   completions  Generate shell completions
   help         Print this message or the help of the given subcommand(s)
 
@@ -103,16 +105,16 @@ Correcting an image
 # Builtin palette
 lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
 
-# Custom colors 
+# Custom colors
 lutgen apply docs/example-image.jpg -- "#ABCDEF" ffffff 000000
 
-# Custom palette file 
+# Custom palette file
 lutgen apply docs/example-image.jpg -- $(cat palette.txt)
 
 # Multiple images
 lutgen apply image1.png image2.png *.jpg -p catppuccin-mocha
 
-# Using an external LUT 
+# Using an external LUT
 lutgen apply --hald-clut mocha_lut.png docs/example-image.jpg
 ```
 
@@ -127,6 +129,19 @@ lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
 
 # Custom palette file with hex codes
 lutgen generate -o custom.png -- $(cat palette.txt)
+```
+
+Palletes
+
+```bash
+# Preview all palettes
+lutgen palette
+
+# Copy a palette to a file for tweaking
+lutgen palette carburetor > carburetor.txt
+
+# Finding a palette name with grep
+lutgen palette --name-only | grep 'gruvbox'
 ```
 
 Correcting videos (using ffmpeg):
@@ -144,132 +159,18 @@ sudo mv _lutgen /usr/local/share/zsh/site-functions/
 
 ### Library
 
-> By default, the `bin` feature and dependencies are enabled.
-> When used as a library, it's recommended to use `default-features = false` to minimalize the dependency tree and build time.
-
-Generating a LUT (simple):
-
-```rust
-use lutgen::{
-    GenerateLut,
-    interpolation::{
-        GaussianRemapper, GaussianSamplingRemapper
-    },
-};
-use lutgen_palettes::Palette;
-
-// Get a premade palette
-let palette = Palette::CatppuccinMocha.get();
-
-// Setup the fast Gaussian RBF algorithm
-let (shape, nearest, lum_factor, preserve) = (128.0, 0, 1.0, false);
-let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor, preserve);
-
-// Generate and remap a HALD:8 for the provided palette
-let hald_clut = remapper.generate_lut(8);
-
-// hald_clut.save("output.png").unwrap();
-
-// Setup another palette to interpolate from, with custom colors
-let palette = vec![
-    [255, 0, 0],
-    [0, 255, 0],
-    [0, 0, 255],
-];
-
-// Setup the slower Gaussian Sampling algorithm
-let (mean, std_dev, iters, lum_factor, seed) = (0.0, 20.0, 512, 1.0, 420);
-let remapper = GaussianSamplingRemapper::new(
-    &palette,
-    mean,
-    std_dev,
-    iters,
-    lum_factor,
-    seed
-);
-
-// Generate and remap a HALD:4 for the provided palette
-let hald_clut = remapper.generate_lut(4);
-
-// hald_clut.save("output.png").unwrap();
-```
-
-Applying a LUT:
-
-```rust
-use image::open;
-
-use lutgen::{
-    identity::correct_image,
-    interpolation::GaussianRemapper,
-    GenerateLut,
-};
-use lutgen_palettes::Palette;
-
-// Generate a hald clut
-let palette = Palette::CatppuccinMocha.get();
-let remapper = GaussianRemapper::new(&palette, 96.0, 0, 1.0, false);
-let hald_clut = remapper.generate_lut(8);
-
-// Save the LUT for later
-hald_clut.save("docs/catppuccin-mocha-hald-clut.png").unwrap();
-
-// Open an image to correct
-let mut external_image = open("docs/example-image.jpg").unwrap().to_rgb8();
-
-// Correct the image using the hald clut we generated
-correct_image(&mut external_image, &hald_clut);
-
-// Save the edited image
-external_image.save("docs/catppuccin-mocha.jpg").unwrap()
-```
-
-Remapping an image directly (advanced):
-
-> Note: While the remappers can be used directly on an image, it's much faster to remap a LUT and correct an image with that.
-
-```rust
-use lutgen::{
-    GenerateLut,
-    interpolation::{GaussianRemapper, InterpolatedRemapper},
-};
-
-// Setup the palette to interpolate from
-let palette = vec![
-    [255, 0, 0],
-    [0, 255, 0],
-    [0, 0, 255],
-];
-
-// Setup a remapper
-let (shape, nearest, lum_factor, preserve) = (96.0, 0, 1.0, false);
-let remapper = GaussianRemapper::new(
-    &palette,
-    shape,
-    nearest,
-    lum_factor,
-    preserve
-);
-
-// Generate an image (generally an identity lut to use on other images)
-let mut hald_clut = lutgen::identity::generate(8);
-
-// Remap the image
-remapper.remap_image(&mut hald_clut);
-
-// hald_clut.save("output.png").unwrap();
-```
+See the latest documentation on [docs.rs](https://docs.rs/lutgen)
 
 ## Planned features
 
 - [ ] Interpolation for more accuracy when correcting with low level luts (<16)
 - [ ] Hardware acceleration for applying luts to images
 
-## Sources 
+## Sources
 
 - Hald Cluts: https://www.quelsolaar.com/technology/clut.html
 - Editing with Hald Cluts: https://im.snibgo.com/edithald.htm
-- Sparse Hald Cluts: https://im.snibgo.com/sphaldcl.htm 
+- Sparse Hald Cluts: https://im.snibgo.com/sphaldcl.htm
 - RBF Interpolation: https://en.wikipedia.org/wiki/Radial_basis_function_interpolation
 - Shepard's method: https://en.wikipedia.org/wiki/Inverse_distance_weighting
 - Oklab Colorspace: https://bottosson.github.io/posts/oklab/
@@ -277,13 +178,4 @@ remapper.remap_image(&mut hald_clut);
 ## Special Thanks
 
 - [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
-
-## Star History
-
-<a href="https://star-history.com/#ozwaldorf/lutgen-rs&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ozwaldorf/lutgen-rs&type=Date" />
-  </picture>
-</a>
+- All the nixpkgs maintainers
