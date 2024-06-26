@@ -40,7 +40,7 @@ pub fn pascal_case(
     for str in sections {
         let mut chars = str.chars();
         if let Some(f) = chars.next() {
-            buf.push_str(&(f.to_uppercase().collect::<String>() + &chars.as_str().to_lowercase()))
+            buf.push_str(&(f.to_uppercase().to_string() + &chars.as_str().to_lowercase()))
         }
     }
     Ok(buf.into())

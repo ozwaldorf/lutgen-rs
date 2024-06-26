@@ -20,4 +20,12 @@ impl Palette {
           {% endfor %}
         }
     }
+
+    pub fn name(&self) -> &'static str {
+      match self {
+          {% for name, palette in palettes -%}
+            Palette::{{ name | pascal_case }} => "{{ name }}",
+          {% endfor %}
+      }
+    }
 }

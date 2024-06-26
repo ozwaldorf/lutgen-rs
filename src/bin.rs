@@ -20,6 +20,7 @@ use lutgen::{
     GenerateLut, Image,
 };
 use lutgen_palettes::Palette;
+use oklab::{srgb_to_oklab, Oklab};
 use regex::{Captures, Regex};
 use spinners::{Spinner, Spinners};
 
@@ -92,6 +93,14 @@ enum Subcommands {
     },
     /// Generate shell completions.
     Completions { shell: Shell },
+    Palette {
+        /// Palette to print. If none, all palettes will be printed.
+        palette: Option<Palette>,
+        /// When printing all palettes, only print the names and no colors.
+        /// Useful for scripting batch palette operations, and grepping for palettes.
+        #[arg(short, long)]
+        name_only: bool,
+    },
 }
 
 #[derive(Parser, Debug)]
@@ -518,6 +527,41 @@ fn main() {
             // Print the patches
             print!("{}", buffer.join("\n"));
             stdout().flush().expect("failed to print diff");
+        },
+        Subcommands::Palette { palette, name_only } => {
+            // Print a palette
+            fn print(palette: &Palette) {
+                eprintln!(
+                    "\x1b[4m{}\x1b[0m",
+                    palette.name().trim_start_matches('_').replace('_', "-")
+                );
+                for &color in palette.get() {
+                    let [r, g, b] = color;
+                    let Oklab { l, .. } = srgb_to_oklab(color.into());
+                    let fg = if l < 0.5 {
+                        "\x1b[38;2;255;255;255m"
+                    } else {
+                        "\x1b[38;2;0;0;0m"
+                    };
+                    println!("\x1b[48;2;{r};{g};{b}m{fg}#{r:02x}{g:02x}{b:02x}\x1b[0m");
+                }
+            }
+
+            if let Some(palette) = palette {
+                print(&palette)
+            } else {
+                for palette in Palette::value_variants() {
+                    if name_only {
+                        println!(
+                            "{}",
+                            palette.name().trim_start_matches('_').replace('_', "-")
+                        )
+                    } else {
+                        eprintln!();
+                        print(palette);
+                    }
+                }
+            }
         },
         Subcommands::Completions { shell } => {
             // Generate the completions and exit immediately
