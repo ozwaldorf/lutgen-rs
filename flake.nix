@@ -3,12 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-
     crane = {
       url = "github:ipetkov/crane";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -17,6 +19,7 @@
       self,
       nixpkgs,
       crane,
+      fenix,
       flake-utils,
       ...
     }:
@@ -62,7 +65,9 @@
           default = lutgen;
         };
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
-        devShells.default = craneLib.devShell { checks = self.checks.${system}; };
+        devShells.default =
+          (craneLib.overrideToolchain (fenix.packages.${system}.complete.toolchain)).devShell
+            { checks = self.checks.${system}; };
         formatter = pkgs.nixfmt-rfc-style;
       }
     )
