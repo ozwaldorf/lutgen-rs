@@ -1,0 +1,488 @@
+.ie \n(.g .ds Aq \(aq
+.el .ds Aq '
+.TH lutgen 1 - - ""
+.PP
+.SH SYNOPSIS
+.nf
+\fBlutgen\fP\fR \fP\fICOMMAND ...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR(\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP\fR
+\fP
+.fi
+.SH LUTGEN\ 
+.SH NAME
+\fRlutgen \- \fP\fRLUT Generator\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fICOMMAND ...\fP
+.PP
+.SS
+\fBExamples:\fP\fR
+  $ \fP\fBlutgen generate \-p gruvbox\-dark\fP\fR
+  $ \fP\fBlutgen apply \-p carburetor wallpaper.png\fP\fR
+  $ \fP\fBlutgen patch \-Np tomorrow theme.css > tomorrow.diff\fP\fR
+  $ \fP\fBlutgen palette gruvbox\-dark gruvbox\-light\fP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.TP
+\fB\-V\fP\fR, \fP\fB\-\-version\fP
+\fRPrints version information\fP
+.PP
+.PP
+.SS AVAILABLE\ COMMANDS:
+.TP
+\fBgenerate\fP\fR, \fP\fBg\fP
+\fRGenerate and save a Hald CLUT to disk.\fP
+.PP
+.TP
+\fBapply\fP\fR, \fP\fBa\fP
+\fRApply a generated or provided Hald CLUT to images.\fP
+.PP
+.TP
+\fBpatch\fP\fR, \fP\fBp\fP
+\fRGenerate a patch for colors inside text files.\fP
+.PP
+.TP
+\fBpalette\fP\fR, \fP\fBP\fP
+\fRPrint palette names and colors\fP
+.PP
+.PP
+.SS
+\fBSupported image formats:\fP\fR
+  avif bmp dds exr ff gif hdr ico jpeg png pnm qoi tga tiff webp\fP
+.SH LUTGEN\ GENERATE\ 
+.SH NAME
+\fRlutgen \- \fP\fRGenerate and save a Hald CLUT to disk.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS AVAILABLE\ POSITIONAL\ ITEMS:
+.TP
+\fICOLORS\fP
+\fRCustom colors to use. Combines with a palette if provided.\fP
+.PP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-o\fP\fR, \fP\fB\-\-output\fP\fR=\fP\fIPATH\fP
+\fRPath to write output to.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
+\fRPalette to use (`lutgen palette names` to view all options).\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4]\fP
+.PP
+.PP
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-m\fP\fR, \fP\fB\-\-mean\fP\fR=\fP\fIMEAN\fP
+\fRAverage amount of noise to apply in each iteration.\fP
+.PP
+.TP
+\fR[default: 0]\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
+\fRStandard deviation parameter for the noise applied in each iteration.\fP
+.PP
+.TP
+\fR[default: 20]\fP
+.PP
+.TP
+\fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
+\fRNumber of iterations of noise to apply to each pixel.\fP
+.PP
+.TP
+\fR[default: 512]\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-seed\fP\fR=\fP\fISEED\fP
+\fRSeed for noise rng.\fP
+.PP
+.TP
+\fR[default: 42080085]\fP
+.PP
+.PP
+.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.PP
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ APPLY\ 
+.SH NAME
+\fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS AVAILABLE\ POSITIONAL\ ITEMS:
+.TP
+\fIIMAGES\fP
+\fRImages to correct, using the generated or provided hald clut.\fP
+.PP
+.TP
+\fICOLORS\fP
+\fRCustom colors to use. Combines with a palette if provided.\fP
+.PP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-o\fP\fR, \fP\fB\-\-output\fP\fR=\fP\fIPATH\fP
+\fRPath to write output to.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
+\fRPalette to use (`lutgen palette names` to view all options).\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4]\fP
+.PP
+.PP
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-m\fP\fR, \fP\fB\-\-mean\fP\fR=\fP\fIMEAN\fP
+\fRAverage amount of noise to apply in each iteration.\fP
+.PP
+.TP
+\fR[default: 0]\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
+\fRStandard deviation parameter for the noise applied in each iteration.\fP
+.PP
+.TP
+\fR[default: 20]\fP
+.PP
+.TP
+\fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
+\fRNumber of iterations of noise to apply to each pixel.\fP
+.PP
+.TP
+\fR[default: 512]\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-seed\fP\fR=\fP\fISEED\fP
+\fRSeed for noise rng.\fP
+.PP
+.TP
+\fR[default: 42080085]\fP
+.PP
+.PP
+.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.PP
+.TP
+\fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
+\fRExternal Hald CLUT to use\fP
+.PP
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ PATCH\ 
+.SH NAME
+\fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS AVAILABLE\ POSITIONAL\ ITEMS:
+.TP
+\fIFILES\fP
+\fRText files to generate patches for.\fP
+.PP
+.TP
+\fICOLORS\fP
+\fRCustom colors to use. Combines with a palette if provided.\fP
+.PP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-w\fP\fR, \fP\fB\-\-write\fP
+\fREnable writing changes directly to the files.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-no\-patch\fP
+\fRDisable computing and printing the patch. Usually paired with \-\-write.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
+\fRPalette to use (`lutgen palette names` to view all options).\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4]\fP
+.PP
+.PP
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-m\fP\fR, \fP\fB\-\-mean\fP\fR=\fP\fIMEAN\fP
+\fRAverage amount of noise to apply in each iteration.\fP
+.PP
+.TP
+\fR[default: 0]\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
+\fRStandard deviation parameter for the noise applied in each iteration.\fP
+.PP
+.TP
+\fR[default: 20]\fP
+.PP
+.TP
+\fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
+\fRNumber of iterations of noise to apply to each pixel.\fP
+.PP
+.TP
+\fR[default: 512]\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-seed\fP\fR=\fP\fISEED\fP
+\fRSeed for noise rng.\fP
+.PP
+.TP
+\fR[default: 42080085]\fP
+.PP
+.PP
+.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.PP
+.TP
+\fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
+\fRExternal Hald CLUT to use\fP
+.PP
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ PALETTE\ 
+.SH NAME
+\fRlutgen \- \fP\fRPrint palette names and colors\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR(\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP
+.PP
+.SS
+\fBExamples:\fP\fR
+  $ lutgen palette carburetor > carburetor.txt
+  $ lutgen palette all
+  $ lutgen palette names | grep gruvbox\fP
+.PP
+.SS AVAILABLE\ POSITIONAL\ ITEMS:
+.TP
+\fIPALETTE\fP
+\fRPalette to use (`lutgen palette names` to view all options).\fP
+.PP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.PP
+.SS AVAILABLE\ COMMANDS:
+.TP
+\fBnames\fP
+\fRPrint all palette names. Useful for scripting and searching.\fP
+.PP
+.TP
+\fBall\fP
+\fRPrint all palette names and colors.\fP
+.PP
+.SH LUTGEN\ PALETTE\ NAMES\ 
+.SH NAME
+\fRlutgen \- \fP\fRPrint all palette names. Useful for scripting and searching.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ PALETTE\ ALL\ 
+.SH NAME
+\fRlutgen \- \fP\fRPrint all palette names and colors.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP

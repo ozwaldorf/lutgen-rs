@@ -11,7 +11,7 @@
         <a href="https://garnix.io"><img alt="ci" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fozwaldorf%2Flutgen-rs&style=for-the-badge&logo=%20&label=garnix&labelColor=grey" /></a>
     </p>
     <p align="center">
-        A blazingly fast interpolated <a href="https://en.wikipedia.org/wiki/3D_lookup_table">LUT</a> generator and applicator for arbitrary and popular color palettes. Theme any image to your desktop colorscheme!
+        A blazingly fast interpolated <a href="https://en.wikipedia.org/wiki/3D_lookup_table">LUT</a> utility for arbitrary and popular color palettes. Theme any image to your desktop colorscheme!
     </p>
 </header>
 
@@ -53,11 +53,9 @@
     <img src="docs/nord.png" />
 </details>
 
-## Usage
+## CLI
 
-> Note: The binary usages are fairly stable, but any release that does make any breaking changes as such, are bumped to 0.X.0
-
-### CLI
+### Installation
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen.svg)](https://repology.org/project/lutgen/versions)
 
@@ -79,25 +77,11 @@ nix run github:ozwaldorf/lutgen-rs
 
 Cache is provided via https://garnix.io
 
-#### Helptext
+### Documentation
 
-```text
-Usage: lutgen <COMMAND>
+See the detailed cli documentation at [docs/README.md](./docs/README.md).
 
-Commands:
-  generate     Generate a hald clut for external or manual usage
-  apply        Correct an image using a hald clut, either generating it, or loading it externally
-  patch        Generate a patch for rgb colors inside text files
-  palette      Print palette colors and names
-  completions  Generate shell completions
-  help         Print this message or the help of the given subcommand(s)
-
-Options:
-  -h, --help     Print help
-  -V, --version  Print version
-```
-
-#### Examples
+### Examples
 
 Correcting an image
 
@@ -141,7 +125,7 @@ lutgen palette
 lutgen palette carburetor > carburetor.txt
 
 # Finding a palette name with grep
-lutgen palette --name-only | grep 'gruvbox'
+lutgen palette names | grep 'gruvbox'
 ```
 
 Correcting videos (using ffmpeg):
@@ -150,14 +134,14 @@ Correcting videos (using ffmpeg):
 ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
 ```
 
-Zsh Completions
+Zsh Completions:
 
 ```bash
-lutgen completions zsh > _lutgen
+lutgen --bpaf-complete-style-zsh > _lutgen
 sudo mv _lutgen /usr/local/share/zsh/site-functions/
 ```
 
-### Library
+## Library
 
 See the latest documentation on [docs.rs](https://docs.rs/lutgen)
 
