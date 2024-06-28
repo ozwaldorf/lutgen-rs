@@ -52,12 +52,12 @@
 //! use lutgen_palettes::Palette;
 //!
 //! // Generate a hald clut
-//! let palette = Palette::Carburetor.get();
+//! let palette = Palette::GruvboxDark.get();
 //! let remapper = GaussianRemapper::new(&palette, 96.0, 0, 1.0, false);
 //! let hald_clut = remapper.generate_lut(8);
 //!
 //! // Save the LUT for later
-//! hald_clut.save("docs/carburetor-hald-clut.png").unwrap();
+//! hald_clut.save("docs/gruvbox-dark-hald-clut.png").unwrap();
 //!
 //! // Open an image to correct
 //! let mut external_image = open("docs/example-image.jpg").unwrap().to_rgb8();
@@ -66,7 +66,7 @@
 //! correct_image(&mut external_image, &hald_clut);
 //!
 //! // Save the edited image
-//! external_image.save("docs/carburetor.jpg").unwrap()
+//! external_image.save("docs/gruvbox-dark.jpg").unwrap()
 //! ```
 //!
 //! #### Remapping an image directly
