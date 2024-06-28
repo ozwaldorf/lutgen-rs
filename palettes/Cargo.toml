@@ -11,7 +11,7 @@ repository = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
 
 [dependencies]
-clap.workspace = true
+strum = { version = "0.26", features = ["derive"] }
 
 [build-dependencies]
 regex.workspace = true

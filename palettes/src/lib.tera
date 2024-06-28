@@ -1,6 +1,7 @@
-use clap::ValueEnum;
+use strum::{Display, EnumString, VariantArray};
 
-#[derive(Clone, Copy, Debug, ValueEnum)]
+#[derive(Clone, Debug, Display, EnumString, VariantArray)]
+#[strum(serialize_all = "kebab-case")]
 pub enum Palette {
   {% for name, palette in palettes -%}
     {{ name | pascal_case }},
@@ -8,6 +9,10 @@ pub enum Palette {
 }
 
 impl Palette {
+    /// Collection of all palette variants
+    pub const VARIANTS: &[Palette] = <Palette as VariantArray>::VARIANTS;
+
+    /// Get the colors for the palette
     pub fn get(&self) -> &'static [[u8; 3]] {
         match self {
           {% for name, palette in palettes -%}
@@ -19,13 +24,5 @@ impl Palette {
             ],
           {% endfor %}
         }
-    }
-
-    pub fn name(&self) -> &'static str {
-      match self {
-          {% for name, palette in palettes -%}
-            Palette::{{ name | pascal_case }} => "{{ name }}",
-          {% endfor %}
-      }
     }
 }
