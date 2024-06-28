@@ -37,12 +37,20 @@
           inherit src;
           strictDeps = true;
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
+          nativeBuildInputs = [ pkgs.installShellFiles ];
         };
 
         lutgen = stableCraneLib.buildPackage (
           commonArgs
           // {
             doCheck = false;
+            postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
+              installManPage docs/lutgen.1
+              installShellCompletion --cmd lutgen \
+                --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
+                --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
+                --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
+            '';
           }
         );
       in
