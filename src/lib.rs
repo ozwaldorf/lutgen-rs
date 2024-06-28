@@ -13,10 +13,8 @@
 //! #### Generating a LUT
 //!
 //! ```rust
-//! use lutgen::{
-//!     interpolation::{GaussianRemapper, GaussianSamplingRemapper},
-//!     GenerateLut,
-//! };
+//! use lutgen::interpolation::{GaussianRemapper, GaussianSamplingRemapper};
+//! use lutgen::GenerateLut;
 //! use lutgen_palettes::Palette;
 //!
 //! // Get a premade palette
@@ -48,7 +46,9 @@
 //!
 //! ```rust
 //! use image::open;
-//! use lutgen::{identity::correct_image, interpolation::GaussianRemapper, GenerateLut};
+//! use lutgen::identity::correct_image;
+//! use lutgen::interpolation::GaussianRemapper;
+//! use lutgen::GenerateLut;
 //! use lutgen_palettes::Palette;
 //!
 //! // Generate a hald clut
@@ -75,10 +75,8 @@
 //! > faster to remap a LUT and correct an image with that.
 //!
 //! ```rust
-//! use lutgen::{
-//!     interpolation::{GaussianRemapper, InterpolatedRemapper},
-//!     GenerateLut,
-//! };
+//! use lutgen::interpolation::{GaussianRemapper, InterpolatedRemapper};
+//! use lutgen::GenerateLut;
 //!
 //! // Setup the palette to interpolate from
 //! let palette = vec![[255, 0, 0], [0, 255, 0], [0, 0, 255]];
