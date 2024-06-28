@@ -1,11 +1,9 @@
 use std::hint::black_box;
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
-use lutgen::{
-    identity::correct_image,
-    interpolation::{GaussianRemapper, ShepardRemapper},
-    GenerateLut, Image,
-};
+use lutgen::identity::correct_image;
+use lutgen::interpolation::{GaussianRemapper, ShepardRemapper};
+use lutgen::{GenerateLut, Image};
 use lutgen_palettes::Palette;
 
 fn benchmark(c: &mut Criterion) {

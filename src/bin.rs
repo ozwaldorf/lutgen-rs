@@ -1,24 +1,17 @@
-use std::{
-    fs::create_dir_all,
-    io::{stdout, Write},
-    path::{Path, PathBuf},
-    process::exit,
-    time::Instant,
-};
+use std::fs::create_dir_all;
+use std::io::{stdout, Write};
+use std::path::{Path, PathBuf};
+use std::process::exit;
+use std::time::Instant;
 
-use clap::{
-    arg, command,
-    error::{ContextKind, ContextValue, ErrorKind},
-    CommandFactory, Parser, ValueEnum,
-};
+use clap::error::{ContextKind, ContextValue, ErrorKind};
+use clap::{arg, command, CommandFactory, Parser, ValueEnum};
 use clap_complete::{generate, Shell};
 use dirs::cache_dir;
 use image::io::Reader;
-use lutgen::{
-    identity::{self, correct_pixel},
-    interpolation::*,
-    GenerateLut, Image,
-};
+use lutgen::identity::{self, correct_pixel};
+use lutgen::interpolation::*;
+use lutgen::{GenerateLut, Image};
 use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
 use regex::{Captures, Regex};
