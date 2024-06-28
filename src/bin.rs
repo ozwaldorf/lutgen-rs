@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{construct, long, positional, Bpaf, Doc, Parser};
+use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
 use lutgen::identity::{correct_pixel, detect_level};
 use lutgen::interpolation::{
     GaussianRemapper,
@@ -16,6 +16,8 @@ use lutgen::{GenerateLut, Image};
 use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
 use regex::{Captures, Regex};
+
+const IMAGE_GLOB: &str = "*.avif|*.bmp|*.dds|*.exr|*.ff|*.gif|*.hdr|*.ico|*.jpg|*.jpeg|*.png|*.pnm|*.qoi|*.tga|*.tiff|*.webp";
 
 /// Compute a set of palette suggestions based on some input. Best matches are first in the set.
 fn suggest_palettes(input: &str) -> BTreeSet<(u16, String)> {
@@ -150,7 +152,6 @@ struct CommonRbf {
     /// Number of nearest colors to consider when interpolating. 0 uses all available colors.
     #[bpaf(short, long, argument("NEAREST"), fallback(16), display_fallback)]
     nearest: usize,
-
     /// Preserve the original image's luminocity values after interpolation.
     #[bpaf(short('P'), long, fallback(false), display_fallback)]
     preserve: bool,
@@ -327,7 +328,7 @@ enum PaletteArgs {
     options,
     version,
     max_width(120),
-    descr("LUT Generator"),
+    descr(env!("CARGO_PKG_DESCRIPTION")),
     header({
         let mut doc = Doc::default();
         doc.emphasis("Examples:");
@@ -344,7 +345,11 @@ enum PaletteArgs {
     footer({
         let mut doc = Doc::default();
         doc.emphasis("Supported image formats:");
-        doc.text("\n  avif bmp dds exr ff gif hdr ico jpeg png pnm qoi tga tiff webp");
+        doc.text("\n");
+        for extension in IMAGE_GLOB.replace("*.", "").split('|') {
+            doc.text(" ");
+            doc.literal(extension);
+        };
         doc
     }),
 )]
@@ -373,15 +378,16 @@ enum Lutgen {
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(palette_arg))]
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
         /// Images to correct, using the generated or provided hald clut.
         #[bpaf(
             positional("IMAGES"),
             guard(|v| v.exists(), "No such file or directory"),
-            some("At least one image is needed to apply"))
-        ]
+            some("At least one image is needed to apply"),
+            complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) })
+        )]
         input: Vec<PathBuf>,
         #[bpaf(external)]
         extra_colors: Vec<Color>,
@@ -404,8 +410,9 @@ enum Lutgen {
             positional::<PathBuf>("FILES"),
             guard(|path| path.exists(), "No such file or directory"),
             parse(|path| std::fs::read_to_string(&path).map(|v| (path, v))),
-            some("At least one file is needed to patch"))
-        ]
+            some("At least one file is needed to patch"),
+            complete_shell(ShellComp::File { mask: None })
+        )]
         input: Vec<(PathBuf, String)>,
         #[bpaf(external)]
         extra_colors: Vec<Color>,
