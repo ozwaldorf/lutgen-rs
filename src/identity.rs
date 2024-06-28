@@ -52,12 +52,27 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
     hald_clut.get_pixel(x, y).0
 }
 
-/// Correct an image with a hald clut identity in place.
-/// Panics if the hald clut is invalid.
+/// Correct an image in place with a hald clut identity.
 ///
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
+///
+/// # Safety
+///
+/// Panics if the hald clut is invalid.
 pub fn correct_image(image: &mut Image, hald_clut: &Image) {
+    let level = detect_level(hald_clut);
+    for pixel in image.pixels_mut() {
+        *pixel = Rgb(correct_pixel(&pixel.0, hald_clut, level));
+    }
+}
+
+/// Detect a hald clut identities level.
+///
+/// # Safety
+///
+/// Panics if the hald clut is invalid.
+pub fn detect_level(hald_clut: &Image) -> u8 {
     let (width, height) = hald_clut.dimensions();
 
     // Find the smallest level that fits inside the hald clut
@@ -70,8 +85,5 @@ pub fn correct_image(image: &mut Image, hald_clut: &Image) {
     assert_eq!(width, level * level * level);
     assert_eq!(width, height);
 
-    // Correct the original pixels
-    for pixel in image.pixels_mut() {
-        *pixel = Rgb(correct_pixel(&pixel.0, hald_clut, level as u8));
-    }
+    level as u8
 }

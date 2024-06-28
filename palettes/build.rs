@@ -1,9 +1,7 @@
-use std::{
-    collections::HashMap,
-    error::Error,
-    fs::{read_to_string, write},
-    path::Path,
-};
+use std::collections::HashMap;
+use std::error::Error;
+use std::fs::{read_to_string, write};
+use std::path::Path;
 
 use tera::{try_get_value, Context, Map, Tera};
 

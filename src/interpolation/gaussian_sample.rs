@@ -2,10 +2,12 @@
 //! finds their nearest neighbors, averaging them all together for a final color.
 
 use image::{Pixel, Rgb};
-use rand::{rngs::StdRng, SeedableRng};
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use rand_distr::{Distribution, Normal};
 
-use super::{nearest_neighbor::NearestNeighborRemapper, InterpolatedRemapper};
+use super::nearest_neighbor::NearestNeighborRemapper;
+use super::InterpolatedRemapper;
 use crate::GenerateLut;
 
 /// Interpolated remapper using a gaussian distribution set to sample and mix colors.
