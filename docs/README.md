@@ -123,7 +123,7 @@ Generate and save a Hald CLUT to disk.
 
 Apply a generated or provided Hald CLUT to images.
 
-**Usage**: **`lutgen`** **`apply`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`--hald-clut`**=_`FILE`_) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ | \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`IMAGES`_ &mdash; 
@@ -134,10 +134,16 @@ Apply a generated or provided Hald CLUT to images.
 
 
 **Available options:**
+- **`-d`**, **`--dir`** &mdash; 
+  Enable always saving output files to a directory. When output is provided, it will always be a directory.
+   
+  [default: false]
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
   Palette to use (`lutgen palette names` to view all options).
+- **`    --hald-clut`**=_`FILE`_ &mdash; 
+  External Hald CLUT to use
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -193,8 +199,6 @@ Apply a generated or provided Hald CLUT to images.
   Disable interpolation completely.
 
 
-- **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -203,7 +207,7 @@ Apply a generated or provided Hald CLUT to images.
 
 Generate a patch for colors inside text files.
 
-**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (\[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`--hald-clut`**=_`FILE`_) _`FILES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ | \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`FILES`_ &mdash; 
@@ -224,6 +228,8 @@ Generate a patch for colors inside text files.
   [default: false]
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
   Palette to use (`lutgen palette names` to view all options).
+- **`    --hald-clut`**=_`FILE`_ &mdash; 
+  External Hald CLUT to use
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -279,8 +285,6 @@ Generate a patch for colors inside text files.
   Disable interpolation completely.
 
 
-- **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 

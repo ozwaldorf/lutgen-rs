@@ -234,7 +234,7 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
         .help("External Hald CLUT to use")
         .argument::<PathBuf>("FILE")
         .parse(|file| Ok::<_, &str>(LutAlgorithm::HaldClut { file }));
-    construct!([lut_algorithm(), clut])
+    construct!([clut, lut_algorithm()])
 }
 
 impl LutAlgorithm {
@@ -367,6 +367,10 @@ enum Lutgen {
     /// Apply a generated or provided Hald CLUT to images.
     #[bpaf(command, short('a'))]
     Apply {
+        /// Enable always saving output files to a directory. When output is provided, it will
+        /// always be a directory.
+        #[bpaf(short, long, fallback(false), display_fallback)]
+        dir: bool,
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
@@ -448,12 +452,20 @@ impl Lutgen {
                 extra_colors,
             } => Lutgen::generate(output, palette, lut_algorithm, extra_colors),
             Lutgen::Apply {
+                dir,
                 output,
                 palette,
                 hald_clut_or_algorithm,
                 input,
                 extra_colors,
-            } => Lutgen::apply(output, palette, hald_clut_or_algorithm, input, extra_colors),
+            } => Lutgen::apply(
+                dir,
+                output,
+                palette,
+                hald_clut_or_algorithm,
+                input,
+                extra_colors,
+            ),
             Lutgen::Patch {
                 write,
                 no_patch,
@@ -488,6 +500,7 @@ impl Lutgen {
     }
 
     fn apply(
+        dir: bool,
         output: Option<PathBuf>,
         palette: Option<Palette>,
         hald_clut_or_algorithm: LutAlgorithm,
@@ -516,28 +529,55 @@ impl Lutgen {
                 match &output {
                     // If user provided a path
                     Some(path) => {
-                        // Create the parent directory if needed
-                        if let Some(parent) = path.parent() {
+                        if dir {
+                            // The path is always a dir
                             if !path.exists() {
-                                std::fs::create_dir_all(parent)
+                                std::fs::create_dir_all(path)
                                     .expect("failed to create output directory");
                             }
-                        }
-
-                        if path.is_dir() {
                             path.join(file.file_name().unwrap())
                         } else {
-                            path.clone()
+                            // Otherwise, ensure the parent dir exists
+                            if let Some(parent) = path.parent() {
+                                if !parent.exists() {
+                                    std::fs::create_dir_all(parent)
+                                        .expect("failed to create output directory");
+                                }
+                            }
+
+                            if path.is_dir() {
+                                // Enable dir mode if user supplied an existing directory
+                                path.join(file.file_name().unwrap())
+                            } else {
+                                path.clone()
+                            }
                         }
                     },
-                    // No path, so save the file under a palette name directory
                     None => {
-                        let path = PathBuf::from(&name);
-                        if !path.exists() {
-                            std::fs::create_dir_all(&path)
-                                .expect("failed to create output directory");
+                        if dir {
+                            // always create a palette dir
+                            let path = PathBuf::from(&name);
+                            if !path.exists() {
+                                std::fs::create_dir_all(&path)
+                                    .expect("failed to create output directory");
+                            }
+                            path.join(file.file_name().unwrap())
+                        } else {
+                            // create an image adjacent to the original, with a palette name prefix
+                            let mut file_name =
+                                file.file_stem().unwrap().to_string_lossy().to_string();
+                            file_name.push('_');
+                            file_name.push_str(&name);
+                            let extension = file
+                                .extension()
+                                .map(|s| s.to_string_lossy())
+                                .unwrap_or("png".into());
+
+                            let mut path = file.clone();
+                            path.set_file_name(file_name);
+                            path.set_extension(extension.as_ref());
+                            path
                         }
-                        path.join(file.file_name().unwrap())
                     },
                 }
             };
