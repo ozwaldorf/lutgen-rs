@@ -140,7 +140,7 @@ struct Common {
         argument("2-16"),
         fallback(10),
         display_fallback,
-        guard(|&v| (2..=16).contains(&v), "hald level must between 2-16"))
+        guard(|v| (2..=16).contains(v), "hald level must between 2-16"))
     ]
     level: u8,
 }
@@ -221,8 +221,6 @@ enum LutAlgorithm {
     },
     #[bpaf(skip)]
     HaldClut {
-        /// External hald clut to use instead of generating one
-        #[bpaf(long("hald-clut"), argument("PATH"))]
         file: PathBuf,
     },
 }
@@ -231,9 +229,9 @@ enum LutAlgorithm {
 /// but we do for apply.
 fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
     let clut = long("hald-clut")
-        .help("External Hald CLUT to use")
+        .help("External Hald CLUT to use instead of generating one.")
         .argument::<PathBuf>("FILE")
-        .parse(|file| Ok::<_, &str>(LutAlgorithm::HaldClut { file }));
+        .map(|file| LutAlgorithm::HaldClut { file });
     construct!([clut, lut_algorithm()])
 }
 
@@ -244,7 +242,7 @@ impl LutAlgorithm {
         extra_colors: Vec<Color>,
     ) -> Result<(String, Image), String> {
         if let Self::HaldClut { file } = &self {
-            return Ok((".".to_string(), load_image(file)?));
+            return Ok(("out".to_string(), load_image(file)?));
         }
 
         let time = Instant::now();
