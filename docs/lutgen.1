@@ -15,7 +15,7 @@
 .fi
 .SH LUTGEN\ 
 .SH NAME
-\fRlutgen \- \fP\fRLUT Generator\fP
+\fRlutgen \- \fP\fRA blazingly fast interpolated LUT utility for arbitrary and popular color palettes.\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fICOMMAND ...\fP
 .PP
@@ -56,7 +56,7 @@
 .PP
 .SS
 \fBSupported image formats:\fP\fR
-  avif bmp dds exr ff gif hdr ico jpeg png pnm qoi tga tiff webp\fP
+ \fP\fBavif\fP\fR \fP\fBbmp\fP\fR \fP\fBdds\fP\fR \fP\fBexr\fP\fR \fP\fBff\fP\fR \fP\fBgif\fP\fR \fP\fBhdr\fP\fR \fP\fBico\fP\fR \fP\fBjpg\fP\fR \fP\fBjpeg\fP\fR \fP\fBpng\fP\fR \fP\fBpnm\fP\fR \fP\fBqoi\fP\fR \fP\fBtga\fP\fR \fP\fBtiff\fP\fR \fP\fBwebp\fP
 .SH LUTGEN\ GENERATE\ 
 .SH NAME
 \fRlutgen \- \fP\fRGenerate and save a Hald CLUT to disk.\fP
@@ -76,7 +76,11 @@
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use (`lutgen palette names` to view all options).\fP
+\fRPalette to use.
+Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, ~/.lutgen/my\-palette.txt is avalable to use with `\-p my\-palette`.\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -192,11 +196,8 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SS AVAILABLE\ OPTIONS:
 .TP
 \fB\-d\fP\fR, \fP\fB\-\-dir\fP
-\fREnable always saving output files to a directory. When output is provided, it will
-always be a directory.\fP
-.PP
-.TP
-\fR[default: false]\fP
+\fRAlways save to a directory when there is only one input file.
+(matches output behavior for multiple files)\fP
 .PP
 .TP
 \fB\-o\fP\fR, \fP\fB\-\-output\fP\fR=\fP\fIPATH\fP
@@ -204,11 +205,15 @@ always be a directory.\fP
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use (`lutgen palette names` to view all options).\fP
+\fRPalette to use.
+Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, ~/.lutgen/my\-palette.txt is avalable to use with `\-p my\-palette`.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
-\fRExternal Hald CLUT to use\fP
+\fRExternal Hald CLUT to use instead of generating one.\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -324,25 +329,23 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SS AVAILABLE\ OPTIONS:
 .TP
 \fB\-w\fP\fR, \fP\fB\-\-write\fP
-\fREnable writing changes directly to the files.\fP
-.PP
-.TP
-\fR[default: false]\fP
+\fRWrite changes directly to the files.\fP
 .PP
 .TP
 \fB\-n\fP\fR, \fP\fB\-\-no\-patch\fP
 \fRDisable computing and printing the patch. Usually paired with \-\-write.\fP
 .PP
 .TP
-\fR[default: false]\fP
-.PP
-.TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use (`lutgen palette names` to view all options).\fP
+\fRPalette to use.
+Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, ~/.lutgen/my\-palette.txt is avalable to use with `\-p my\-palette`.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
-\fRExternal Hald CLUT to use\fP
+\fRExternal Hald CLUT to use instead of generating one.\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -447,14 +450,19 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .SS
 \fBExamples:\fP\fR
-  $ lutgen palette carburetor > carburetor.txt
   $ lutgen palette all
-  $ lutgen palette names | grep gruvbox\fP
+  $ lutgen palette names | grep gruvbox
+  $ lutgen palette oxocarbon\-dark oxocarbon\-light
+  $ lutgen palette carburetor > palette.txt\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
 \fIPALETTE\fP
-\fRPalette to use (`lutgen palette names` to view all options).\fP
+\fRPalette to use.
+Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, ~/.lutgen/my\-palette.txt is avalable to use with `\-p my\-palette`.\fP
 .PP
 .PP
 .SS AVAILABLE\ OPTIONS:

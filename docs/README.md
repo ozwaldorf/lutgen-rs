@@ -13,7 +13,7 @@
 
 ## lutgen
 
-LUT Generator
+A blazingly fast interpolated LUT utility for arbitrary and popular color palettes.
 
 **Usage**: **`lutgen`** _`COMMAND ...`_
 
@@ -40,7 +40,7 @@ LUT Generator
 
 
 **Supported image formats:**
- avif bmp dds exr ff gif hdr ico jpeg png pnm qoi tga tiff webp
+**`avif`** **`bmp`** **`dds`** **`exr`** **`ff`** **`gif`** **`hdr`** **`ico`** **`jpg`** **`jpeg`** **`png`** **`pnm`** **`qoi`** **`tga`** **`tiff`** **`webp`**
 
 
 ## lutgen generate
@@ -59,7 +59,9 @@ Generate and save a Hald CLUT to disk.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use (`lutgen palette names` to view all options).
+  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -135,15 +137,15 @@ Apply a generated or provided Hald CLUT to images.
 
 **Available options:**
 - **`-d`**, **`--dir`** &mdash; 
-  Enable always saving output files to a directory. When output is provided, it will always be a directory.
-   
-  [default: false]
+  Always save to a directory when there is only one input file. (matches output behavior for multiple files)
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use (`lutgen palette names` to view all options).
+  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use
+  External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -219,17 +221,15 @@ Generate a patch for colors inside text files.
 
 **Available options:**
 - **`-w`**, **`--write`** &mdash; 
-  Enable writing changes directly to the files.
-   
-  [default: false]
+  Write changes directly to the files.
 - **`-n`**, **`--no-patch`** &mdash; 
   Disable computing and printing the patch. Usually paired with --write.
-   
-  [default: false]
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use (`lutgen palette names` to view all options).
+  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use
+  External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -296,13 +296,16 @@ Print palette names and colors
 **Usage**: **`lutgen`** **`palette`** (_`COMMAND ...`_ | _`PALETTE`_...)
 
 **Examples:**
- $ lutgen palette carburetor > carburetor.txt
  $ lutgen palette all
  $ lutgen palette names | grep gruvbox
+ $ lutgen palette oxocarbon-dark oxocarbon-light
+ $ lutgen palette carburetor > palette.txt
 
 **Available positional items:**
 - _`PALETTE`_ &mdash; 
-  Palette to use (`lutgen palette names` to view all options).
+  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+
+  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
 
 
 
