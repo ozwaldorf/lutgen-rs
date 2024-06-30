@@ -69,6 +69,42 @@ impl FromStr for DynamicPalette {
     }
 }
 impl DynamicPalette {
+    const HELP: &'static str = "\
+Palette to use.
+Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+
+Custom palette names are case-insensitive and parsed from the file stem.
+For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.";
+
+    /// Argument parser and completion for palettes
+    pub fn parse_flag() -> impl Parser<Self> {
+        long("palette")
+            .short('p')
+            .argument::<String>("PALETTE")
+            .help(Self::HELP)
+            .complete(|v| {
+                DynamicPalette::suggestions(v)
+                    .into_iter()
+                    .map(|(_, name)| (name, None))
+                    .collect()
+            })
+            .parse(|s| DynamicPalette::from_str(&s))
+    }
+
+    /// Positional parser and completion for palettes
+    pub fn parse_arg() -> impl Parser<Vec<Self>> {
+        positional::<String>("PALETTE")
+            .help(Self::HELP)
+            .complete(|v| {
+                DynamicPalette::suggestions(v)
+                    .into_iter()
+                    .map(|(_, name)| (name, None))
+                    .collect()
+            })
+            .parse(|s| DynamicPalette::from_str(&s))
+            .some("missing `all`, `names`, or at least one palette to preview")
+    }
+
     pub fn get(&self) -> &[[u8; 3]] {
         match self {
             DynamicPalette::Builtin(p) => p.get(),
@@ -123,35 +159,6 @@ impl DynamicPalette {
                 .into()
         })
     }
-}
-
-/// Argument parser and completion for palettes
-fn palette_arg() -> impl Parser<DynamicPalette> {
-    long("palette")
-        .short('p')
-        .argument::<String>("PALETTE")
-        .help("Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR")
-        .complete(|v| {
-            DynamicPalette::suggestions(v)
-                .into_iter()
-                .map(|(_, name)| (name, None))
-                .collect()
-        })
-        .parse(|s| DynamicPalette::from_str(&s))
-}
-
-/// Positional parser and completion for palettes
-fn palettes_arg() -> impl Parser<Vec<DynamicPalette>> {
-    positional::<String>("PALETTE")
-        .help("Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR")
-        .complete(|v| {
-            DynamicPalette::suggestions(v)
-                .into_iter()
-                .map(|(_, name)| (name, None))
-                .collect()
-        })
-        .parse(|s| DynamicPalette::from_str(&s))
-        .some("missing `all`, `names`, or at least one palette to preview")
 }
 
 /// Utility for easily parsing from bpaf
@@ -412,7 +419,7 @@ enum PaletteArgs {
     All,
     Palettes(
         /// Palettes to print color previews for.
-        #[bpaf(external(palettes_arg))]
+        #[bpaf(external(DynamicPalette::parse_arg))]
         Vec<DynamicPalette>,
     ),
 }
@@ -455,7 +462,7 @@ enum Lutgen {
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
-        #[bpaf(optional, external(palette_arg))]
+        #[bpaf(optional, external(DynamicPalette::parse_flag))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         lut_algorithm: LutAlgorithm,
@@ -472,7 +479,7 @@ enum Lutgen {
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
-        #[bpaf(optional, external(palette_arg))]
+        #[bpaf(optional, external(DynamicPalette::parse_flag))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
@@ -496,7 +503,7 @@ enum Lutgen {
         /// Disable computing and printing the patch. Usually paired with --write.
         #[bpaf(short, long)]
         no_patch: bool,
-        #[bpaf(optional, external(palette_arg))]
+        #[bpaf(optional, external(DynamicPalette::parse_flag))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
@@ -789,7 +796,7 @@ impl Lutgen {
         }
 
         let is_terminal = stdout().is_terminal();
-        let print = |palette: DynamicPalette| {
+        let print = move |palette: DynamicPalette| {
             // Print palette name with underline
             if is_terminal {
                 eprintln!("\n\x1b[4m{palette}\x1b[0m\n");
