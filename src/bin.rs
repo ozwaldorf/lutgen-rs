@@ -82,10 +82,16 @@ fn palettes_arg() -> impl Parser<Vec<Palette>> {
 /// Utility for easily parsing from bpaf
 #[derive(Clone)]
 struct Color([u8; 3]);
-impl Debug for Color {
+impl Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let [r, g, b] = self.0;
         f.write_str(&format!("#{r:02x}{g:02x}{b:02x}"))
+    }
+}
+impl Debug for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let [r, g, b] = self.0;
+        f.write_str(&format!("rgb({r}, {g}, {b})"))
     }
 }
 impl FromStr for Color {
@@ -99,7 +105,7 @@ impl FromStr for Color {
                 hex = hex.chars().flat_map(|a| [a, a]).collect();
             },
             6 => {},
-            _ => return Err(format!("Invalid hex length: {code}")),
+            l => return Err(format!("Invalid hex length for {code}: {l}")),
         }
         if let Ok(channel_bytes) = u32::from_str_radix(&hex, 16) {
             let r = ((channel_bytes >> 16) & 0xFF) as u8;
