@@ -1,7 +1,9 @@
 use std::collections::BTreeSet;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
+use std::io::{stdout, IsTerminal};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
+use std::sync::OnceLock;
 use std::time::Instant;
 
 use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
@@ -19,63 +21,136 @@ use regex::{Captures, Regex};
 
 const IMAGE_GLOB: &str = "*.avif|*.bmp|*.dds|*.exr|*.ff|*.gif|*.hdr|*.ico|*.jpg|*.jpeg|*.png|*.pnm|*.qoi|*.tga|*.tiff|*.webp";
 
-/// Compute a set of palette suggestions based on some input. Best matches are first in the set.
-fn suggest_palettes(input: &str) -> BTreeSet<(u16, String)> {
-    Palette::VARIANTS
-        .iter()
-        .filter_map(|p| {
-            let variant = p.to_string();
-            let score = strsim::jaro_winkler(input, &variant);
-            (score > 0.7).then_some((((1. - score) * 10000.) as u16, variant))
-        })
-        .collect::<BTreeSet<_>>()
+#[derive(Clone, Debug)]
+enum DynamicPalette {
+    Builtin(Palette),
+    Custom(String, Vec<[u8; 3]>),
 }
-
-/// Parse a palette
-fn parse_palette(input: String) -> Result<Palette, String> {
-    Palette::from_str(&input).map_err(|_| {
-        let mut doc: Doc = "unknown palette".into();
-
-        if let Some((_, name)) = suggest_palettes(&input).pop_first() {
-            doc.text("\n  \n  ");
-            doc.text("Did you mean ");
-            doc.emphasis(&name);
+impl Display for DynamicPalette {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DynamicPalette::Builtin(palette) => std::fmt::Display::fmt(palette, f),
+            DynamicPalette::Custom(name, _) => f.write_str(name),
         }
+    }
+}
+impl FromStr for DynamicPalette {
+    type Err = String;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        if let Some((name, path)) = Self::get_custom_palettes()
+            .iter()
+            .find(|(name, _)| input == name.to_lowercase())
+        {
+            let contents = std::fs::read_to_string(path)
+                .map_err(|e| format!("failed to read custom palette file: {e}"))?;
 
-        doc.text("\n  \n  ");
-        doc.emphasis("Hint: ");
-        doc.text("view all palettes with ");
-        doc.literal("`lutgen palette names`");
-        doc.monochrome(true)
-    })
+            let mut palette = Vec::new();
+            for color in contents.split_whitespace() {
+                palette.push(Color::from_str(color)?.0)
+            }
+
+            Ok(DynamicPalette::Custom(name.clone(), palette))
+        } else if let Ok(palette) = Palette::from_str(input) {
+            Ok(DynamicPalette::Builtin(palette))
+        } else {
+            let mut doc: Doc = "unknown palette\n  \n  ".into();
+
+            if let Some((_, name)) = Self::suggestions(input).pop_first() {
+                doc.text("Did you mean ");
+                doc.emphasis(&name);
+                doc.text("\n  \n  ");
+            }
+
+            doc.emphasis("Hint: ");
+            doc.text("view all palettes with ");
+            doc.literal("`lutgen palette names`");
+            Err(doc.monochrome(true))
+        }
+    }
+}
+impl DynamicPalette {
+    pub fn get(&self) -> &[[u8; 3]] {
+        match self {
+            DynamicPalette::Builtin(p) => p.get(),
+            DynamicPalette::Custom(_, p) => p.as_ref(),
+        }
+    }
+
+    /// Compute a set of palette suggestions based on some input. Best matches are first in the set.
+    pub fn suggestions(input: &str) -> BTreeSet<(u16, String)> {
+        let input = input.to_lowercase();
+        Palette::VARIANTS
+            .iter()
+            .map(ToString::to_string)
+            .chain(Self::get_custom_palettes().iter().map(|v| v.0.clone()))
+            .filter_map(|variant| {
+                let score = strsim::jaro_winkler(&input, &variant);
+                (score > 0.7).then_some((((1. - score) * 10000.) as u16, variant))
+            })
+            .collect::<BTreeSet<_>>()
+    }
+
+    /// Parse files in the palette directory and return all items and locations
+    fn get_custom_palettes() -> Vec<(String, PathBuf)> {
+        let path = Self::dir();
+        if path.is_dir() {
+            std::fs::read_dir(path)
+                .expect("failed to read lutgen dir")
+                .map(|v| {
+                    let path = v.expect("failed to get file info").path();
+                    (
+                        path.file_stem()
+                            .expect("missing file stem")
+                            .to_string_lossy()
+                            .to_lowercase(),
+                        path,
+                    )
+                })
+                .collect()
+        } else {
+            vec![]
+        }
+    }
+
+    /// Get the directory for custom palettes
+    fn dir() -> &'static Path {
+        static LUTGEN_DIR: OnceLock<PathBuf> = OnceLock::new();
+        LUTGEN_DIR.get_or_init(|| {
+            std::env::var("LUTGEN_DIR")
+                .unwrap_or(
+                    std::env::var("HOME").expect("Failed to find home directory") + "/.lutgen",
+                )
+                .into()
+        })
+    }
 }
 
 /// Argument parser and completion for palettes
-fn palette_arg() -> impl Parser<Palette> {
+fn palette_arg() -> impl Parser<DynamicPalette> {
     long("palette")
         .short('p')
         .argument::<String>("PALETTE")
-        .help("Palette to use (`lutgen palette names` to view all options).")
+        .help("Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR")
         .complete(|v| {
-            suggest_palettes(v)
+            DynamicPalette::suggestions(v)
                 .into_iter()
                 .map(|(_, name)| (name, None))
                 .collect()
         })
-        .parse(parse_palette)
+        .parse(|s| DynamicPalette::from_str(&s))
 }
 
 /// Positional parser and completion for palettes
-fn palettes_arg() -> impl Parser<Vec<Palette>> {
+fn palettes_arg() -> impl Parser<Vec<DynamicPalette>> {
     positional::<String>("PALETTE")
-        .help("Palette to use (`lutgen palette names` to view all options).")
+        .help("Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR")
         .complete(|v| {
-            suggest_palettes(v)
+            DynamicPalette::suggestions(v)
                 .into_iter()
                 .map(|(_, name)| (name, None))
                 .collect()
         })
-        .parse(parse_palette)
+        .parse(|s| DynamicPalette::from_str(&s))
         .some("missing `all`, `names`, or at least one palette to preview")
 }
 
@@ -259,7 +334,7 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 impl LutAlgorithm {
     fn generate(
         self,
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         extra_colors: Vec<Color>,
     ) -> Result<(String, Image), String> {
         if let Self::HaldClut { file } = &self {
@@ -338,7 +413,7 @@ enum PaletteArgs {
     Palettes(
         /// Palettes to print color previews for.
         #[bpaf(external(palettes_arg))]
-        Vec<Palette>,
+        Vec<DynamicPalette>,
     ),
 }
 
@@ -381,7 +456,7 @@ enum Lutgen {
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(palette_arg))]
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         #[bpaf(external)]
         lut_algorithm: LutAlgorithm,
         #[bpaf(external)]
@@ -419,10 +494,10 @@ enum Lutgen {
         #[bpaf(short, long)]
         write: bool,
         /// Disable computing and printing the patch. Usually paired with --write.
-        #[bpaf(short, long, fallback(false), display_fallback)]
+        #[bpaf(short, long)]
         no_patch: bool,
         #[bpaf(optional, external(palette_arg))]
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
         /// Text files to generate patches for.
@@ -513,7 +588,7 @@ impl Lutgen {
 
     fn generate(
         output: Option<PathBuf>,
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         lut_algorithm: LutAlgorithm,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
@@ -528,7 +603,7 @@ impl Lutgen {
     fn apply(
         dir: bool,
         output: Option<PathBuf>,
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         hald_clut_or_algorithm: LutAlgorithm,
         input: Vec<PathBuf>,
         extra_colors: Vec<Color>,
@@ -623,7 +698,7 @@ impl Lutgen {
     fn patch(
         write: bool,
         no_patch: bool,
-        palette: Option<Palette>,
+        palette: Option<DynamicPalette>,
         hald_clut_or_algorithm: LutAlgorithm,
         input: Vec<(PathBuf, String)>,
         extra_colors: Vec<Color>,
@@ -708,28 +783,44 @@ impl Lutgen {
     }
 
     fn palette(args: PaletteArgs) -> Result<String, String> {
-        fn print(palette: &Palette) {
-            // Print palette name with underline
-            eprintln!("\n\x1b[4m{palette}\x1b[0m\n");
-            for &color in palette.get() {
-                // Print each color, setting foreground based on luminocity
-                let [r, g, b] = color;
-                let Oklab { l, .. } = srgb_to_oklab(color.into());
-                let fg = if l < 0.5 {
-                    "\x1b[38;2;255;255;255m"
-                } else {
-                    "\x1b[38;2;0;0;0m"
-                };
-                println!("\x1b[48;2;{r};{g};{b}m{fg}#{r:02x}{g:02x}{b:02x}\x1b[0m");
-            }
+        if matches!(args, PaletteArgs::Names) {
+            Palette::VARIANTS.iter().for_each(|p| println!("{p}"));
+            return Ok(Default::default());
         }
 
+        let is_terminal = stdout().is_terminal();
+        let print = |palette: DynamicPalette| {
+            // Print palette name with underline
+            if is_terminal {
+                eprintln!("\n\x1b[4m{palette}\x1b[0m\n");
+            }
+            for color in palette.get() {
+                let color = Color(*color);
+                if is_terminal {
+                    // Set background to the color, and choose foreground based on luminocity
+                    let [r, g, b] = color.0;
+                    let Oklab { l, .. } = srgb_to_oklab(color.0.into());
+                    let fg = if l < 0.5 {
+                        "\x1b[38;2;255;255;255m"
+                    } else {
+                        "\x1b[38;2;0;0;0m"
+                    };
+                    println!("\x1b[48;2;{r};{g};{b}m{fg}{color}\x1b[0m");
+                } else {
+                    println!("{color}");
+                }
+            }
+        };
+
         match args {
-            PaletteArgs::Names => Palette::VARIANTS.iter().for_each(|p| println!("{p}")),
-            PaletteArgs::All => Palette::VARIANTS.iter().for_each(print),
+            PaletteArgs::All => Palette::VARIANTS
+                .iter()
+                .map(|&p| DynamicPalette::Builtin(p))
+                .for_each(print),
             PaletteArgs::Palettes(palettes) => {
-                palettes.iter().for_each(print);
+                palettes.into_iter().for_each(print);
             },
+            _ => unreachable!(),
         }
 
         Ok("".into())
