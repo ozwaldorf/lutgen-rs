@@ -123,9 +123,23 @@ impl AsRef<[u8; 3]> for Color {
     }
 }
 fn extra_colors() -> impl Parser<Vec<Color>> {
-    positional("COLORS")
+    positional::<String>("COLORS")
         .help("Custom colors to use. Combines with a palette if provided.")
         .strict()
+        .complete(|s| {
+            let hex = s.trim_start_matches('#').to_string();
+            if hex.len() == 3 {
+                vec![(
+                    "#".chars()
+                        .chain(hex.chars().flat_map(|a| [a, a]))
+                        .collect::<String>(),
+                    None,
+                )]
+            } else {
+                vec![(s.clone(), None)]
+            }
+        })
+        .parse(|s| Color::from_str(&s))
         .many()
 }
 
