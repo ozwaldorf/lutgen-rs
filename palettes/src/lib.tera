@@ -10,7 +10,7 @@ pub enum Palette {
 
 impl Palette {
     /// Collection of all palette variants
-    pub const VARIANTS: &[Palette] = <Palette as VariantArray>::VARIANTS;
+    pub const VARIANTS: &'static [Palette] = <Palette as VariantArray>::VARIANTS;
 
     /// Get the colors for the palette
     pub fn get(&self) -> &'static [[u8; 3]] {
