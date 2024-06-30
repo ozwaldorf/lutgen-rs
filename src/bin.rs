@@ -365,9 +365,9 @@ enum Lutgen {
     /// Apply a generated or provided Hald CLUT to images.
     #[bpaf(command, short('a'))]
     Apply {
-        /// Enable always saving output files to a directory. When output is provided, it will
-        /// always be a directory.
-        #[bpaf(short, long, fallback(false), display_fallback)]
+        /// Always save to a directory when there is only one input file.
+        /// (matches output behavior for multiple files)
+        #[bpaf(short, long)]
         dir: bool,
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
@@ -389,8 +389,8 @@ enum Lutgen {
     /// Generate a patch for colors inside text files.
     #[bpaf(command, short('p'))]
     Patch {
-        /// Enable writing changes directly to the files.
-        #[bpaf(short, long, fallback(false), display_fallback)]
+        /// Write changes directly to the files.
+        #[bpaf(short, long)]
         write: bool,
         /// Disable computing and printing the patch. Usually paired with --write.
         #[bpaf(short, long, fallback(false), display_fallback)]
@@ -417,9 +417,10 @@ enum Lutgen {
         header({
             let mut doc = Doc::default();
             doc.emphasis("Examples:");
-            doc.text("\n  $ lutgen palette carburetor > carburetor.txt");
             doc.text("\n  $ lutgen palette all");
             doc.text("\n  $ lutgen palette names | grep gruvbox");
+            doc.text("\n  $ lutgen palette oxocarbon-dark oxocarbon-light");
+            doc.text("\n  $ lutgen palette carburetor > palette.txt");
             doc
         })
     )]
