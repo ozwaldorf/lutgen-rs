@@ -1,6 +1,6 @@
 use strum::{Display, EnumString, VariantArray};
 
-#[derive(Clone, Debug, Display, EnumString, VariantArray)]
+#[derive(Clone, Copy, Debug, Display, EnumString, VariantArray)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Palette {
   {% for name, palette in palettes -%}
