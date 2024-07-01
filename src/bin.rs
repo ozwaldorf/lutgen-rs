@@ -153,10 +153,8 @@ For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`
         static LUTGEN_DIR: OnceLock<PathBuf> = OnceLock::new();
         LUTGEN_DIR.get_or_init(|| {
             std::env::var("LUTGEN_DIR")
-                .unwrap_or(
-                    std::env::var("HOME").expect("Failed to find home directory") + "/.lutgen",
-                )
-                .into()
+                .map(Into::into)
+                .unwrap_or(dirs::config_dir().unwrap().join("lutgen"))
         })
     }
 }
@@ -526,10 +524,14 @@ enum Lutgen {
         header({
             let mut doc = Doc::default();
             doc.emphasis("Examples:");
-            doc.text("\n  $ lutgen palette all");
-            doc.text("\n  $ lutgen palette names | grep gruvbox");
-            doc.text("\n  $ lutgen palette oxocarbon-dark oxocarbon-light");
-            doc.text("\n  $ lutgen palette carburetor > palette.txt");
+            doc.text("\n  $ ");
+            doc.literal("lutgen palette all");
+            doc.text("\n  $ ");
+            doc.literal("lutgen palette names | grep gruvbox");
+            doc.text("\n  $ ");
+            doc.literal("lutgen palette oxocarbon-dark oxocarbon-light");
+            doc.text("\n  $ ");
+            doc.literal("lutgen palette carburetor > palette.txt");
             doc
         })
     )]
