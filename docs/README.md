@@ -59,9 +59,9 @@ Generate and save a Hald CLUT to disk.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -141,9 +141,9 @@ Apply a generated or provided Hald CLUT to images.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
@@ -225,9 +225,9 @@ Generate a patch for colors inside text files.
 - **`-n`**, **`--no-patch`** &mdash; 
   Disable computing and printing the patch. Usually paired with --write.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
@@ -296,16 +296,16 @@ Print palette names and colors
 **Usage**: **`lutgen`** **`palette`** (_`COMMAND ...`_ | _`PALETTE`_...)
 
 **Examples:**
- $ lutgen palette all
- $ lutgen palette names | grep gruvbox
- $ lutgen palette oxocarbon-dark oxocarbon-light
- $ lutgen palette carburetor > palette.txt
+ $ **`lutgen palette all`**
+ $ **`lutgen palette names | grep gruvbox`**
+ $ **`lutgen palette oxocarbon-dark oxocarbon-light`**
+ $ **`lutgen palette carburetor > palette.txt`**
 
 **Available positional items:**
 - _`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to ~/.lutgen or $LUTGEN_DIR
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, ~/.lutgen/my-palette.txt is avalable to use with `-p my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 
 
 
