@@ -1,6 +1,7 @@
 use std::f64;
 
-use kiddo::{distance_metric::DistanceMetric, NearestNeighbour, SquaredEuclidean};
+use kiddo::distance_metric::DistanceMetric;
+use kiddo::{NearestNeighbour, SquaredEuclidean};
 
 use super::{ColorTree, InterpolatedRemapper};
 use crate::GenerateLut;
