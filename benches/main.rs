@@ -3,7 +3,9 @@ use std::hint::black_box;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use lutgen::{
     identity::correct_image,
-    interpolation::{GaussianRemapper, ShepardRemapper},
+    interpolation::{
+        GaussianRemapper, GaussianSamplingRemapper, InterpolatedRemapper, ShepardRemapper,
+    },
     GenerateLut, Image,
 };
 use lutgen_palettes::Palette;
@@ -23,7 +25,7 @@ fn benchmark(c: &mut Criterion) {
     g.sample_size(25);
     for i in (1..=4).map(|i| i * 4) {
         g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
-            b.iter(|| gaussian_rbf(*i));
+            b.iter(|| hald(*i, gaussian_rbf));
         });
     }
     drop(g);
@@ -32,17 +34,37 @@ fn benchmark(c: &mut Criterion) {
     g.sample_size(25);
     for i in (1..=4).map(|i| i * 4) {
         g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
-            b.iter(|| shepards_method(*i));
+            b.iter(|| hald(*i, shepards_method));
         });
     }
+    drop(g);
+
+    let mut g = c.benchmark_group("remap_gaussian_sampling");
+    g.sample_size(25);
+    for i in (1..=4).map(|i| i * 4) {
+        g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
+            b.iter(|| hald(*i, gaussian_sampling));
+        });
+    }
+    drop(g);
+
+    let mut g = c.benchmark_group("remap_gaussian_sampling");
+    g.sample_size(100);
+    g.bench_function(BenchmarkId::new("pixel", 1), |b| {
+        b.iter(|| {
+            let mut pixel = [63, 127, 255].into();
+            gaussian_sampling().remap_pixel(&mut pixel);
+            black_box(pixel);
+        })
+    });
+
     drop(g);
 
     let mut g = c.benchmark_group("apply");
     g.sample_size(100);
     for i in (1..=4).map(|i| i * 4) {
         g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
-            let a = GaussianRemapper::new(Palette::Carburetor.get(), 96.0, 16, 1.0, true);
-            let lut = a.generate_lut(*i);
+            let lut = gaussian_rbf().generate_lut(*i);
             let image = image::open("docs/example-image.jpg")
                 .expect("failed to load image")
                 .to_rgb8();
@@ -58,16 +80,21 @@ fn generate(level: u8) {
     black_box(identity);
 }
 
-fn gaussian_rbf(level: u8) {
-    let algorithm = GaussianRemapper::new(Palette::Carburetor.get(), 96.0, 16, 1.0, true);
-    let lut = algorithm.generate_lut(level);
+fn hald<'a, F: FnOnce() -> T, T: InterpolatedRemapper<'a> + GenerateLut<'a>>(level: u8, fun: F) {
+    let lut = GenerateLut::generate_lut(&fun(), level);
     black_box(lut);
 }
 
-fn shepards_method(level: u8) {
-    let algorithm = ShepardRemapper::new(Palette::Carburetor.get(), 16.0, 16, 1.0, true);
-    let lut = algorithm.generate_lut(level);
-    black_box(lut);
+fn gaussian_rbf() -> GaussianRemapper {
+    GaussianRemapper::new(Palette::Carburetor.get(), 96.0, 16, 1.0, true)
+}
+
+fn shepards_method() -> ShepardRemapper {
+    ShepardRemapper::new(Palette::Carburetor.get(), 16.0, 16, 1.0, true)
+}
+
+fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
+    GaussianSamplingRemapper::new(Palette::Carburetor.get(), 0.0, 20.0, 512, 1.0, 42080085)
 }
 
 fn apply(lut: &Image, mut img: Image) {
