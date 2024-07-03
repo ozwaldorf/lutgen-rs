@@ -70,14 +70,18 @@ impl FromStr for DynamicPalette {
 }
 impl DynamicPalette {
     const HELP: &'static str = "\
-Palette to use.
-Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+Builtin or custom palette to use.
 
-Custom palette names are case-insensitive and parsed from the file stem.
-For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.";
+Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+   - Linux: `/home/alice/.config/lutgen`
+   - macOS: `/Users/Alice/Library/Application Support/lutgen`
+   - Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
+
+Names are case-insensitive and parsed from the file stem, minus any file extensions.
+For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.";
 
     /// Argument parser and completion for palettes
-    pub fn parse_flag() -> impl Parser<Self> {
+    pub fn flag_parser() -> impl Parser<Self> {
         long("palette")
             .short('p')
             .argument::<String>("PALETTE")
@@ -92,7 +96,7 @@ For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`
     }
 
     /// Positional parser and completion for palettes
-    pub fn parse_arg() -> impl Parser<Vec<Self>> {
+    pub fn arg_parser() -> impl Parser<Vec<Self>> {
         positional::<String>("PALETTE")
             .help(Self::HELP)
             .complete(|v| {
@@ -202,25 +206,27 @@ impl AsRef<[u8; 3]> for Color {
         &self.0
     }
 }
-fn extra_colors() -> impl Parser<Vec<Color>> {
-    positional::<String>("COLORS")
-        .help("Custom colors to use. Combines with a palette if provided.")
-        .strict()
-        .complete(|s| {
-            let hex = s.trim_start_matches('#').to_string();
-            if hex.len() == 3 {
-                vec![(
-                    "#".chars()
-                        .chain(hex.chars().flat_map(|a| [a, a]))
-                        .collect::<String>(),
-                    None,
-                )]
-            } else {
-                vec![(s.clone(), None)]
-            }
-        })
-        .parse(|s| Color::from_str(&s))
-        .many()
+impl Color {
+    fn extra_colors() -> impl Parser<Vec<Color>> {
+        positional::<String>("COLORS")
+            .help("Custom colors to use. Combines with a palette if provided.")
+            .strict()
+            .complete(|s| {
+                let hex = s.trim_start_matches('#').to_string();
+                if hex.len() == 3 {
+                    vec![(
+                        "#".chars()
+                            .chain(hex.chars().flat_map(|a| [a, a]))
+                            .collect::<String>(),
+                        None,
+                    )]
+                } else {
+                    vec![(s.clone(), None)]
+                }
+            })
+            .parse(|s| Color::from_str(&s))
+            .many()
+    }
 }
 
 #[derive(Bpaf, Clone, Debug)]
@@ -417,7 +423,7 @@ enum PaletteArgs {
     All,
     Palettes(
         /// Palettes to print color previews for.
-        #[bpaf(external(DynamicPalette::parse_arg))]
+        #[bpaf(external(DynamicPalette::arg_parser))]
         Vec<DynamicPalette>,
     ),
 }
@@ -460,11 +466,11 @@ enum Lutgen {
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
-        #[bpaf(optional, external(DynamicPalette::parse_flag))]
+        #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         lut_algorithm: LutAlgorithm,
-        #[bpaf(external)]
+        #[bpaf(external(Color::extra_colors))]
         extra_colors: Vec<Color>,
     },
     /// Apply a generated or provided Hald CLUT to images.
@@ -477,7 +483,7 @@ enum Lutgen {
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"))]
         output: Option<PathBuf>,
-        #[bpaf(optional, external(DynamicPalette::parse_flag))]
+        #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
@@ -489,7 +495,7 @@ enum Lutgen {
             complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) })
         )]
         input: Vec<PathBuf>,
-        #[bpaf(external)]
+        #[bpaf(external(Color::extra_colors))]
         extra_colors: Vec<Color>,
     },
     /// Generate a patch for colors inside text files.
@@ -501,7 +507,7 @@ enum Lutgen {
         /// Disable computing and printing the patch. Usually paired with --write.
         #[bpaf(short, long)]
         no_patch: bool,
-        #[bpaf(optional, external(DynamicPalette::parse_flag))]
+        #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
@@ -514,7 +520,7 @@ enum Lutgen {
             complete_shell(ShellComp::File { mask: None })
         )]
         input: Vec<(PathBuf, String)>,
-        #[bpaf(external)]
+        #[bpaf(external(Color::extra_colors))]
         extra_colors: Vec<Color>,
     },
     /// Print palette names and colors
@@ -536,6 +542,19 @@ enum Lutgen {
         })
     )]
     Palette(#[bpaf(external(palette_args))] PaletteArgs),
+    /// Generate shell completions (zsh, bash, fish, and elvish)
+    #[bpaf(command)]
+    Completions {
+        /// Shell to generate completions for.
+        #[bpaf(
+            positional("SHELL"),
+            guard(
+                |s| ["zsh", "bash", "fish", "elvish"].contains(&s.to_lowercase().as_str()),
+                "unknown shell"
+            )
+        )]
+        shell: String,
+    },
 }
 
 fn load_image<P: AsRef<Path>>(path: P) -> Result<Image, String> {
@@ -592,6 +611,15 @@ impl Lutgen {
                 extra_colors,
             ),
             Lutgen::Palette(args) => Lutgen::palette(args),
+            Lutgen::Completions { shell } => {
+                // Execute binary with the hidden bpaf generate flag and proxy output
+                let out = std::process::Command::new(env!("CARGO_BIN_NAME"))
+                    .arg(format!("--bpaf-complete-style-{shell}"))
+                    .output()
+                    .expect("failed to generate completions");
+                print!("{}", String::from_utf8_lossy(&out.stdout));
+                std::process::exit(0);
+            },
         }
     }
 

@@ -47,9 +47,9 @@
             postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
               installManPage docs/lutgen.1
               installShellCompletion --cmd lutgen \
-                --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
-                --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
-                --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
+                --bash <($out/bin/lutgen completions bash) \
+                --fish <($out/bin/lutgen completions fish) \
+                --zsh <($out/bin/lutgen completions zsh)
             '';
           }
         );
