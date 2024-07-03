@@ -10,6 +10,7 @@
   * [`lutgen palette`↴](#lutgen-palette)
   * [`lutgen palette names`↴](#lutgen-palette-names)
   * [`lutgen palette all`↴](#lutgen-palette-all)
+  * [`lutgen completions`↴](#lutgen-completions)
 
 ## lutgen
 
@@ -36,6 +37,8 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
   Generate a patch for colors inside text files.
 - **`palette`**, **`P`** &mdash; 
   Print palette names and colors
+- **`completions`** &mdash; 
+  Generate shell completions (zsh, bash, fish, and elvish)
 
 
 
@@ -59,9 +62,14 @@ Generate and save a Hald CLUT to disk.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+  Builtin or custom palette to use.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+  - Linux: `/home/alice/.config/lutgen`
+  - macOS: `/Users/Alice/Library/Application Support/lutgen`
+  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
+
+  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
@@ -141,9 +149,14 @@ Apply a generated or provided Hald CLUT to images.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+  Builtin or custom palette to use.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+  - Linux: `/home/alice/.config/lutgen`
+  - macOS: `/Users/Alice/Library/Application Support/lutgen`
+  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
+
+  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
@@ -225,9 +238,14 @@ Generate a patch for colors inside text files.
 - **`-n`**, **`--no-patch`** &mdash; 
   Disable computing and printing the patch. Usually paired with --write.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+  Builtin or custom palette to use.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+  - Linux: `/home/alice/.config/lutgen`
+  - macOS: `/Users/Alice/Library/Application Support/lutgen`
+  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
+
+  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
@@ -303,9 +321,14 @@ Print palette names and colors
 
 **Available positional items:**
 - _`PALETTE`_ &mdash; 
-  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+  Builtin or custom palette to use.
 
-  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+  - Linux: `/home/alice/.config/lutgen`
+  - macOS: `/Users/Alice/Library/Application Support/lutgen`
+  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
+
+  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 
 
 
@@ -338,6 +361,23 @@ Print all palette names. Useful for scripting and searching.
 Print all palette names and colors.
 
 **Usage**: **`lutgen`** **`palette`** **`all`** 
+
+**Available options:**
+- **`-h`**, **`--help`** &mdash; 
+  Prints help information
+
+
+## lutgen completions
+
+Generate shell completions (zsh, bash, fish, and elvish)
+
+**Usage**: **`lutgen`** **`completions`** _`SHELL`_
+
+**Available positional items:**
+- _`SHELL`_ &mdash; 
+  Shell to generate completions for.
+
+
 
 **Available options:**
 - **`-h`**, **`--help`** &mdash; 

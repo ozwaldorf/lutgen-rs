@@ -11,6 +11,7 @@
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR(\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP\fR
+\fP\fBlutgen\fP\fR \fP\fBcompletions\fP\fR \fP\fISHELL\fP\fR
 \fP
 .fi
 .SH LUTGEN\ 
@@ -53,6 +54,10 @@
 \fBpalette\fP\fR, \fP\fBP\fP
 \fRPrint palette names and colors\fP
 .PP
+.TP
+\fBcompletions\fP
+\fRGenerate shell completions (zsh, bash, fish, and elvish)\fP
+.PP
 .PP
 .SS
 \fBSupported image formats:\fP\fR
@@ -76,11 +81,15 @@
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use.
-Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+\fRBuiltin or custom palette to use.
 
-Custom palette names are case\-insensitive and parsed from the file stem.
-For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+   \- Linux: `/home/alice/.config/lutgen`
+   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
+   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
+
+Names are case\-insensitive and parsed from the file stem, minus any file extensions.
+For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -205,11 +214,15 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use.
-Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+\fRBuiltin or custom palette to use.
 
-Custom palette names are case\-insensitive and parsed from the file stem.
-For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+   \- Linux: `/home/alice/.config/lutgen`
+   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
+   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
+
+Names are case\-insensitive and parsed from the file stem, minus any file extensions.
+For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
@@ -337,11 +350,15 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRPalette to use.
-Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+\fRBuiltin or custom palette to use.
 
-Custom palette names are case\-insensitive and parsed from the file stem.
-For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+   \- Linux: `/home/alice/.config/lutgen`
+   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
+   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
+
+Names are case\-insensitive and parsed from the file stem, minus any file extensions.
+For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
@@ -458,11 +475,15 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
 \fIPALETTE\fP
-\fRPalette to use.
-Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
+\fRBuiltin or custom palette to use.
 
-Custom palette names are case\-insensitive and parsed from the file stem.
-For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
+   \- Linux: `/home/alice/.config/lutgen`
+   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
+   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
+
+Names are case\-insensitive and parsed from the file stem, minus any file extensions.
+For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .PP
 .SS AVAILABLE\ OPTIONS:
@@ -496,6 +517,23 @@ For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palett
 \fRlutgen \- \fP\fRPrint all palette names and colors.\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP
+.PP
+.SS AVAILABLE\ OPTIONS:
+.TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ COMPLETIONS\ 
+.SH NAME
+\fRlutgen \- \fP\fRGenerate shell completions (zsh, bash, fish, and elvish)\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBcompletions\fP\fR \fP\fISHELL\fP
+.PP
+.SS AVAILABLE\ POSITIONAL\ ITEMS:
+.TP
+\fISHELL\fP
+\fRShell to generate completions for.\fP
+.PP
 .PP
 .SS AVAILABLE\ OPTIONS:
 .TP

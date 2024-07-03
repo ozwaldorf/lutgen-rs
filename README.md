@@ -135,10 +135,13 @@ Correcting videos (using ffmpeg):
 ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
 ```
 
-Zsh Completions:
+Dynamic completions:
 
 ```bash
-lutgen --bpaf-complete-style-zsh > _lutgen
+# Supports zsh, bash, fish, and elvish
+lutgen completions zsh > _lutgen
+
+# Install the completion script
 sudo mv _lutgen /usr/local/share/zsh/site-functions/
 ```
 
