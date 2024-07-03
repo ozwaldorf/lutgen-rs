@@ -377,7 +377,7 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 impl LutAlgorithm {
     fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<Image, String> {
         if let Self::HaldClut { file } = &self {
-            return Ok(load_image(file)?);
+            return load_image(file);
         }
 
         let time = Instant::now();
@@ -461,12 +461,10 @@ fn concat_colors(
         colors.extend(extra_colors.iter().map(AsRef::as_ref));
     }
 
-    if colors.is_empty() {
-        return Err(
-            "A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into(),
-        );
-    } else {
+    if !colors.is_empty() {
         Ok((name, colors))
+    } else {
+        Err("A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into())
     }
 }
 
