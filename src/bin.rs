@@ -1,9 +1,9 @@
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::io::{stdout, IsTerminal};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use std::sync::OnceLock;
 use std::time::Instant;
 
 use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
@@ -21,7 +21,7 @@ use regex::{Captures, Regex};
 
 const IMAGE_GLOB: &str = "*.avif|*.bmp|*.dds|*.exr|*.ff|*.gif|*.hdr|*.ico|*.jpg|*.jpeg|*.png|*.pnm|*.qoi|*.tga|*.tiff|*.webp";
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash)]
 enum DynamicPalette {
     Builtin(Palette),
     Custom(String, Vec<[u8; 3]>),
@@ -117,7 +117,7 @@ For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-p
     }
 
     /// Compute a set of palette suggestions based on some input. Best matches are first in the set.
-    pub fn suggestions(input: &str) -> BTreeSet<(u16, String)> {
+    fn suggestions(input: &str) -> BTreeSet<(u16, String)> {
         let input = input.to_lowercase();
         Palette::VARIANTS
             .iter()
@@ -132,7 +132,10 @@ For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-p
 
     /// Parse files in the palette directory and return all items and locations
     fn get_custom_palettes() -> Vec<(String, PathBuf)> {
-        let path = Self::dir();
+        let path = std::env::var("LUTGEN_DIR")
+            .map(Into::into)
+            .unwrap_or(dirs::config_dir().unwrap().join("lutgen"));
+
         if path.is_dir() {
             std::fs::read_dir(path)
                 .expect("failed to read lutgen dir")
@@ -151,21 +154,11 @@ For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-p
             vec![]
         }
     }
-
-    /// Get the directory for custom palettes
-    fn dir() -> &'static Path {
-        static LUTGEN_DIR: OnceLock<PathBuf> = OnceLock::new();
-        LUTGEN_DIR.get_or_init(|| {
-            std::env::var("LUTGEN_DIR")
-                .map(Into::into)
-                .unwrap_or(dirs::config_dir().unwrap().join("lutgen"))
-        })
-    }
 }
 
 /// Utility for easily parsing from bpaf
-#[derive(Clone)]
-struct Color([u8; 3]);
+#[derive(Clone, Hash)]
+struct Color(pub [u8; 3]);
 impl Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let [r, g, b] = self.0;
@@ -229,7 +222,32 @@ impl Color {
     }
 }
 
-#[derive(Bpaf, Clone, Debug)]
+/// Utility to wrap non-hashable types with their string impl
+#[derive(Clone, Debug)]
+struct Hashed<T: Clone + Debug>(pub T);
+impl<T: Clone + Debug + ToString> Hash for Hashed<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.to_string().hash(state);
+    }
+}
+impl<T: Clone + Debug + FromStr> FromStr for Hashed<T> {
+    type Err = T::Err;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        T::from_str(s).map(Hashed)
+    }
+}
+impl<T: Clone + Debug> AsRef<T> for Hashed<T> {
+    fn as_ref(&self) -> &T {
+        &self.0
+    }
+}
+impl<T: Clone + Debug> Display for Hashed<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Bpaf, Clone, Debug, Hash)]
 struct Common {
     /// Factor to multiply luminocity values by. Effectively weights the interpolation to prefer
     /// more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
@@ -237,10 +255,10 @@ struct Common {
         short('L'),
         long("lum"),
         argument("FACTOR"),
-        fallback(1.0),
+        fallback(Hashed(1.0)),
         display_fallback
     )]
-    lum_factor: f64,
+    lum_factor: Hashed<f64>,
     /// Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
     #[bpaf(
         short,
@@ -253,7 +271,7 @@ struct Common {
     level: u8,
 }
 
-#[derive(Bpaf, Clone, Debug)]
+#[derive(Bpaf, Clone, Debug, Hash)]
 struct CommonRbf {
     /// Number of nearest colors to consider when interpolating. 0 uses all available colors.
     #[bpaf(short, long, argument("NEAREST"), fallback(16), display_fallback)]
@@ -263,30 +281,40 @@ struct CommonRbf {
     preserve: bool,
 }
 
-#[derive(Bpaf, Clone, Debug)]
-struct GaussianRbfArgs {
-    /// Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-    /// less blending between colors in the palette, where bigger numbers equal less blending.
-    /// Effect is heavily dependant on the number of nearest colors used.
-    #[bpaf(short, long, argument("SHAPE"), fallback(128.0), display_fallback)]
-    shape: f64,
-    #[bpaf(external)]
-    common_rbf: CommonRbf,
-    #[bpaf(external)]
-    common: Common,
-}
-
-#[derive(Bpaf, Clone, Debug)]
+#[derive(Bpaf, Clone, Debug, Hash)]
 enum LutAlgorithm {
-    GaussianRbf(#[bpaf(external(gaussian_rbf_args))] GaussianRbfArgs),
+    // Default algorithm, so adjacent isn't used.
+    GaussianRbf {
+        #[bpaf(external)]
+        common: Common,
+        #[bpaf(external)]
+        common_rbf: CommonRbf,
+        /// Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+        /// less blending between colors in the palette, where bigger numbers equal less blending.
+        /// Effect is heavily dependant on the number of nearest colors used.
+        #[bpaf(
+            short,
+            long,
+            argument("SHAPE"),
+            fallback(Hashed(128.0)),
+            display_fallback
+        )]
+        shape: Hashed<f64>,
+    },
     #[bpaf(adjacent)]
     ShepardsMethod {
         /// Enable using Shepard's method (Inverse Distance RBF) for interpolation.
         #[bpaf(short('S'), long("shepards-method"), req_flag(()))]
         _shepards_method: (),
         /// Power parameter for shepard's method.
-        #[bpaf(short, long, argument("POWER"), fallback(4.0), display_fallback)]
-        power: f64,
+        #[bpaf(
+            short,
+            long,
+            argument("POWER"),
+            fallback(Hashed(4.0)),
+            display_fallback
+        )]
+        power: Hashed<f64>,
         #[bpaf(external)]
         common_rbf: CommonRbf,
         #[bpaf(external)]
@@ -298,11 +326,17 @@ enum LutAlgorithm {
         #[bpaf(short('G'), long("gaussian-sampling"), req_flag(()))]
         _gaussian_sampling: (),
         /// Average amount of noise to apply in each iteration.
-        #[bpaf(short, long, argument("MEAN"), fallback(0.0), display_fallback)]
-        mean: f64,
+        #[bpaf(short, long, argument("MEAN"), fallback(Hashed(0.0)), display_fallback)]
+        mean: Hashed<f64>,
         /// Standard deviation parameter for the noise applied in each iteration.
-        #[bpaf(short, long, argument("STD_DEV"), fallback(20.0), display_fallback)]
-        std_dev: f64,
+        #[bpaf(
+            short,
+            long,
+            argument("STD_DEV"),
+            fallback(Hashed(20.0)),
+            display_fallback
+        )]
+        std_dev: Hashed<f64>,
         /// Number of iterations of noise to apply to each pixel.
         #[bpaf(short, long, argument("ITERS"), fallback(512), display_fallback)]
         iterations: usize,
@@ -327,9 +361,7 @@ enum LutAlgorithm {
         common: Common,
     },
     #[bpaf(skip)]
-    HaldClut {
-        file: PathBuf,
-    },
+    HaldClut { file: PathBuf },
 }
 
 /// Manually allow using an external hald clut, hack since we dont want to allow this for generate,
@@ -343,53 +375,28 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 }
 
 impl LutAlgorithm {
-    fn generate(
-        self,
-        palette: Option<DynamicPalette>,
-        extra_colors: Vec<Color>,
-    ) -> Result<(String, Image), String> {
+    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<Image, String> {
         if let Self::HaldClut { file } = &self {
-            return Ok(("out".to_string(), load_image(file)?));
+            return Ok(load_image(file)?);
         }
 
         let time = Instant::now();
 
-        let mut name = String::new();
-        let mut colors = palette
-            .as_ref()
-            .map(|p| {
-                name.push_str(&p.to_string());
-                p.get().to_vec()
-            })
-            .unwrap_or_default();
-        if !extra_colors.is_empty() {
-            if !name.is_empty() {
-                name.push('-');
-            }
-            name.push_str("custom");
-            colors.extend(extra_colors.iter().map(AsRef::as_ref));
-        }
-        if colors.is_empty() {
-            return Err(
-                "A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into(),
-            );
-        }
-
         let lut = match self {
-            LutAlgorithm::GaussianRbf(GaussianRbfArgs {
+            LutAlgorithm::GaussianRbf {
                 shape,
                 common_rbf: CommonRbf { nearest, preserve },
                 common: Common { level, lum_factor },
                 ..
-            }) => GaussianRemapper::new(&colors, shape, nearest, lum_factor, preserve)
-                .generate_lut(level),
+            } => GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
+                .generate_lut(*level),
             LutAlgorithm::ShepardsMethod {
                 power,
                 common_rbf: CommonRbf { nearest, preserve },
                 common: Common { level, lum_factor },
                 ..
-            } => ShepardRemapper::new(&colors, power, nearest, lum_factor, preserve)
-                .generate_lut(level),
+            } => ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
+                .generate_lut(*level),
             LutAlgorithm::GaussianSampling {
                 mean,
                 std_dev,
@@ -397,23 +404,28 @@ impl LutAlgorithm {
                 seed,
                 common: Common { level, lum_factor },
                 ..
-            } => {
-                GaussianSamplingRemapper::new(&colors, mean, std_dev, iterations, lum_factor, seed)
-                    .generate_lut(level)
-            },
+            } => GaussianSamplingRemapper::new(
+                &colors,
+                mean.0,
+                std_dev.0,
+                *iterations,
+                lum_factor.0,
+                *seed,
+            )
+            .generate_lut(*level),
             LutAlgorithm::NearestNeighbor {
                 common: Common { level, lum_factor },
                 ..
-            } => NearestNeighborRemapper::new(&colors, lum_factor).generate_lut(level),
+            } => NearestNeighborRemapper::new(&colors, lum_factor.0).generate_lut(*level),
             _ => unreachable!(),
         };
-        println!("✔ Generated `{name}` LUT in {:.2?}", time.elapsed());
+        println!("✔ Generated \"{name}\" LUT in {:.2?}", time.elapsed());
 
-        Ok((name, lut))
+        Ok(lut)
     }
 }
 
-#[derive(Bpaf, Clone, Debug)]
+#[derive(Bpaf, Clone, Debug, Hash)]
 enum PaletteArgs {
     /// Print all palette names. Useful for scripting and searching.
     #[bpaf(command)]
@@ -428,8 +440,37 @@ enum PaletteArgs {
     ),
 }
 
-/// LUT Generator
-#[derive(Bpaf, Clone, Debug)]
+/// Concat an optional palette and extra colors, as well as constructing a name tag.
+fn concat_colors(
+    palette: Option<DynamicPalette>,
+    extra_colors: Vec<Color>,
+) -> Result<(String, Vec<[u8; 3]>), String> {
+    let mut name = String::new();
+    let mut colors = palette
+        .as_ref()
+        .map(|p| {
+            name.push_str(&p.to_string());
+            p.get().to_vec()
+        })
+        .unwrap_or_default();
+    if !extra_colors.is_empty() {
+        if !name.is_empty() {
+            name.push('-');
+        }
+        name.push_str("custom");
+        colors.extend(extra_colors.iter().map(AsRef::as_ref));
+    }
+
+    if colors.is_empty() {
+        return Err(
+            "A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into(),
+        );
+    } else {
+        Ok((name, colors))
+    }
+}
+
+#[derive(Bpaf, Clone, Debug, Hash)]
 #[bpaf(
     options,
     version,
@@ -485,6 +526,9 @@ enum Lutgen {
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
+        /// Cache generated LUT. No effect when using an external LUT.
+        #[bpaf(short, long)]
+        cache: bool,
         #[bpaf(external)]
         hald_clut_or_algorithm: LutAlgorithm,
         /// Images to correct, using the generated or provided hald clut.
@@ -582,19 +626,32 @@ impl Lutgen {
             } => Lutgen::generate(output, palette, lut_algorithm, extra_colors),
             Lutgen::Apply {
                 dir,
-                output,
-                palette,
-                hald_clut_or_algorithm,
-                input,
-                extra_colors,
-            } => Lutgen::apply(
-                dir,
-                output,
-                palette,
-                hald_clut_or_algorithm,
-                input,
-                extra_colors,
-            ),
+                ref output,
+                ref palette,
+                cache,
+                ref hald_clut_or_algorithm,
+                ref input,
+                ref extra_colors,
+            } => {
+                let hash =
+                    if cache && !matches!(hald_clut_or_algorithm, LutAlgorithm::HaldClut { .. }) {
+                        let mut hasher = DefaultHasher::new();
+                        self.hash(&mut hasher);
+                        Some(hasher.finish())
+                    } else {
+                        None
+                    };
+
+                Lutgen::apply(
+                    hash,
+                    dir,
+                    output.to_owned(),
+                    palette.to_owned(),
+                    hald_clut_or_algorithm.to_owned(),
+                    input.to_owned(),
+                    extra_colors.to_owned(),
+                )
+            },
             Lutgen::Patch {
                 write,
                 no_patch,
@@ -629,7 +686,8 @@ impl Lutgen {
         lut_algorithm: LutAlgorithm,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
-        let (name, lut) = lut_algorithm.generate(palette, extra_colors)?;
+        let (name, colors) = concat_colors(palette, extra_colors)?;
+        let lut = lut_algorithm.generate(&name, colors)?;
         let time = Instant::now();
         let path = output.unwrap_or(format!("{name}.png").into());
         lut.save(&path).map_err(|e| e.to_string())?;
@@ -638,6 +696,7 @@ impl Lutgen {
     }
 
     fn apply(
+        hash: Option<u64>,
         dir: bool,
         output: Option<PathBuf>,
         palette: Option<DynamicPalette>,
@@ -645,7 +704,30 @@ impl Lutgen {
         input: Vec<PathBuf>,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
-        let (name, lut) = hald_clut_or_algorithm.generate(palette, extra_colors)?;
+        let (name, colors) = concat_colors(palette, extra_colors)?;
+
+        let lut = if let Some(hash) = hash {
+            let mut path = dirs::cache_dir()
+                .expect("failed to determine cache dir")
+                .join("lutgen");
+            if !path.exists() {
+                std::fs::create_dir_all(&path).expect("failed to create cache directory");
+            }
+
+            path = path.join(format!("{name}-{hash}.png"));
+            if !path.exists() {
+                let lut = hald_clut_or_algorithm.generate(&name, colors)?;
+                let time = Instant::now();
+                lut.save(path)
+                    .map_err(|e| format!("failed to write cached LUT: {e}"))?;
+                println!("✔ Cached \"{name}\" LUT in {:.02?}", time.elapsed());
+                lut
+            } else {
+                load_image(path)?
+            }
+        } else {
+            hald_clut_or_algorithm.generate(&name, colors)?
+        };
 
         for file in &input {
             let mut image = load_image(file)?;
@@ -742,7 +824,8 @@ impl Lutgen {
     ) -> Result<String, String> {
         const REGEX: &str = r"(#)([0-9a-fA-F]{3}){1,2}|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
 
-        let (_, lut) = hald_clut_or_algorithm.generate(palette, extra_colors)?;
+        let (name, colors) = concat_colors(palette, extra_colors)?;
+        let lut = hald_clut_or_algorithm.generate(&name, colors)?;
         let level = detect_level(&lut);
 
         let len = input.len();
