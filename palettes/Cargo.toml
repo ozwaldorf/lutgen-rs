@@ -16,7 +16,8 @@ strum = { version = "0.26", features = ["derive"] }
 [build-dependencies]
 regex.workspace = true
 toml = "0.8"
-tera = { version = "1", default-features = false }
+serde = { version = "1.0", features = [ "derive" ] }
+tinytemplate = "1.2"
 
 [features]
 default = []
