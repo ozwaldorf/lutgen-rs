@@ -3,33 +3,52 @@ use std::error::Error;
 use std::fs::{read_to_string, write};
 use std::path::Path;
 
-use tera::{try_get_value, Context, Map, Tera};
+use serde::Serialize;
+use tinytemplate::TinyTemplate;
+
+#[derive(Serialize)]
+struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+#[derive(Serialize)]
+struct Palette {
+    name: String,
+    palette: Vec<Color>,
+}
+#[derive(Serialize)]
+struct Context {
+    palettes: Vec<Palette>,
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     println!("cargo:rerun-if-changed=palettes.toml");
-    println!("cargo:rerun-if-changed=src/lib.tera");
+    println!("cargo:rerun-if-changed=src/lib.template");
 
     let out_dir = std::env::var("OUT_DIR")?;
-    let mut tera = Tera::default();
-    tera.register_filter("hex_to_rgb", hex_to_rgb_filter);
-    tera.register_filter("pascal_case", pascal_case);
+    let mut tt = TinyTemplate::new();
+    tt.add_template("lib.rs", include_str!("src/lib.template"))?;
 
-    let mut context = Context::new();
-    let data: tera::Value = toml::from_str(&read_to_string("palettes.toml")?)?;
-    context.insert("palettes", &data);
+    let ctx = Context {
+        palettes: toml::from_str::<HashMap<String, Vec<String>>>(&read_to_string(
+            "palettes.toml",
+        )?)?
+        .into_iter()
+        .map(|(name, palette)| Palette {
+            name: pascal_case(name),
+            palette: palette.into_iter().map(parse_color).collect(),
+        })
+        .collect(),
+    };
 
-    let rust_code = tera.render_str(&read_to_string("src/lib.tera")?, &context)?;
+    let rust_code = tt.render("lib.rs", &ctx)?;
     write(Path::new(&out_dir).join("lib.rs"), rust_code)?;
 
     Ok(())
 }
 
-pub fn pascal_case(
-    value: &tera::Value,
-    _: &HashMap<String, tera::Value>,
-) -> tera::Result<tera::Value> {
-    let s = try_get_value!("pascal_case", "value", String, value);
-
+pub fn pascal_case(s: String) -> String {
     let sections: Vec<_> = s.split('_').collect();
     let mut buf = String::new();
     if s.starts_with('_') {
@@ -41,30 +60,25 @@ pub fn pascal_case(
             buf.push_str(&(f.to_uppercase().to_string() + &chars.as_str().to_lowercase()))
         }
     }
-    Ok(buf.into())
+    buf
 }
 
-fn hex_to_rgb_filter(
-    value: &tera::Value,
-    _args: &HashMap<String, tera::Value>,
-) -> tera::Result<tera::Value> {
-    let hex_string = try_get_value!("hex_to_rgb", "value", String, value);
-    let hex_string = match hex_string.strip_prefix('#') {
+fn parse_color(s: String) -> Color {
+    let hex_string = match s.strip_prefix('#') {
         Some(s) => s,
-        None => return Err(tera::Error::msg("expected hex string starting with `#`")),
+        None => panic!("expected hex string starting with `#`"),
     };
     if hex_string.len() != 6 {
-        return Err(tera::Error::msg("expected a 6 digit hex string"));
+        panic!("expected a 6 digit hex string");
     }
     let channel_bytes = match u32::from_str_radix(hex_string, 16) {
         Ok(n) => n,
-        Err(_) => return Err(tera::Error::msg("expected a valid hex string")),
+        Err(_) => panic!("expected a valid hex string"),
     };
 
-    let mut map = Map::new();
-    map.insert("r".to_string(), ((channel_bytes >> 16) & 0xFF).into());
-    map.insert("g".to_string(), ((channel_bytes >> 8) & 0xFF).into());
-    map.insert("b".to_string(), (channel_bytes & 0xFF).into());
-
-    Ok(map.into())
+    Color {
+        r: ((channel_bytes >> 16) & 0xFF) as u8,
+        g: ((channel_bytes >> 8) & 0xFF) as u8,
+        b: (channel_bytes & 0xFF) as u8,
+    }
 }
