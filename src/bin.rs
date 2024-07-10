@@ -639,11 +639,11 @@ impl Lutgen {
                 Lutgen::apply(
                     hash,
                     dir,
-                    output.to_owned(),
-                    palette.to_owned(),
-                    hald_clut_or_algorithm.to_owned(),
-                    input.to_owned(),
-                    extra_colors.to_owned(),
+                    output,
+                    palette,
+                    hald_clut_or_algorithm,
+                    input,
+                    extra_colors,
                 )
             },
             Lutgen::Patch {
