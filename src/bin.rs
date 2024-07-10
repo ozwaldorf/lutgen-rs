@@ -623,13 +623,9 @@ impl Lutgen {
                 extra_colors,
             } => Lutgen::generate(output, palette, lut_algorithm, extra_colors),
             Lutgen::Apply {
-                dir,
-                ref output,
-                ref palette,
                 cache,
                 ref hald_clut_or_algorithm,
-                ref input,
-                ref extra_colors,
+                ..
             } => {
                 let hash =
                     if cache && !matches!(hald_clut_or_algorithm, LutAlgorithm::HaldClut { .. }) {
@@ -639,6 +635,19 @@ impl Lutgen {
                     } else {
                         None
                     };
+
+                let Lutgen::Apply {
+                    dir,
+                    output,
+                    palette,
+                    hald_clut_or_algorithm,
+                    input,
+                    extra_colors,
+                    ..
+                } = self
+                else {
+                    unreachable!()
+                };
 
                 Lutgen::apply(
                     hash,
