@@ -584,19 +584,6 @@ enum Lutgen {
         })
     )]
     Palette(#[bpaf(external(palette_args))] PaletteArgs),
-    /// Generate shell completions (zsh, bash, fish, and elvish)
-    #[bpaf(command)]
-    Completions {
-        /// Shell to generate completions for.
-        #[bpaf(
-            positional("SHELL"),
-            guard(
-                |s| ["zsh", "bash", "fish", "elvish"].contains(&s.to_lowercase().as_str()),
-                "unknown shell"
-            )
-        )]
-        shell: String,
-    },
 }
 
 fn load_image<P: AsRef<Path>>(path: P) -> Result<Image, String> {
@@ -675,15 +662,6 @@ impl Lutgen {
                 extra_colors,
             ),
             Lutgen::Palette(args) => Lutgen::palette(args),
-            Lutgen::Completions { shell } => {
-                // Execute binary with the hidden bpaf generate flag and proxy output
-                let out = std::process::Command::new(env!("CARGO_BIN_NAME"))
-                    .arg(format!("--bpaf-complete-style-{shell}"))
-                    .output()
-                    .expect("failed to generate completions");
-                print!("{}", String::from_utf8_lossy(&out.stdout));
-                std::process::exit(0);
-            },
         }
     }
 

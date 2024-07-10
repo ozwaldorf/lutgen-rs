@@ -10,7 +10,6 @@
   * [`lutgen palette`↴](#lutgen-palette)
   * [`lutgen palette names`↴](#lutgen-palette-names)
   * [`lutgen palette all`↴](#lutgen-palette-all)
-  * [`lutgen completions`↴](#lutgen-completions)
 
 ## lutgen
 
@@ -37,8 +36,6 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
   Generate a patch for colors inside text files.
 - **`palette`**, **`P`** &mdash; 
   Print palette names and colors
-- **`completions`** &mdash; 
-  Generate shell completions (zsh, bash, fish, and elvish)
 
 
 
@@ -50,7 +47,7 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
 
 Generate and save a Hald CLUT to disk.
 
-**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`COLORS`_ &mdash; 
@@ -62,18 +59,17 @@ Generate and save a Hald CLUT to disk.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Builtin or custom palette to use.
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-  - Linux: `/home/alice/.config/lutgen`
-  - macOS: `/Users/Alice/Library/Application Support/lutgen`
-  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
-
-  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
-- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
-  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    
-  [default: 128]
+  [default: 1.0]
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
 - **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
   Number of nearest colors to consider when interpolating. 0 uses all available colors.
    
@@ -82,21 +78,17 @@ Generate and save a Hald CLUT to disk.
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
+  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
-  [default: 1]
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
+  [default: 128.0]
 ### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
   Power parameter for shepard's method.
    
-  [default: 4]
+  [default: 4.0]
 
 
 ### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
@@ -105,11 +97,11 @@ Generate and save a Hald CLUT to disk.
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
   Average amount of noise to apply in each iteration.
    
-  [default: 0]
+  [default: 0.0]
 - **`-s`**, **`--std-dev`**=_`STD_DEV`_ &mdash; 
   Standard deviation parameter for the noise applied in each iteration.
    
-  [default: 20]
+  [default: 20.0]
 - **`-i`**, **`--iterations`**=_`ITERS`_ &mdash; 
   Number of iterations of noise to apply to each pixel.
    
@@ -133,7 +125,7 @@ Generate and save a Hald CLUT to disk.
 
 Apply a generated or provided Hald CLUT to images.
 
-**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ | \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ | \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`IMAGES`_ &mdash; 
@@ -149,20 +141,21 @@ Apply a generated or provided Hald CLUT to images.
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Builtin or custom palette to use.
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-  - Linux: `/home/alice/.config/lutgen`
-  - macOS: `/Users/Alice/Library/Application Support/lutgen`
-  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
-
-  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
+- **`-c`**, **`--cache`** &mdash; 
+  Cache generated LUT. No effect when using an external LUT.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
-- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
-  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    
-  [default: 128]
+  [default: 1.0]
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
 - **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
   Number of nearest colors to consider when interpolating. 0 uses all available colors.
    
@@ -171,21 +164,17 @@ Apply a generated or provided Hald CLUT to images.
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
+  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
-  [default: 1]
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
+  [default: 128.0]
 ### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
   Power parameter for shepard's method.
    
-  [default: 4]
+  [default: 4.0]
 
 
 ### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
@@ -194,11 +183,11 @@ Apply a generated or provided Hald CLUT to images.
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
   Average amount of noise to apply in each iteration.
    
-  [default: 0]
+  [default: 0.0]
 - **`-s`**, **`--std-dev`**=_`STD_DEV`_ &mdash; 
   Standard deviation parameter for the noise applied in each iteration.
    
-  [default: 20]
+  [default: 20.0]
 - **`-i`**, **`--iterations`**=_`ITERS`_ &mdash; 
   Number of iterations of noise to apply to each pixel.
    
@@ -222,7 +211,7 @@ Apply a generated or provided Hald CLUT to images.
 
 Generate a patch for colors inside text files.
 
-**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ | \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ | \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] | **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] | **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`FILES`_ &mdash; 
@@ -238,20 +227,19 @@ Generate a patch for colors inside text files.
 - **`-n`**, **`--no-patch`** &mdash; 
   Disable computing and printing the patch. Usually paired with --write.
 - **`-p`**, **`--palette`**=_`PALETTE`_ &mdash; 
-  Builtin or custom palette to use.
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-  - Linux: `/home/alice/.config/lutgen`
-  - macOS: `/Users/Alice/Library/Application Support/lutgen`
-  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
-
-  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating one.
-- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
-  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    
-  [default: 128]
+  [default: 1.0]
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
 - **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
   Number of nearest colors to consider when interpolating. 0 uses all available colors.
    
@@ -260,21 +248,17 @@ Generate a patch for colors inside text files.
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
+  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
-  [default: 1]
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
+  [default: 128.0]
 ### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
   Power parameter for shepard's method.
    
-  [default: 4]
+  [default: 4.0]
 
 
 ### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
@@ -283,11 +267,11 @@ Generate a patch for colors inside text files.
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
   Average amount of noise to apply in each iteration.
    
-  [default: 0]
+  [default: 0.0]
 - **`-s`**, **`--std-dev`**=_`STD_DEV`_ &mdash; 
   Standard deviation parameter for the noise applied in each iteration.
    
-  [default: 20]
+  [default: 20.0]
 - **`-i`**, **`--iterations`**=_`ITERS`_ &mdash; 
   Number of iterations of noise to apply to each pixel.
    
@@ -321,14 +305,9 @@ Print palette names and colors
 
 **Available positional items:**
 - _`PALETTE`_ &mdash; 
-  Builtin or custom palette to use.
+  Palette to use. Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-  Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-  - Linux: `/home/alice/.config/lutgen`
-  - macOS: `/Users/Alice/Library/Application Support/lutgen`
-  - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
-
-  Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
+  Custom palette names are case-insensitive and parsed from the file stem. For example, `~/.lutgen/my-palette.txt` would be avalable to use as `my-palette`.
 
 
 
@@ -361,23 +340,6 @@ Print all palette names. Useful for scripting and searching.
 Print all palette names and colors.
 
 **Usage**: **`lutgen`** **`palette`** **`all`** 
-
-**Available options:**
-- **`-h`**, **`--help`** &mdash; 
-  Prints help information
-
-
-## lutgen completions
-
-Generate shell completions (zsh, bash, fish, and elvish)
-
-**Usage**: **`lutgen`** **`completions`** _`SHELL`_
-
-**Available positional items:**
-- _`SHELL`_ &mdash; 
-  Shell to generate completions for.
-
-
 
 **Available options:**
 - **`-h`**, **`--help`** &mdash; 

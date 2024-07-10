@@ -5,13 +5,12 @@
 .SH SYNOPSIS
 .nf
 \fBlutgen\fP\fR \fP\fICOMMAND ...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR(\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP\fR
-\fP\fBlutgen\fP\fR \fP\fBcompletions\fP\fR \fP\fISHELL\fP\fR
 \fP
 .fi
 .SH LUTGEN\ 
@@ -54,10 +53,6 @@
 \fBpalette\fP\fR, \fP\fBP\fP
 \fRPrint palette names and colors\fP
 .PP
-.TP
-\fBcompletions\fP
-\fRGenerate shell completions (zsh, bash, fish, and elvish)\fP
-.PP
 .PP
 .SS
 \fBSupported image formats:\fP\fR
@@ -66,7 +61,7 @@
 .SH NAME
 \fRlutgen \- \fP\fRGenerate and save a Hald CLUT to disk.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -81,24 +76,26 @@
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRBuiltin or custom palette to use.
+\fRPalette to use.
+Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-   \- Linux: `/home/alice/.config/lutgen`
-   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
-   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
-
-Names are case\-insensitive and parsed from the file stem, minus any file extensions.
-For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 128]\fP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
 .PP
 .TP
 \fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
@@ -115,19 +112,13 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
 .PP
 .TP
-\fR[default: 1]\fP
-.PP
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
+\fR[default: 128.0]\fP
 .PP
 .SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
 .TP
@@ -139,7 +130,7 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRPower parameter for shepard\*(Aqs method.\fP
 .PP
 .TP
-\fR[default: 4]\fP
+\fR[default: 4.0]\fP
 .PP
 .PP
 .SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
@@ -152,14 +143,14 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRAverage amount of noise to apply in each iteration.\fP
 .PP
 .TP
-\fR[default: 0]\fP
+\fR[default: 0.0]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
 \fRStandard deviation parameter for the noise applied in each iteration.\fP
 .PP
 .TP
-\fR[default: 20]\fP
+\fR[default: 20.0]\fP
 .PP
 .TP
 \fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
@@ -190,7 +181,7 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SH NAME
 \fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -214,28 +205,34 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRBuiltin or custom palette to use.
+\fRPalette to use.
+Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-   \- Linux: `/home/alice/.config/lutgen`
-   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
-   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
-
-Names are case\-insensitive and parsed from the file stem, minus any file extensions.
-For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
+.PP
+.TP
+\fB\-c\fP\fR, \fP\fB\-\-cache\fP
+\fRCache generated LUT. No effect when using an external LUT.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
 \fRExternal Hald CLUT to use instead of generating one.\fP
 .PP
 .TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 128]\fP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
 .PP
 .TP
 \fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
@@ -252,19 +249,13 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
 .PP
 .TP
-\fR[default: 1]\fP
-.PP
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
+\fR[default: 128.0]\fP
 .PP
 .SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
 .TP
@@ -276,7 +267,7 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRPower parameter for shepard\*(Aqs method.\fP
 .PP
 .TP
-\fR[default: 4]\fP
+\fR[default: 4.0]\fP
 .PP
 .PP
 .SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
@@ -289,14 +280,14 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRAverage amount of noise to apply in each iteration.\fP
 .PP
 .TP
-\fR[default: 0]\fP
+\fR[default: 0.0]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
 \fRStandard deviation parameter for the noise applied in each iteration.\fP
 .PP
 .TP
-\fR[default: 20]\fP
+\fR[default: 20.0]\fP
 .PP
 .TP
 \fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
@@ -327,7 +318,7 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SH NAME
 \fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -350,28 +341,30 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .TP
 \fB\-p\fP\fR, \fP\fB\-\-palette\fP\fR=\fP\fIPALETTE\fP
-\fRBuiltin or custom palette to use.
+\fRPalette to use.
+Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-   \- Linux: `/home/alice/.config/lutgen`
-   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
-   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
-
-Names are case\-insensitive and parsed from the file stem, minus any file extensions.
-For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
 \fRExternal Hald CLUT to use instead of generating one.\fP
 .PP
 .TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 128]\fP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
 .PP
 .TP
 \fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
@@ -388,19 +381,13 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+less blending between colors in the palette, where bigger numbers equal less blending.
+Effect is heavily dependant on the number of nearest colors used.\fP
 .PP
 .TP
-\fR[default: 1]\fP
-.PP
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
+\fR[default: 128.0]\fP
 .PP
 .SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
 .TP
@@ -412,7 +399,7 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRPower parameter for shepard\*(Aqs method.\fP
 .PP
 .TP
-\fR[default: 4]\fP
+\fR[default: 4.0]\fP
 .PP
 .PP
 .SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
@@ -425,14 +412,14 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRAverage amount of noise to apply in each iteration.\fP
 .PP
 .TP
-\fR[default: 0]\fP
+\fR[default: 0.0]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
 \fRStandard deviation parameter for the noise applied in each iteration.\fP
 .PP
 .TP
-\fR[default: 20]\fP
+\fR[default: 20.0]\fP
 .PP
 .TP
 \fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
@@ -475,15 +462,11 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
 \fIPALETTE\fP
-\fRBuiltin or custom palette to use.
+\fRPalette to use.
+Custom palettes can be added to `~/.lutgen` or `$LUTGEN_DIR`.
 
-Custom palettes can be added to `$LUTGEN_DIR` or `<CONFIG DIR>/lutgen`.
-   \- Linux: `/home/alice/.config/lutgen`
-   \- macOS: `/Users/Alice/Library/Application Support/lutgen`
-   \- Windows: `C:\\Users\\Alice\\AppData\\Roaming\\lutgen`
-
-Names are case\-insensitive and parsed from the file stem, minus any file extensions.
-For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
+Custom palette names are case\-insensitive and parsed from the file stem.
+For example, `~/.lutgen/my\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .PP
 .SS AVAILABLE\ OPTIONS:
@@ -517,23 +500,6 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 \fRlutgen \- \fP\fRPrint all palette names and colors.\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP
-.PP
-.SS AVAILABLE\ OPTIONS:
-.TP
-\fB\-h\fP\fR, \fP\fB\-\-help\fP
-\fRPrints help information\fP
-.PP
-.SH LUTGEN\ COMPLETIONS\ 
-.SH NAME
-\fRlutgen \- \fP\fRGenerate shell completions (zsh, bash, fish, and elvish)\fP
-.SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBcompletions\fP\fR \fP\fISHELL\fP
-.PP
-.SS AVAILABLE\ POSITIONAL\ ITEMS:
-.TP
-\fISHELL\fP
-\fRShell to generate completions for.\fP
-.PP
 .PP
 .SS AVAILABLE\ OPTIONS:
 .TP
