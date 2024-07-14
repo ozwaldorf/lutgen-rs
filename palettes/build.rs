@@ -1,10 +1,46 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 use std::error::Error;
 use std::fs::{read_to_string, write};
 use std::path::Path;
 
 use serde::Serialize;
 use tinytemplate::TinyTemplate;
+
+const TEMPLATE: &str = r#"
+use strum::\{Display, EnumString, VariantArray};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Display, EnumString, VariantArray)]
+#[strum(serialize_all = "kebab-case")]
+pub enum Palette \{
+  {{ for item in palettes }}
+    { item.name },
+  {{ endfor }}
+}
+
+impl Palette \{
+    /// Collection of all palette variants
+    pub const VARIANTS: &'static [Palette] = <Palette as VariantArray>::VARIANTS;
+
+    /// Get the colors for the palette
+    pub fn get(&self) -> &'static [[u8; 3]] \{
+        match self \{
+          {{ for item in palettes }}
+            Palette::{ item.name } => &[
+              {{ for color in item.palette }}
+                [ { color.r }u8, { color.g }, { color.b } ],
+              {{ endfor }}
+            ],
+          {{ endfor }}
+        }
+    }
+}
+
+impl std::hash::Hash for Palette \{
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) \{
+        self.to_string().hash(state);
+        self.get().hash(state);
+    }
+}"#;
 
 #[derive(Serialize)]
 struct Color {
@@ -28,10 +64,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let out_dir = std::env::var("OUT_DIR")?;
     let mut tt = TinyTemplate::new();
-    tt.add_template("lib.rs", include_str!("src/lib.template"))?;
+    tt.add_template("lib.rs", TEMPLATE)?;
 
     let ctx = Context {
-        palettes: toml::from_str::<HashMap<String, Vec<String>>>(&read_to_string(
+        palettes: toml::from_str::<BTreeMap<String, Vec<String>>>(&read_to_string(
             "palettes.toml",
         )?)?
         .into_iter()

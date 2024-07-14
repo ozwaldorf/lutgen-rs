@@ -10,6 +10,9 @@ authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
 
+[lib]
+path = "./lib.rs"
+
 [dependencies]
 strum = { version = "0.26", features = ["derive"] }
 
@@ -19,5 +22,3 @@ toml = "0.8"
 serde = { version = "1.0", features = [ "derive" ] }
 tinytemplate = "1.2"
 
-[features]
-default = []
