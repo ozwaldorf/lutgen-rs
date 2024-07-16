@@ -503,7 +503,7 @@ enum Lutgen {
     #[bpaf(command, short('g'))]
     Generate {
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(bpaf::ShellComp::Dir { mask: None }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
@@ -520,7 +520,7 @@ enum Lutgen {
         #[bpaf(short, long)]
         dir: bool,
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(bpaf::ShellComp::Dir { mask: None }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
