@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
+use bpaf::{construct, long, positional, Bpaf, Doc, Parser};
 use lutgen::identity::{correct_pixel, detect_level};
 use lutgen::interpolation::{
     GaussianRemapper,
@@ -19,7 +19,7 @@ use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
 use regex::{Captures, Regex};
 
-const IMAGE_GLOB: &str = "*.avif|*.bmp|*.dds|*.exr|*.ff|*.gif|*.hdr|*.ico|*.jpg|*.jpeg|*.png|*.pnm|*.qoi|*.tga|*.tiff|*.webp";
+const IMAGE_GLOB: &str = "avif bmp dds exr ff gif hdr ico jpg jpeg png pnm qoi tga tiff webp";
 
 #[derive(Clone, Debug, Hash)]
 enum DynamicPalette {
@@ -491,7 +491,7 @@ fn concat_colors(
         let mut doc = Doc::default();
         doc.emphasis("Supported image formats:");
         doc.text("\n");
-        for extension in IMAGE_GLOB.replace("*.", "").split('|') {
+        for extension in IMAGE_GLOB.split(' ') {
             doc.text(" ");
             doc.literal(extension);
         };
@@ -534,7 +534,6 @@ enum Lutgen {
             positional("IMAGES"),
             guard(|v| v.exists(), "No such file or directory"),
             some("At least one image is needed to apply"),
-            complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) })
         )]
         input: Vec<PathBuf>,
         #[bpaf(external(Color::extra_colors))]
@@ -558,8 +557,7 @@ enum Lutgen {
             positional::<PathBuf>("FILES"),
             guard(|path| path.exists(), "No such file or directory"),
             parse(|path| std::fs::read_to_string(&path).map(|v| (path, v))),
-            some("At least one file is needed to patch"),
-            complete_shell(ShellComp::File { mask: None })
+            some("At least one file is needed to patch")
         )]
         input: Vec<(PathBuf, String)>,
         #[bpaf(external(Color::extra_colors))]
