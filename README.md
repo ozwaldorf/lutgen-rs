@@ -92,8 +92,8 @@ lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
 # Custom colors
 lutgen apply docs/example-image.jpg -- "#ABCDEF" ffffff 000000
 
-# Custom palette file with whitespace separated hex colors
-echo "fff 555 000 abcdef deadbe" > ~/.lutgen/my-palette-name
+# Custom palette file with whitespace separated hex colors (linux example shown)
+echo "fff 555 000 abcdef deadbe" > ~/.config/lutgen/my-palette-name
 lutgen apply docs/example-image.jpg -p my-palette-name
 
 # Multiple images
@@ -112,8 +112,9 @@ lutgen generate -p catppuccin-mocha -o mocha_lut.png
 # Custom colors
 lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
 
-# Custom palette file with hex codes
-lutgen generate -o custom.png -- $(cat palette.txt)
+# Custom palette file with whitespace separated hex colors (linux example shown)
+echo "fff 555 000 abcdef deadbe" > ~/.config/lutgen/my-palette-name
+lutgen generate -p my-palette-name
 ```
 
 Preview palletes
@@ -123,7 +124,7 @@ Preview palletes
 lutgen palette
 
 # Copy a palette to the custom palette dir for modifying and overriding
-lutgen palette carburetor > ~/.lutgen/carburetor
+lutgen palette carburetor > ~/.config/lutgen/carburetor
 
 # Finding a palette name with grep
 lutgen palette names | grep 'gruvbox'
