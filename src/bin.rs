@@ -539,6 +539,7 @@ enum Lutgen {
             positional("IMAGES"),
             guard(|v| v.exists(), "No such file or directory"),
             some("At least one image is needed to apply"),
+            catch
         )]
         input: Vec<PathBuf>,
         #[bpaf(external(Color::extra_colors))]
@@ -562,7 +563,8 @@ enum Lutgen {
             positional::<PathBuf>("FILES"),
             guard(|path| path.exists(), "No such file or directory"),
             parse(|path| std::fs::read_to_string(&path).map(|v| (path, v))),
-            some("At least one file is needed to patch")
+            some("At least one file is needed to patch"),
+            catch
         )]
         input: Vec<(PathBuf, String)>,
         #[bpaf(external(Color::extra_colors))]
