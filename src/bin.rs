@@ -19,7 +19,7 @@ use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
 use regex::{Captures, Regex};
 
-const IMAGE_GLOB: &str = "avif bmp dds exr ff gif hdr ico jpg jpeg png pnm qoi tga tiff webp";
+const IMAGE_GLOB: &str = "*.(avif|bmp|dds|exr|ff|gif|hdr|ico|jpg|jpeg|png|pnm|qoi|tga|tiff|webp)";
 
 #[derive(Clone, Debug, Hash)]
 enum DynamicPalette {
@@ -537,9 +537,9 @@ enum Lutgen {
         /// Images to correct, using the generated or provided hald clut.
         #[bpaf(
             positional("IMAGES"),
+            non_strict,
             guard(|v| v.exists(), "No such file or directory"),
             some("At least one image is needed to apply"),
-            catch
         )]
         input: Vec<PathBuf>,
         #[bpaf(external(Color::extra_colors))]
@@ -561,10 +561,10 @@ enum Lutgen {
         /// Text files to generate patches for.
         #[bpaf(
             positional::<PathBuf>("FILES"),
+            non_strict,
             guard(|path| path.exists(), "No such file or directory"),
             parse(|path| std::fs::read_to_string(&path).map(|v| (path, v))),
             some("At least one file is needed to patch"),
-            catch
         )]
         input: Vec<(PathBuf, String)>,
         #[bpaf(external(Color::extra_colors))]

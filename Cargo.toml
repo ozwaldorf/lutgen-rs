@@ -2,7 +2,13 @@
 name = "lutgen"
 version = "0.11.0"
 documentation = "https://docs.rs/lutgen"
-keywords = ["image-processing", "color", "hald-clut", "lookup-tables", "gaussian"]
+keywords = [
+  "image-processing",
+  "color",
+  "hald-clut",
+  "lookup-tables",
+  "gaussian",
+]
 description = "A blazingly fast interpolated LUT utility for arbitrary and popular color palettes."
 edition = "2021"
 license = "MIT"
@@ -31,22 +37,20 @@ oklab = "1.0"
 
 # Bin dependencies
 lutgen-palettes = { version = "0.4", path = "palettes", optional = true }
-bpaf = { version = "0.9", features = ["derive", "dull-color", "autocomplete", "docgen"], optional = true }
 strsim = { version = "0.11", optional = true }
 dirs = { version = "5.0", optional = true }
 regex = { workspace = true, optional = true }
 imara-diff = { version = "0.1", optional = true }
 
+[dependencies.bpaf]
+git = "https://github.com/pacak/bpaf"
+rev = "48683615eea74bf1f7d7160564b6a08c07940cc6"
+features = ["derive", "dull-color", "autocomplete", "docgen"]
+optional = true
+
 [features]
 default = ["bin"]
-bin = [
-  "lutgen-palettes",
-  "bpaf",
-  "strsim",
-  "dirs",
-  "regex",
-  "imara-diff"
-]
+bin = ["lutgen-palettes", "bpaf", "strsim", "dirs", "regex", "imara-diff"]
 
 [[bin]]
 name = "lutgen"
@@ -74,5 +78,5 @@ custom = [
   "./lutgen --bpaf-complete-style-fish > completions/$_pkgname.fish",
   "install -Dm644 completions/$_pkgname -t \"$pkgdir/usr/share/bash-completion/completions\"",
   "install -Dm644 completions/_$_pkgname -t \"$pkgdir/usr/share/zsh/site-functions\"",
-  "install -Dm644 completions/$_pkgname.fish -t \"$pkgdir/usr/share/fish/vendor_completions.d\""
+  "install -Dm644 completions/$_pkgname.fish -t \"$pkgdir/usr/share/fish/vendor_completions.d\"",
 ]
