@@ -380,6 +380,12 @@ impl LutAlgorithm {
             return load_image(file);
         }
 
+        if colors.is_empty() {
+            return Err(
+                "A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into(),
+            );
+        }
+
         let time = Instant::now();
 
         let lut = match self {
@@ -444,7 +450,7 @@ enum PaletteArgs {
 fn concat_colors(
     palette: Option<DynamicPalette>,
     extra_colors: Vec<Color>,
-) -> Result<(String, Vec<[u8; 3]>), String> {
+) -> (String, Vec<[u8; 3]>) {
     let mut name = String::new();
     let mut colors = palette
         .as_ref()
@@ -460,12 +466,11 @@ fn concat_colors(
         name.push_str("custom");
         colors.extend(extra_colors.iter().map(AsRef::as_ref));
     }
-
-    if !colors.is_empty() {
-        Ok((name, colors))
-    } else {
-        Err("A palette (-p/--palette) and/or custom colors (-- #FFFFFF) are required".into())
+    if name.is_empty() {
+        name.push_str("hald-clut");
     }
+
+    (name, colors)
 }
 
 #[derive(Bpaf, Clone, Debug, Hash)]
@@ -669,7 +674,7 @@ impl Lutgen {
         lut_algorithm: LutAlgorithm,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
-        let (name, colors) = concat_colors(palette, extra_colors)?;
+        let (name, colors) = concat_colors(palette, extra_colors);
         let lut = lut_algorithm.generate(&name, colors)?;
         let time = Instant::now();
         let path = output.unwrap_or(format!("{name}.png").into());
@@ -687,8 +692,7 @@ impl Lutgen {
         input: Vec<PathBuf>,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
-        let (name, colors) = concat_colors(palette, extra_colors)?;
-
+        let (name, colors) = concat_colors(palette, extra_colors);
         let lut = if let Some(hash) = hash {
             let mut path = dirs::cache_dir()
                 .expect("failed to determine cache dir")
@@ -807,7 +811,7 @@ impl Lutgen {
     ) -> Result<String, String> {
         const REGEX: &str = r"(#)([0-9a-fA-F]{3}){1,2}|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
 
-        let (name, colors) = concat_colors(palette, extra_colors)?;
+        let (name, colors) = concat_colors(palette, extra_colors);
         let lut = hald_clut_or_algorithm.generate(&name, colors)?;
         let level = detect_level(&lut);
 
