@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{construct, long, positional, Bpaf, Doc, Parser};
+use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
 use lutgen::identity::{correct_pixel, detect_level};
 use lutgen::interpolation::{
     GaussianRemapper,
@@ -508,7 +508,7 @@ enum Lutgen {
     #[bpaf(command, short('g'))]
     Generate {
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"), complete_shell(bpaf::ShellComp::Dir { mask: None }))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::Dir { mask: None }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
@@ -525,7 +525,7 @@ enum Lutgen {
         #[bpaf(short, long)]
         dir: bool,
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"), complete_shell(bpaf::ShellComp::Dir { mask: None }))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::Dir { mask: None }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
@@ -539,6 +539,7 @@ enum Lutgen {
             positional("IMAGES"),
             non_strict,
             guard(|v| v.exists(), "No such file or directory"),
+            complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }),
             some("At least one image is needed to apply"),
         )]
         input: Vec<PathBuf>,
@@ -563,6 +564,7 @@ enum Lutgen {
             positional::<PathBuf>("FILES"),
             non_strict,
             guard(|path| path.exists(), "No such file or directory"),
+            complete_shell(ShellComp::File { mask: None }),
             parse(|path| std::fs::read_to_string(&path).map(|v| (path, v))),
             some("At least one file is needed to patch"),
         )]

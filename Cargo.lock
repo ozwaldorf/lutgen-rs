@@ -139,7 +139,7 @@ checksum = "7c12d1856e42f0d817a835fe55853957c85c8c8a470114029143d3f12671446e"
 [[package]]
 name = "bpaf"
 version = "0.9.12"
-source = "git+https://github.com/pacak/bpaf?rev=48683615eea74bf1f7d7160564b6a08c07940cc6#48683615eea74bf1f7d7160564b6a08c07940cc6"
+source = "git+https://github.com/pacak/bpaf?rev=fc144431d9078c182c52a07bc01fb86f13ba3e0f#fc144431d9078c182c52a07bc01fb86f13ba3e0f"
 dependencies = [
  "bpaf_derive",
  "owo-colors",
@@ -149,7 +149,7 @@ dependencies = [
 [[package]]
 name = "bpaf_derive"
 version = "0.5.10"
-source = "git+https://github.com/pacak/bpaf?rev=48683615eea74bf1f7d7160564b6a08c07940cc6#48683615eea74bf1f7d7160564b6a08c07940cc6"
+source = "git+https://github.com/pacak/bpaf?rev=fc144431d9078c182c52a07bc01fb86f13ba3e0f#fc144431d9078c182c52a07bc01fb86f13ba3e0f"
 dependencies = [
  "proc-macro2",
  "quote",
