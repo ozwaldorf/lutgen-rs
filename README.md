@@ -121,7 +121,7 @@ Preview palletes
 
 ```bash
 # Preview all palettes
-lutgen palette
+lutgen palette all
 
 # Copy a palette to the custom palette dir for modifying and overriding
 lutgen palette carburetor > ~/.config/lutgen/carburetor
