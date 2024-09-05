@@ -44,7 +44,7 @@ imara-diff = { version = "0.1", optional = true }
 
 [dependencies.bpaf]
 git = "https://github.com/pacak/bpaf"
-rev = "fc144431d9078c182c52a07bc01fb86f13ba3e0f"
+rev = "e71df7b67059da560b927b29ce0fbef362e0c2c2"
 features = ["derive", "dull-color", "autocomplete", "docgen"]
 optional = true
 

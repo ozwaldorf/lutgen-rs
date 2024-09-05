@@ -596,7 +596,7 @@ enum Lutgen {
 fn load_image<P: AsRef<Path>>(path: P) -> Result<Image, String> {
     let path = path.as_ref();
     let time = Instant::now();
-    let lut = image::io::Reader::open(path)
+    let lut = image::ImageReader::open(path)
         .map_err(|e| format!("failed to open image: {e}"))?
         .with_guessed_format()
         .map_err(|e| format!("failed to guess image format: {e}"))?
