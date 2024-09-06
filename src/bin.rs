@@ -943,7 +943,7 @@ fn main() {
     match lutgen().fallback_to_usage().run().execute() {
         Ok(s) => eprintln!("\nFinished {s}in {:.2?}", time.elapsed()),
         Err(e) => {
-            bpaf::ParseFailure::Stderr(e.as_str().into()).print_mesage(80);
+            bpaf::ParseFailure::Stderr(e.as_str().into()).print_message(80);
             std::process::exit(1)
         },
     }
