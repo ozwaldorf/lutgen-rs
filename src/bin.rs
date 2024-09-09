@@ -496,7 +496,7 @@ fn concat_colors(
         let mut doc = Doc::default();
         doc.emphasis("Supported image formats:");
         doc.text("\n");
-        for extension in IMAGE_GLOB.split(' ') {
+        for extension in IMAGE_GLOB[3..IMAGE_GLOB.len() - 1].split('|') {
             doc.text(" ");
             doc.literal(extension);
         };
