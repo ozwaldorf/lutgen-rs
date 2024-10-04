@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.11.0"
+version = "0.11.1"
 documentation = "https://docs.rs/lutgen"
 keywords = [
   "image-processing",
@@ -21,8 +21,8 @@ categories = ["multimedia::images"]
 members = ["palettes"]
 
 [workspace.dependencies]
-clap = { version = "4.2", features = ["derive"] }
-regex = "1.10"
+clap = { version = "4.5", features = ["derive"] }
+regex = "1.11"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
@@ -33,7 +33,7 @@ rand = "0.8"
 rand_distr = "0.4"
 rayon = "1.10"
 kiddo = "4.2"
-oklab = "1.0"
+oklab = "1.1"
 
 # Bin dependencies
 lutgen-palettes = { version = "0.4", path = "palettes", optional = true }
@@ -43,7 +43,7 @@ regex = { workspace = true, optional = true }
 imara-diff = { version = "0.1", optional = true }
 
 [dependencies.bpaf]
-version = "0.9.13"
+version = "0.9.14"
 features = ["derive", "dull-color", "autocomplete", "docgen"]
 optional = true
 
