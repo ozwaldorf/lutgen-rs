@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.11.1"
+version = "0.11.2"
 documentation = "https://docs.rs/lutgen"
 keywords = [
   "image-processing",

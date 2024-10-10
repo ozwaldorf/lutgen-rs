@@ -505,7 +505,7 @@ fn concat_colors(
 )]
 enum Lutgen {
     /// Generate and save a Hald CLUT to disk.
-    #[bpaf(command, short('g'))]
+    #[bpaf(command, short('g'), fallback_to_usage)]
     Generate {
         /// Path to write output to.
         #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::Dir { mask: None }))]
@@ -518,7 +518,7 @@ enum Lutgen {
         extra_colors: Vec<Color>,
     },
     /// Apply a generated or provided Hald CLUT to images.
-    #[bpaf(command, short('a'))]
+    #[bpaf(command, short('a'), fallback_to_usage)]
     Apply {
         /// Always save to a directory when there is only one input file.
         /// (matches output behavior for multiple files)
@@ -547,7 +547,7 @@ enum Lutgen {
         extra_colors: Vec<Color>,
     },
     /// Generate a patch for colors inside text files.
-    #[bpaf(command, short('p'))]
+    #[bpaf(command, short('p'), fallback_to_usage)]
     Patch {
         /// Write changes directly to the files.
         #[bpaf(short, long)]
@@ -588,7 +588,8 @@ enum Lutgen {
             doc.text("\n  $ ");
             doc.literal("lutgen palette carburetor > palette.txt");
             doc
-        })
+        }),
+        fallback_to_usage
     )]
     Palette(#[bpaf(external(palette_args))] PaletteArgs),
 }
