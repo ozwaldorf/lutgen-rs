@@ -67,6 +67,17 @@ cd lutgen-rs
 cargo install --path .
 ```
 
+### Docker image
+
+```sh
+sh <(curl -L https://raw.githubusercontent.com/ozwaldorf/lutgen-rs/main/scripts/oneline.sh)
+```
+- You can call lutgen-rs from inside the docker image like so:
+```sh
+docker run --rm lutgen:latest --help
+```
+> Don't forget to mount a volume to insert or take images out of the container
+
 #### Nix flake
 
 A nix flake is available and can be run easily with:
