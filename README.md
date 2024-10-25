@@ -76,7 +76,10 @@ sh <(curl -L https://raw.githubusercontent.com/ozwaldorf/lutgen-rs/main/scripts/
 ```sh
 docker run --rm lutgen:latest --help
 ```
-> Don't forget to mount a volume to insert or take images out of the container
+- In order to work with images, you should mount a volume like so:
+```sh
+podman run --rm -v $PWD/tmp/:/tmp lutgen:latest apply -p=catppuccin-mocha /tmp/example.png
+```
 
 #### Nix flake
 
