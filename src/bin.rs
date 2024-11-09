@@ -368,8 +368,11 @@ enum LutAlgorithm {
 /// but we do for apply.
 fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
     let clut = long("hald-clut")
-        .help("External Hald CLUT to use instead of generating one.")
+        .help("External Hald CLUT to use instead of generating.")
         .argument::<PathBuf>("FILE")
+        .complete_shell(ShellComp::File {
+            mask: Some(IMAGE_GLOB),
+        })
         .map(|file| LutAlgorithm::HaldClut { file });
     construct!([clut, lut_algorithm()])
 }
@@ -508,7 +511,7 @@ enum Lutgen {
     #[bpaf(command, short('g'), fallback_to_usage)]
     Generate {
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::Dir { mask: None }))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
@@ -525,7 +528,7 @@ enum Lutgen {
         #[bpaf(short, long)]
         dir: bool,
         /// Path to write output to.
-        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::Dir { mask: None }))]
+        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }))]
         output: Option<PathBuf>,
         #[bpaf(optional, external(DynamicPalette::flag_parser))]
         palette: Option<DynamicPalette>,
