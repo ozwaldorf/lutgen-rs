@@ -157,7 +157,7 @@ Apply a generated or provided Hald CLUT to images.
 - **`-c`**, **`--cache`** &mdash; 
   Cache generated LUT. No effect when using an external LUT.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use instead of generating one.
+  External Hald CLUT to use instead of generating.
 - **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
   Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    
@@ -246,7 +246,7 @@ Generate a patch for colors inside text files.
 
   Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
-  External Hald CLUT to use instead of generating one.
+  External Hald CLUT to use instead of generating.
 - **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
   Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    

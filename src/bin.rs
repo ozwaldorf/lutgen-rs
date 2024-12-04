@@ -809,9 +809,19 @@ impl Lutgen {
 
                     let time = Instant::now();
                     let path = Self::find_path(input.len(), dir, &name, file, output.clone());
-                    image
-                        .save(&path)
-                        .map_err(|e| format!("failed to write image: {e}"))?;
+                    let res = image.save(&path);
+
+                    match res {
+                        Ok(_) => {},
+                        Err(image::ImageError::Unsupported(_)) => {
+                            // fallback to saving the image as rgb, without transparency
+                            image::buffer::ConvertBuffer::<ClutImage>::convert(&image)
+                                .save(&path)
+                                .map_err(|e| format!("failed to save image: {e}"))?;
+                        },
+                        Err(e) => return Err(format!("failed to write image: {e}")),
+                    }
+
                     println!("✔ Saved output to {path:?} in {:.2?}", time.elapsed());
                 },
                 Either::Right(mut frames) => {

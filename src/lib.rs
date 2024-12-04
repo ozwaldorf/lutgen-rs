@@ -45,6 +45,7 @@
 //! #### Applying a LUT
 //!
 //! ```rust
+//! use image::buffer::ConvertBuffer;
 //! use image::open;
 //! use lutgen::identity::correct_image;
 //! use lutgen::interpolation::GaussianRemapper;
@@ -60,13 +61,14 @@
 //! hald_clut.save("docs/gruvbox-dark-hald-clut.png").unwrap();
 //!
 //! // Open an image to correct
-//! let mut external_image = open("docs/example-image.jpg").unwrap().to_rgb8();
+//! let mut external_image = open("docs/example-image.jpg").unwrap().to_rgba8();
 //!
 //! // Correct the image using the hald clut we generated
 //! correct_image(&mut external_image, &hald_clut);
 //!
 //! // Save the edited image
-//! external_image.save("docs/gruvbox-dark.jpg").unwrap()
+//! let rgbimage: image::RgbImage = external_image.convert();
+//! rgbimage.save("docs/gruvbox-dark.jpg").unwrap()
 //! ```
 //!
 //! #### Remapping an image directly
@@ -75,6 +77,7 @@
 //! > faster to remap a LUT and correct an image with that.
 //!
 //! ```rust
+//! use image::buffer::ConvertBuffer;
 //! use lutgen::interpolation::{GaussianRemapper, InterpolatedRemapper};
 //! use lutgen::GenerateLut;
 //!
@@ -86,7 +89,7 @@
 //! let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor, preserve);
 //!
 //! // Generate an image (generally an identity lut to use on other images)
-//! let mut hald_clut = lutgen::identity::generate(8);
+//! let mut hald_clut = lutgen::identity::generate(8).convert();
 //!
 //! // Remap the image
 //! remapper.remap_image(&mut hald_clut);
