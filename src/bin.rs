@@ -813,8 +813,9 @@ impl Lutgen {
 
                     match res {
                         Ok(_) => {},
-                        Err(image::ImageError::Unsupported(_)) => {
+                        Err(image::ImageError::Unsupported(e)) => {
                             // fallback to saving the image as rgb, without transparency
+                            eprintln!("warning: {} does not support transparency", e.format_hint());
                             image::buffer::ConvertBuffer::<ClutImage>::convert(&image)
                                 .save(&path)
                                 .map_err(|e| format!("failed to save image: {e}"))?;
