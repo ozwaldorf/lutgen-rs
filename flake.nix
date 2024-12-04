@@ -2,11 +2,8 @@
   description = "Lutgen";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    crane.url = "github:ipetkov/crane";
     fenix = {
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,7 +26,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs.lib) optionals;
 
-        stableCraneLib = crane.lib.${system};
+        stableCraneLib = crane.mkLib pkgs;
         craneLib = stableCraneLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
@@ -95,7 +92,10 @@
           default = lutgen;
         };
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
-        devShells.default = craneLib.devShell { checks = self.checks.${system}; };
+        devShells.default = craneLib.devShell {
+          checks = self.checks.${system};
+          packages = [ pkgs.rust-analyzer ];
+        };
         formatter = pkgs.nixfmt-rfc-style;
       }
     )
