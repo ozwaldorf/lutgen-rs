@@ -34,6 +34,7 @@ rand_distr = "0.4"
 rayon = "1.10"
 kiddo = "4.2"
 oklab = "1.1"
+arrayref = "0.3"
 
 # Bin dependencies
 lutgen-palettes = { version = "0.4", path = "palettes", optional = true }
@@ -43,7 +44,7 @@ regex = { workspace = true, optional = true }
 imara-diff = { version = "0.1", optional = true }
 
 [dependencies.bpaf]
-version = "0.9.14"
+version = "0.9.15"
 features = ["derive", "dull-color", "autocomplete", "docgen"]
 optional = true
 
