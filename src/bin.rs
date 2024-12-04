@@ -1,12 +1,12 @@
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display};
 use std::hash::{DefaultHasher, Hash, Hasher};
-use std::io::{IsTerminal, Seek, Write, stdout};
+use std::io::{stdout, IsTerminal, Seek, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{Bpaf, Doc, Parser, ShellComp, construct, long, positional};
+use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
 use image::codecs::gif::{GifDecoder, GifEncoder};
 use image::codecs::png::PngDecoder;
 use image::codecs::webp::WebPDecoder;
@@ -20,7 +20,7 @@ use lutgen::interpolation::{
 };
 use lutgen::{ClutImage, GenerateLut, Image};
 use lutgen_palettes::Palette;
-use oklab::{Oklab, srgb_to_oklab};
+use oklab::{srgb_to_oklab, Oklab};
 use rayon::iter::Either;
 use regex::{Captures, Regex};
 
