@@ -1,12 +1,16 @@
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display};
 use std::hash::{DefaultHasher, Hash, Hasher};
-use std::io::{stdout, IsTerminal};
+use std::io::{IsTerminal, Seek, Write, stdout};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{construct, long, positional, Bpaf, Doc, Parser, ShellComp};
+use bpaf::{Bpaf, Doc, Parser, ShellComp, construct, long, positional};
+use image::codecs::gif::{GifDecoder, GifEncoder};
+use image::codecs::png::PngDecoder;
+use image::codecs::webp::WebPDecoder;
+use image::{AnimationDecoder, DynamicImage, Frame};
 use lutgen::identity::{correct_pixel, detect_level};
 use lutgen::interpolation::{
     GaussianRemapper,
@@ -14,9 +18,10 @@ use lutgen::interpolation::{
     NearestNeighborRemapper,
     ShepardRemapper,
 };
-use lutgen::{GenerateLut, Image};
+use lutgen::{ClutImage, GenerateLut, Image};
 use lutgen_palettes::Palette;
-use oklab::{srgb_to_oklab, Oklab};
+use oklab::{Oklab, srgb_to_oklab};
+use rayon::iter::Either;
 use regex::{Captures, Regex};
 
 const IMAGE_GLOB: &str = "*.(avif|bmp|dds|exr|ff|gif|hdr|ico|jpg|jpeg|png|pnm|qoi|tga|tiff|webp)";
@@ -378,9 +383,9 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 }
 
 impl LutAlgorithm {
-    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<Image, String> {
+    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<ClutImage, String> {
         if let Self::HaldClut { file } = &self {
-            return load_image(file);
+            return load_image(file).map(|i| i.to_rgb8());
         }
 
         if colors.is_empty() {
@@ -597,7 +602,7 @@ enum Lutgen {
     Palette(#[bpaf(external(palette_args))] PaletteArgs),
 }
 
-fn load_image<P: AsRef<Path>>(path: P) -> Result<Image, String> {
+fn load_image<P: AsRef<Path>>(path: P) -> Result<DynamicImage, String> {
     let path = path.as_ref();
     let time = Instant::now();
     let lut = image::ImageReader::open(path)
@@ -605,10 +610,80 @@ fn load_image<P: AsRef<Path>>(path: P) -> Result<Image, String> {
         .with_guessed_format()
         .map_err(|e| format!("failed to guess image format: {e}"))?
         .decode()
-        .map_err(|e| format!("failed to decode image: {e}"))?
-        .to_rgb8();
+        .map_err(|e| format!("failed to decode image: {e}"))?;
     println!("✔ Loaded {path:?} in {:.2?}", time.elapsed());
     Ok(lut)
+}
+
+fn load_static_or_animated_image<P: AsRef<Path>>(
+    path: P,
+) -> Result<Either<Image, Vec<Frame>>, String> {
+    let path = path.as_ref();
+    let time = Instant::now();
+    let decoder = image::ImageReader::open(path)
+        .map_err(|e| format!("failed to open image: {e}"))?
+        .with_guessed_format()
+        .map_err(|e| format!("failed to guess image format: {e}"))?;
+
+    let output = match decoder.format() {
+        Some(image::ImageFormat::Gif) => {
+            // Reset reader and decode gif as animation
+            let mut reader = decoder.into_inner();
+            reader.seek(std::io::SeekFrom::Start(0)).unwrap();
+            Either::Right(
+                GifDecoder::new(reader)
+                    .unwrap()
+                    .into_frames()
+                    .collect_frames()
+                    .map_err(|e| format!("failed to decode frames: {e}"))?,
+            )
+        },
+        Some(image::ImageFormat::Png) => {
+            // Reset reader
+            let mut reader = decoder.into_inner();
+            reader.seek(std::io::SeekFrom::Start(0)).unwrap();
+            let decoder = PngDecoder::new(reader).map_err(|_| "image is not a png".to_string())?;
+            // If the png contains an apng, return as animated, otherwise as an image
+            if decoder.is_apng().unwrap() {
+                Either::Right(
+                    decoder
+                        .apng()
+                        .unwrap()
+                        .into_frames()
+                        .collect_frames()
+                        .map_err(|e| format!("failed to decode frames: {e}"))?,
+                )
+            } else {
+                Either::Left(DynamicImage::from_decoder(decoder).unwrap().into_rgba8())
+            }
+        },
+        Some(image::ImageFormat::WebP) => {
+            // Reset reader
+            let mut reader = decoder.into_inner();
+            reader.seek(std::io::SeekFrom::Start(0)).unwrap();
+            let decoder = WebPDecoder::new(reader).unwrap();
+            // If the webp contains an animation, return as animated, otherwise as an image
+            if decoder.has_animation() {
+                Either::Right(
+                    decoder
+                        .into_frames()
+                        .collect_frames()
+                        .map_err(|e| format!("failed to decode frames: {e}"))?,
+                )
+            } else {
+                Either::Left(DynamicImage::from_decoder(decoder).unwrap().into_rgba8())
+            }
+        },
+        // All other image types are just images
+        _ => Either::Left(
+            decoder
+                .decode()
+                .map_err(|e| format!("failed to decode image: {e}"))?
+                .to_rgba8(),
+        ),
+    };
+    println!("✔ Loaded {path:?} in {:.2?}", time.elapsed());
+    Ok(output)
 }
 
 impl Lutgen {
@@ -718,88 +793,72 @@ impl Lutgen {
                 println!("✔ Cached \"{name}\" LUT in {:.02?}", time.elapsed());
                 lut
             } else {
-                load_image(path)?
+                load_image(path)?.into_rgb8()
             }
         } else {
             hald_clut_or_algorithm.generate(&name, colors)?
         };
 
         for file in &input {
-            let mut image = load_image(file)?;
+            let res = load_static_or_animated_image(file)?;
+            match res {
+                Either::Left(mut image) => {
+                    let time = Instant::now();
+                    lutgen::identity::correct_image(&mut image, &lut);
+                    println!("✔ Applied LUT to {file:?} in {:.2?}", time.elapsed());
 
-            let time = Instant::now();
-            lutgen::identity::correct_image(&mut image, &lut);
-            println!("✔ Applied LUT to {file:?} in {:.2?}", time.elapsed());
+                    let time = Instant::now();
+                    let path = Self::find_path(input.len(), dir, &name, file, output.clone());
+                    image
+                        .save(&path)
+                        .map_err(|e| format!("failed to write image: {e}"))?;
+                    println!("✔ Saved output to {path:?} in {:.2?}", time.elapsed());
+                },
+                Either::Right(mut frames) => {
+                    let time = Instant::now();
+                    let len = frames.len();
+                    frames.iter_mut().enumerate().for_each(|(i, frame)| {
+                        print!("\r… Encoding frame {i}/{len}");
+                        std::io::stdout().lock().flush().unwrap();
+                        let img = frame.buffer_mut();
+                        lutgen::identity::correct_image(img, &lut);
+                    });
+                    println!("\r✔ Encoded {len} frames in {:.2?}", time.elapsed());
 
-            let time = Instant::now();
-            let path = if input.len() > 1 {
-                // For multiple images, the output path is always treated as a directory
-                let path = output.clone().unwrap_or(PathBuf::from(&name));
-                if !path.exists() {
-                    std::fs::create_dir_all(&path).expect("failed to create output directory");
-                }
-                path.join(file.file_name().unwrap())
-            } else {
-                // For single images
-                match &output {
-                    // If user provided a path
-                    Some(path) => {
-                        if dir {
-                            // The path is always a dir
-                            if !path.exists() {
-                                std::fs::create_dir_all(path)
-                                    .expect("failed to create output directory");
-                            }
-                            path.join(file.file_name().unwrap())
-                        } else {
-                            // Otherwise, ensure the parent dir exists
-                            if let Some(parent) = path.parent() {
-                                if !parent.exists() {
-                                    std::fs::create_dir_all(parent)
-                                        .expect("failed to create output directory");
-                                }
-                            }
-
-                            if path.is_dir() {
-                                // Enable dir mode if user supplied an existing directory
-                                path.join(file.file_name().unwrap())
-                            } else {
-                                path.clone()
-                            }
-                        }
-                    },
-                    None => {
-                        if dir {
-                            // always create a palette dir
-                            let path = PathBuf::from(&name);
-                            if !path.exists() {
-                                std::fs::create_dir_all(&path)
-                                    .expect("failed to create output directory");
-                            }
-                            path.join(file.file_name().unwrap())
-                        } else {
-                            // create an image adjacent to the original, with a palette name prefix
-                            let mut file_name =
-                                file.file_stem().unwrap().to_string_lossy().to_string();
-                            file_name.push('_');
-                            file_name.push_str(&name);
-                            let extension = file
-                                .extension()
-                                .map(|s| s.to_string_lossy())
-                                .unwrap_or("png".into());
-
-                            let mut path = file.clone();
-                            path.set_file_name(file_name);
-                            path.set_extension(extension.as_ref());
-                            path
-                        }
-                    },
-                }
-            };
-            image
-                .save(&path)
-                .map_err(|e| format!("failed to write image: {e}"))?;
-            println!("✔ Saved output to {path:?} in {:.2?}", time.elapsed());
+                    let time = Instant::now();
+                    let path = Self::find_path(
+                        input.len(),
+                        dir,
+                        &name,
+                        &file.with_extension("gif"),
+                        output.clone(),
+                    );
+                    let mut buf = Vec::new();
+                    match path
+                        .extension()
+                        .expect("expected image extension")
+                        .to_string_lossy()
+                        .to_ascii_lowercase()
+                        .as_str()
+                    {
+                        "gif" => {
+                            // encode frames into a gif
+                            let mut encoder = GifEncoder::new(&mut buf);
+                            encoder
+                                .set_repeat(image::codecs::gif::Repeat::Infinite)
+                                .unwrap();
+                            encoder
+                                .encode_frames(frames)
+                                .map_err(|e| format!("failed to encode frame: {e}"))?;
+                        },
+                        _ => {
+                            return Err("animated output must be a gif".to_string());
+                        },
+                    }
+                    std::fs::write(&path, buf).map_err(|e| format!("failed to write gif: {e}"))?;
+                    println!("✔ Saved output to {path:?} in {:.2?}", time.elapsed());
+                },
+            }
         }
 
         Ok(format!(
@@ -807,6 +866,79 @@ impl Lutgen {
             input.len(),
             if input.len() > 1 { "s" } else { "" }
         ))
+    }
+
+    fn find_path(
+        input_len: usize,
+        dir: bool,
+        palette: &str,
+        input: &Path,
+        output: Option<PathBuf>,
+    ) -> PathBuf {
+        if input_len > 1 {
+            // For multiple images, the output path is always treated as a directory
+            let path = output.clone().unwrap_or(PathBuf::from(palette));
+            if !path.exists() {
+                std::fs::create_dir_all(&path).expect("failed to create output directory");
+            }
+            path.join(input.file_name().unwrap())
+        } else {
+            // For single images
+            match &output {
+                // If user provided a path
+                Some(path) => {
+                    if dir {
+                        // The path is always a dir
+                        if !path.exists() {
+                            std::fs::create_dir_all(path)
+                                .expect("failed to create output directory");
+                        }
+                        path.join(input.file_name().unwrap())
+                    } else {
+                        // Otherwise, ensure the parent dir exists
+                        if let Some(parent) = path.parent() {
+                            if !parent.exists() {
+                                std::fs::create_dir_all(parent)
+                                    .expect("failed to create output directory");
+                            }
+                        }
+
+                        if path.is_dir() {
+                            // Enable dir mode if user supplied an existing directory
+                            path.join(input.file_name().unwrap())
+                        } else {
+                            path.clone()
+                        }
+                    }
+                },
+                None => {
+                    if dir {
+                        let dir = PathBuf::from(palette);
+                        // always create a palette dir
+                        if !input.exists() {
+                            std::fs::create_dir_all(&dir)
+                                .expect("failed to create output directory");
+                        }
+                        dir.join(input.file_name().unwrap())
+                    } else {
+                        // create an image adjacent to the original, with a palette name prefix
+                        let mut file_name =
+                            input.file_stem().unwrap().to_string_lossy().to_string();
+                        file_name.push('_');
+                        file_name.push_str(palette);
+                        let extension = input
+                            .extension()
+                            .map(|s| s.to_string_lossy())
+                            .unwrap_or("png".into());
+
+                        let mut path = input.to_path_buf();
+                        path.set_file_name(file_name);
+                        path.set_extension(extension.as_ref());
+                        path
+                    }
+                },
+            }
+        }
     }
 
     fn patch(

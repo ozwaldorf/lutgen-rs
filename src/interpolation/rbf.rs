@@ -1,5 +1,6 @@
 use std::f64;
 
+use arrayref::array_ref;
 use kiddo::distance_metric::DistanceMetric;
 use kiddo::{NearestNeighbour, SquaredEuclidean};
 
@@ -18,10 +19,10 @@ pub struct RBFRemapper<F: RadialBasisFn> {
     preserve_lum: bool,
 }
 
-impl<'a, F: RadialBasisFn> GenerateLut<'a> for RBFRemapper<F> {}
-impl<'a, F: RadialBasisFn> RBFRemapper<F> {
+impl<F: RadialBasisFn> GenerateLut<'_> for RBFRemapper<F> {}
+impl<F: RadialBasisFn> RBFRemapper<F> {
     pub fn with_function(
-        palette: &'a [[u8; 3]],
+        palette: &[[u8; 3]],
         rbf: F,
         nearest: usize,
         lum_factor: f64,
@@ -54,10 +55,10 @@ impl<'a, F: RadialBasisFn> RBFRemapper<F> {
     }
 }
 
-impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
-    fn remap_pixel(&self, pixel: &mut image::Rgb<u8>) {
+impl<F: RadialBasisFn> InterpolatedRemapper<'_> for RBFRemapper<F> {
+    fn remap_pixel(&self, pixel: &mut image::Rgba<u8>) {
         let raw_color = &mut pixel.0;
-        let color = oklab::srgb_to_oklab((*raw_color).into());
+        let color = oklab::srgb_to_oklab((*array_ref![raw_color, 0, 3]).into());
         let color = [
             color.l as f64 * self.lum_factor,
             color.a as f64,
@@ -98,7 +99,7 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
             },
         }
 
-        *raw_color = oklab::oklab_to_srgb(oklab::Oklab {
+        let rgb = oklab::oklab_to_srgb(oklab::Oklab {
             l: if self.preserve_lum {
                 (color[0] / self.lum_factor) as f32
             } else {
@@ -106,8 +107,9 @@ impl<'a, F: RadialBasisFn> InterpolatedRemapper<'a> for RBFRemapper<F> {
             },
             a: (numerator[1] / denominator) as f32,
             b: (numerator[2] / denominator) as f32,
-        })
-        .into();
+        });
+
+        raw_color[0..3].copy_from_slice(rgb.as_ref());
     }
 }
 

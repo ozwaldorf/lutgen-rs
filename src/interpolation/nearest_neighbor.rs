@@ -1,4 +1,5 @@
-use image::Rgb;
+use arrayref::array_ref;
+use image::Rgba;
 use kiddo::{NearestNeighbour, SquaredEuclidean};
 use oklab::{srgb_to_oklab, Oklab};
 
@@ -37,13 +38,13 @@ impl<'a> InterpolatedRemapper<'a> for NearestNeighborRemapper<'a> {
         }
     }
 
-    fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
-        let Oklab { l, a, b } = srgb_to_oklab(pixel.0.into());
+    fn remap_pixel(&self, pixel: &mut Rgba<u8>) {
+        let Oklab { l, a, b } = srgb_to_oklab((*array_ref![pixel.0, 0, 3]).into());
         let NearestNeighbour { item, .. } = self.tree.nearest_one::<SquaredEuclidean>(&[
             l as f64 * self.lum_factor,
             a as f64,
             b as f64,
         ]);
-        *pixel = Rgb(self.palette[item as usize]);
+        pixel.0[0..3].copy_from_slice(&self.palette[item as usize]);
     }
 }

@@ -1,12 +1,10 @@
 //! Hald clut identity creation and application
 
-use image::Rgb;
-
-use crate::Image;
+use crate::{ClutImage, Image};
 
 /// Hald clut base identity generator.
 /// Algorithm derived from: <https://www.quelsolaar.com/technology/clut.html>
-pub fn generate(level: u8) -> Image {
+pub fn generate(level: u8) -> ClutImage {
     let level = level as u32;
     let cube_size = level * level;
     let image_size = cube_size * level;
@@ -31,14 +29,15 @@ pub fn generate(level: u8) -> Image {
         }
     }
 
-    Image::from_vec(image_size, image_size, buffer).expect("failed to create identity from buffer")
+    ClutImage::from_vec(image_size, image_size, buffer)
+        .expect("failed to create identity from buffer")
 }
 
 /// Correct a single pixel with a hald clut identity.
 ///
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
-pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
+pub fn correct_pixel(input: &[u8; 3], hald_clut: &ClutImage, level: u8) -> [u8; 3] {
     let level = level as u32;
     let cube_size = level * level;
 
@@ -60,10 +59,13 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &Image, level: u8) -> [u8; 3] {
 /// # Safety
 ///
 /// Panics if the hald clut is invalid.
-pub fn correct_image(image: &mut Image, hald_clut: &Image) {
+pub fn correct_image(image: &mut Image, hald_clut: &ClutImage) {
     let level = detect_level(hald_clut);
     for pixel in image.pixels_mut() {
-        *pixel = Rgb(correct_pixel(&pixel.0, hald_clut, level));
+        let [r, g, b] = correct_pixel(&[pixel[0], pixel[1], pixel[2]], hald_clut, level);
+        pixel.0[0] = r;
+        pixel.0[1] = g;
+        pixel.0[2] = b;
     }
 }
 
@@ -72,7 +74,7 @@ pub fn correct_image(image: &mut Image, hald_clut: &Image) {
 /// # Safety
 ///
 /// Panics if the hald clut is invalid.
-pub fn detect_level(hald_clut: &Image) -> u8 {
+pub fn detect_level(hald_clut: &ClutImage) -> u8 {
     let (width, height) = hald_clut.dimensions();
 
     // Find the smallest level that fits inside the hald clut

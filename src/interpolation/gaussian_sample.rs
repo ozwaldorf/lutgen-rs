@@ -1,7 +1,7 @@
 //! Gaussian sample based remapping. Samples a number of iterations of each pixel and
 //! finds their nearest neighbors, averaging them all together for a final color.
 
-use image::{Pixel, Rgb};
+use image::{Pixel, Rgba};
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 use rand_distr::{Distribution, Normal};
@@ -47,7 +47,7 @@ impl<'a> GaussianSamplingRemapper<'a> {
 
 impl<'a> GenerateLut<'a> for GaussianSamplingRemapper<'a> {}
 impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
-    fn remap_pixel(&self, pixel: &mut Rgb<u8>) {
+    fn remap_pixel(&self, pixel: &mut Rgba<u8>) {
         let mut mean = [0f64; 3];
 
         let mut rng: StdRng = SeedableRng::seed_from_u64(self.seed);
@@ -69,7 +69,7 @@ impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
         }
 
         // Round off and set the final color
-        *pixel = Rgb([
+        pixel.0[0..3].copy_from_slice(&[
             mean[0].round() as u8,
             mean[1].round() as u8,
             mean[2].round() as u8,

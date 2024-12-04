@@ -1,7 +1,7 @@
 //! Interpolated remapping algorithms.
 
 pub use gaussian_sample::GaussianSamplingRemapper;
-use image::Rgb;
+use image::Rgba;
 use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
 use rayon::prelude::*;
@@ -16,7 +16,7 @@ mod rbf;
 /// Interpolated Remapper. Implements an algorithm with some initialization parameters.
 pub trait InterpolatedRemapper<'a>: Sync {
     /// Remap a single pixel in place
-    fn remap_pixel(&self, pixel: &mut Rgb<u8>);
+    fn remap_pixel(&self, pixel: &mut Rgba<u8>);
 
     /// Remap an image in place. Default implementation uses `rayon` to iterate in parallel over
     /// the pixels.

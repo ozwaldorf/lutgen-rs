@@ -94,20 +94,22 @@
 //! // hald_clut.save("output.png").unwrap();
 //! ```
 
-use image::{ImageBuffer, Rgb};
+use image::buffer::ConvertBuffer;
+use image::{ImageBuffer, Rgb, Rgba};
 use interpolation::InterpolatedRemapper;
 
 pub mod identity;
 pub mod interpolation;
 
-/// Core image type (Rgb8)
-pub type Image = ImageBuffer<Rgb<u8>, Vec<u8>>;
+/// Core image type (Rgba8)
+pub type Image = ImageBuffer<Rgba<u8>, Vec<u8>>;
+pub type ClutImage = ImageBuffer<Rgb<u8>, Vec<u8>>;
 
 pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
     /// Helper method to generate a lut using an [`InterpolatedRemapper`].
-    fn generate_lut(&self, level: u8) -> Image {
-        let mut identity = identity::generate(level);
+    fn generate_lut(&self, level: u8) -> ClutImage {
+        let mut identity = identity::generate(level).convert();
         self.remap_image(&mut identity);
-        identity
+        identity.convert()
     }
 }

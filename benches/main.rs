@@ -1,6 +1,6 @@
 use std::hint::black_box;
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use lutgen::identity::correct_image;
 use lutgen::interpolation::{
     GaussianRemapper,
@@ -8,7 +8,7 @@ use lutgen::interpolation::{
     InterpolatedRemapper,
     ShepardRemapper,
 };
-use lutgen::{GenerateLut, Image};
+use lutgen::{ClutImage, GenerateLut, Image};
 use lutgen_palettes::Palette;
 
 fn benchmark(c: &mut Criterion) {
@@ -53,7 +53,7 @@ fn benchmark(c: &mut Criterion) {
     g.sample_size(100);
     g.bench_function(BenchmarkId::new("pixel", 1), |b| {
         b.iter(|| {
-            let mut pixel = [63, 127, 255].into();
+            let mut pixel = [63, 127, 255, 255].into();
             gaussian_sampling().remap_pixel(&mut pixel);
             black_box(pixel);
         })
@@ -68,7 +68,7 @@ fn benchmark(c: &mut Criterion) {
             let lut = gaussian_rbf().generate_lut(*i);
             let image = image::open("docs/example-image.jpg")
                 .expect("failed to load image")
-                .to_rgb8();
+                .to_rgba8();
 
             b.iter(|| apply(&lut, image.clone()));
         });
@@ -98,7 +98,7 @@ fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
     GaussianSamplingRemapper::new(Palette::Carburetor.get(), 0.0, 20.0, 512, 1.0, 42080085)
 }
 
-fn apply(lut: &Image, mut img: Image) {
+fn apply(lut: &ClutImage, mut img: Image) {
     correct_image(&mut img, lut);
     black_box(img);
 }
