@@ -105,12 +105,12 @@ pub mod identity;
 pub mod interpolation;
 
 /// Core image type (Rgba8)
-pub type Image = ImageBuffer<Rgba<u8>, Vec<u8>>;
-pub type ClutImage = ImageBuffer<Rgb<u8>, Vec<u8>>;
+pub type RgbaImage = ImageBuffer<Rgba<u8>, Vec<u8>>;
+pub type RgbImage = ImageBuffer<Rgb<u8>, Vec<u8>>;
 
 pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
     /// Helper method to generate a lut using an [`InterpolatedRemapper`].
-    fn generate_lut(&self, level: u8) -> ClutImage {
+    fn generate_lut(&self, level: u8) -> RgbImage {
         let mut identity = identity::generate(level).convert();
         self.remap_image(&mut identity);
         identity.convert()

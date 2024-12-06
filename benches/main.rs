@@ -8,7 +8,7 @@ use lutgen::interpolation::{
     InterpolatedRemapper,
     ShepardRemapper,
 };
-use lutgen::{ClutImage, GenerateLut, Image};
+use lutgen::{GenerateLut, RgbImage, RgbaImage};
 use lutgen_palettes::Palette;
 
 fn benchmark(c: &mut Criterion) {
@@ -98,7 +98,7 @@ fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
     GaussianSamplingRemapper::new(Palette::Carburetor.get(), 0.0, 20.0, 512, 1.0, 42080085)
 }
 
-fn apply(lut: &ClutImage, mut img: Image) {
+fn apply(lut: &RgbImage, mut img: RgbaImage) {
     correct_image(&mut img, lut);
     black_box(img);
 }

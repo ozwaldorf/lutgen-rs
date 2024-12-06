@@ -1,10 +1,10 @@
 //! Hald clut identity creation and application
 
-use crate::{ClutImage, Image};
+use crate::{RgbImage, RgbaImage};
 
 /// Hald clut base identity generator.
 /// Algorithm derived from: <https://www.quelsolaar.com/technology/clut.html>
-pub fn generate(level: u8) -> ClutImage {
+pub fn generate(level: u8) -> RgbImage {
     let level = level as u32;
     let cube_size = level * level;
     let image_size = cube_size * level;
@@ -29,7 +29,7 @@ pub fn generate(level: u8) -> ClutImage {
         }
     }
 
-    ClutImage::from_vec(image_size, image_size, buffer)
+    RgbImage::from_vec(image_size, image_size, buffer)
         .expect("failed to create identity from buffer")
 }
 
@@ -37,7 +37,7 @@ pub fn generate(level: u8) -> ClutImage {
 ///
 /// Simple implementation that doesn't do any interpolation,
 /// so higher LUT sizes will prove to be more accurate.
-pub fn correct_pixel(input: &[u8; 3], hald_clut: &ClutImage, level: u8) -> [u8; 3] {
+pub fn correct_pixel(input: &[u8; 3], hald_clut: &RgbImage, level: u8) -> [u8; 3] {
     let level = level as u32;
     let cube_size = level * level;
 
@@ -59,7 +59,7 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &ClutImage, level: u8) -> [u8; 
 /// # Safety
 ///
 /// Panics if the hald clut is invalid.
-pub fn correct_image(image: &mut Image, hald_clut: &ClutImage) {
+pub fn correct_image(image: &mut RgbaImage, hald_clut: &RgbImage) {
     let level = detect_level(hald_clut);
     for pixel in image.pixels_mut() {
         let [r, g, b] = correct_pixel(&[pixel[0], pixel[1], pixel[2]], hald_clut, level);
@@ -74,7 +74,7 @@ pub fn correct_image(image: &mut Image, hald_clut: &ClutImage) {
 /// # Safety
 ///
 /// Panics if the hald clut is invalid.
-pub fn detect_level(hald_clut: &ClutImage) -> u8 {
+pub fn detect_level(hald_clut: &RgbImage) -> u8 {
     let (width, height) = hald_clut.dimensions();
 
     // Find the smallest level that fits inside the hald clut

@@ -18,7 +18,7 @@ use lutgen::interpolation::{
     NearestNeighborRemapper,
     ShepardRemapper,
 };
-use lutgen::{ClutImage, GenerateLut, Image};
+use lutgen::{GenerateLut, RgbImage, RgbaImage};
 use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
 use rayon::iter::Either;
@@ -383,7 +383,7 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 }
 
 impl LutAlgorithm {
-    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<ClutImage, String> {
+    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<RgbImage, String> {
         if let Self::HaldClut { file } = &self {
             return load_image(file).map(|i| i.to_rgb8());
         }
@@ -617,7 +617,7 @@ fn load_image<P: AsRef<Path>>(path: P) -> Result<DynamicImage, String> {
 
 fn load_static_or_animated_image<P: AsRef<Path>>(
     path: P,
-) -> Result<Either<Image, Vec<Frame>>, String> {
+) -> Result<Either<RgbaImage, Vec<Frame>>, String> {
     let path = path.as_ref();
     let time = Instant::now();
     let decoder = image::ImageReader::open(path)
@@ -816,7 +816,7 @@ impl Lutgen {
                         Err(image::ImageError::Unsupported(e)) => {
                             // fallback to saving the image as rgb, without transparency
                             eprintln!("warning: {} does not support transparency", e.format_hint());
-                            image::buffer::ConvertBuffer::<ClutImage>::convert(&image)
+                            image::buffer::ConvertBuffer::<RgbImage>::convert(&image)
                                 .save(&path)
                                 .map_err(|e| format!("failed to save image: {e}"))?;
                         },
