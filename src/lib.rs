@@ -98,15 +98,13 @@
 //! ```
 
 use image::buffer::ConvertBuffer;
-use image::{ImageBuffer, Rgb, Rgba};
 use interpolation::InterpolatedRemapper;
 
 pub mod identity;
 pub mod interpolation;
 
 /// Core image type (Rgba8)
-pub type RgbaImage = ImageBuffer<Rgba<u8>, Vec<u8>>;
-pub type RgbImage = ImageBuffer<Rgb<u8>, Vec<u8>>;
+pub use image::{RgbImage, RgbaImage};
 
 pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
     /// Helper method to generate a lut using an [`InterpolatedRemapper`].
