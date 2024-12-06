@@ -163,5 +163,8 @@ See the latest documentation on [docs.rs](https://docs.rs/lutgen)
 
 ## Special Thanks
 
+- [Gingeh](https://github.com/Gingeh) for the initial inspiration and imagemagick approach
+- [The Catppuccin Org](https://github.com/catppuccin) for continual feedback and support along the way
 - [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
 - All the nixpkgs maintainers
+
