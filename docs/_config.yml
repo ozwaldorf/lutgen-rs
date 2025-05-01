@@ -1,0 +1,8 @@
+title: Lutgen Wiki
+description: Documentation, usage, examples for lutgen-rs
+theme: just-the-docs
+color_scheme: dark
+aux_links:
+  Github: https://github.com/ozwaldorf/lutgen-rs
+exclude:
+  - man/

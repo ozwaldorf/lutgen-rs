@@ -1103,8 +1103,14 @@ fn generate_docs() {
     let options = lutgen();
 
     let roff = options.render_manpage(app, bpaf::doc::Section::General, None, None, None);
-    std::fs::write("docs/lutgen.1", roff).expect("failed to write manpage");
+    std::fs::write("docs/man/lutgen.1", roff).expect("failed to write manpage");
 
-    let md = options.header("").render_markdown(app);
-    std::fs::write("docs/README.md", md).expect("failed to write markdown docs");
+    let md = options
+        .header("")
+        .render_markdown(app)
+        .replace('|', "&#124;");
+    let header = "---\nlayout: page\ntitle: Command summary\npermalink: cli\n---";
+
+    std::fs::write("docs/pages/cli.md", format!("{header}{md}"))
+        .expect("failed to write markdown docs");
 }

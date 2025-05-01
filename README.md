@@ -23,34 +23,34 @@
 
 <details>
     <summary>Catppuccin Mocha</summary>
-    <img src="docs/catppuccin-mocha-hald-clut.png" />
+    <img src="docs/assets/catppuccin-mocha-hald-clut.png" />
 </details>
 <details>
     <summary>Gruvbox Dark</summary>
-    <img src="docs/gruvbox-dark-hald-clut.png" />
+    <img src="docs/assets/gruvbox-dark-hald-clut.png" />
 </details>
 <details>
     <summary>Nord</summary>
-    <img src="docs/nord-hald-clut.png" />
+    <img src="docs/assets/nord-hald-clut.png" />
 </details>
 
 ### Color Corrections
 
 <details>
     <summary>Original Image</summary>
-    <img src="docs/example-image.jpg" />
+    <img src="docs/assets/example-image.jpg" />
 </details>
 <details>
     <summary>Catppuccin Mocha</summary>
-    <img src="docs/catppuccin-mocha.jpg" />
+    <img src="docs/assets/catppuccin-mocha.jpg" />
 </details>
 <details>
     <summary>Gruvbox Dark</summary>
-    <img src="docs/gruvbox-dark.jpg" />
+    <img src="docs/assets/gruvbox-dark.jpg" />
 </details>
 <details>
     <summary>Nord</summary>
-    <img src="docs/nord.png" />
+    <img src="docs/assets/nord.png" />
 </details>
 
 ## CLI
@@ -79,7 +79,7 @@ Cache is provided via https://garnix.io
 
 ### Documentation
 
-Detailed cli documentation is available at [docs/README.md](./docs/README.md).
+Detailed documentation is available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
 
 ### Examples
 
@@ -87,20 +87,20 @@ Correcting an image
 
 ```bash
 # Builtin palette
-lutgen apply -p catppuccin-mocha docs/example-image.jpg -o mocha_version.jpg
+lutgen apply -p catppuccin-mocha docs/assets/example-image.jpg -o mocha_version.jpg
 
 # Custom colors
-lutgen apply docs/example-image.jpg -- "#ABCDEF" ffffff 000000
+lutgen apply docs/assets/example-image.jpg -- "#ABCDEF" ffffff 000000
 
 # Custom palette file with whitespace separated hex colors (linux example shown)
 echo "fff 555 000 abcdef deadbe" > ~/.config/lutgen/my-palette-name
-lutgen apply docs/example-image.jpg -p my-palette-name
+lutgen apply docs/assets/example-image.jpg -p my-palette-name
 
 # Multiple images
 lutgen apply image1.png image2.png *.jpg -p catppuccin-mocha
 
 # Using an external LUT
-lutgen apply --hald-clut mocha_lut.png docs/example-image.jpg
+lutgen apply --hald-clut mocha_lut.png docs/assets/example-image.jpg
 ```
 
 Generating a standalone LUT for external or manual usage

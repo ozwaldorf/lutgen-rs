@@ -94,7 +94,11 @@
         apps.default = flake-utils.lib.mkApp { drv = lutgen; };
         devShells.default = craneLib.devShell {
           checks = self.checks.${system};
-          packages = [ pkgs.rust-analyzer ];
+          packages = with pkgs; [
+            rust-analyzer
+            jekyll
+            bundler
+          ];
         };
         formatter = pkgs.nixfmt-rfc-style;
       }
