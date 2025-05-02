@@ -46,11 +46,11 @@ This produces nearly identical results to the original method, while exposing mo
 
 ## Oklab
 
-I was suggested to look into Oklab as a better alternative to doing math on colors with RGB. This worked out perfectly, as finding nearest neigbors and averaging colors in Oklab is much more perceptually accurate, and results are smooth and look great!
+I was suggested to look into Oklab as a better alternative to doing math on colors with RGB. This worked out perfectly, as finding nearest neighbors and averaging colors in Oklab is much more perceptually accurate, and results are smooth and look great!
 
 ## Optimization
 
-After the first algorithm was implemented, I sought out to find an even faster algorithm, knowing that there had to be another way. I had found an existing method of producing sparce hald-cluts, using Shepard's Method (aka inverse distance weighting) outlined [here](https://im.snibgo.com/edithald.htm#sparse), so I sought to write my own implementation of this.
+After the first algorithm was implemented, I sought out to find an even faster algorithm, knowing that there had to be another way. I had found an existing method of producing sparce hald-cluts, using Shepard's Method (aka inverse distance weighting) outlined [here](https://im.snibgo.com/sphaldcl.htm#procmod), so I sought to write my own implementation of this.
 
 This proved successful, further reducing the time from several seconds using gaussian sampling, to a few hundred milliseconds using Shepard's Method (IDW). However, the output from Shepard's method was a little different from guassian sampling, and I knew it should be possible to have a similar algorithm that produces results as good looking as gaussian sampling.
 
