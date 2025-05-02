@@ -66,7 +66,7 @@ fn benchmark(c: &mut Criterion) {
     for i in (1..=4).map(|i| i * 4) {
         g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
             let lut = gaussian_rbf().generate_lut(*i);
-            let image = image::open("docs/images/example-image.jpg")
+            let image = image::open("docs/assets/example-image.jpg")
                 .expect("failed to load image")
                 .to_rgba8();
 
