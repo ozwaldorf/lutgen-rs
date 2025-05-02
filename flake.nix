@@ -42,7 +42,7 @@
           // {
             doCheck = false;
             postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
-              installManPage docs/lutgen.1
+              installManPage docs/man/lutgen.1
               installShellCompletion --cmd lutgen \
                 --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
                 --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
