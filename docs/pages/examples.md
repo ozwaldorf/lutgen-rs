@@ -30,6 +30,15 @@ lutgen generate -p catppuccin-mocha
 
 # Custom colors
 lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
+
+# Extract from an existing image
+lutgen extract -o custom.png my-image.png
+```
+
+Raw hald-clut LUTs can then be applied to an image using lutgen or other image editing software that supports the format.
+
+```bash
+lutgen apply --hald-clut custom.png another-image.png
 ```
 
 ## Color palettes
