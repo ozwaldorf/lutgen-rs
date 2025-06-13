@@ -22,23 +22,32 @@ lutgen apply --preserve catpuccin-mocha --lum 0.5 --preserve my-image.png
 lutgen a -p catppuccin-mocha -PL0.5 my-image.png
 ```
 
-## Generating raw LUTs
+## Generating and extracting raw LUTs
+
+Raw hald-cluts can be generated directly for use in other software or using in lutgen manually:
 
 ```bash
-# Builtin palette
+# Generate from a builtin palette
 lutgen generate -p catppuccin-mocha
 
-# Custom colors
+# Generate from custom colors
 lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
-
-# Extract from an existing image
-lutgen extract -o custom.png my-image.png
 ```
 
-Raw hald-clut LUTs can then be applied to an image using lutgen or other image editing software that supports the format.
+Lutgen also supports extracting from existing image(s), useful especially for film emulation or replicating a look and feel:
 
 ```bash
-lutgen apply --hald-clut custom.png another-image.png
+# Extract a lut from an existing image
+lutgen extract -o custom-hald-clut.png my-image.png
+
+# Extract a lut using multiple source images
+lutgen extract -o polaroid-669-hald-clut.png polaroid-669-samples/*.png
+```
+
+Raw hald-cluts can then be imported into other image editing software, or applied to an image directly using lutgen:
+
+```bash
+lutgen apply --hald-clut polaroid-669-clut.png another-image.png
 ```
 
 ## Color palettes
