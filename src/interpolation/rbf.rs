@@ -1,7 +1,7 @@
 use std::f64;
 
 use arrayref::array_ref;
-use kiddo::distance_metric::DistanceMetric;
+use kiddo::traits::DistanceMetric;
 use kiddo::{NearestNeighbour, SquaredEuclidean};
 
 use super::{ColorTree, InterpolatedRemapper};
