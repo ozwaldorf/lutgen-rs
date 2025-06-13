@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fmt::{Debug, Display};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::io::{stdout, IsTerminal, Seek, Write};
@@ -526,18 +526,20 @@ enum Lutgen {
         #[bpaf(external(Color::extra_colors))]
         extra_colors: Vec<Color>,
     },
-    /// Extract an existing image's palette and generate a LUT to replicate it
+    /// Extract colors and generate a LUT from existing image(s).
+    /// Can be used for replicating an images look directly
+    /// (copying a colorscheme, film emulation).
     #[bpaf(command, short('e'), fallback_to_usage)]
     Extract {
         /// Palette size to extract from an image
         #[bpaf(long, fallback(128), display_fallback)]
         color_count: u8,
-        /// Path to write output to.
+        /// Path to write output to
         #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }))]
         output: Option<PathBuf>,
         #[bpaf(external)]
         lut_algorithm: LutAlgorithm,
-        /// Images to generate hald cluts for.
+        /// Images to extract colors from for generating the hald clut
         #[bpaf(
             positional("IMAGES"),
             non_strict,
@@ -800,38 +802,41 @@ impl Lutgen {
         lut_algorithm: LutAlgorithm,
         inputs: Vec<PathBuf>,
     ) -> Result<String, String> {
-        let len = inputs.len();
+        let mut palette_set = HashSet::new();
         for input in inputs {
-            // load image
-            let image = image::open(&input)
-                .map_err(|e| format!("failed to read image: {e:?}"))?
-                .to_rgb8();
+            // reserve space for a full additional set of items. We may add less so we
+            // incrementally reserve after each image.
+            palette_set.reserve(color_count as usize);
+
+            let image = load_image(&input)?.to_rgb8();
 
             // extract palette
             let start = Instant::now();
             let mut pipeline = PalettePipeline::try_from(&image).unwrap();
-            let palette = pipeline
+            for color in pipeline
                 .colorspace(ColorSpace::Oklab)
                 .quantize_method(QuantizeMethod::kmeans())
                 .palette_size(color_count)
                 .palette_par()
-                .into_iter()
-                .map(|color| [color.red, color.green, color.blue])
-                .collect::<Vec<_>>();
+            {
+                // push palette to full set
+                palette_set.insert([color.red, color.green, color.blue]);
+            }
             println!(
                 "✔ Extracted {color_count} colors in {:.2?}",
                 start.elapsed()
             );
-
-            // generate lut for palette
-            let lut = lut_algorithm.generate("extracted", palette)?;
-
-            // save lut
-            let start = Instant::now();
-            let path = Lutgen::find_path(len, false, "extracted", &input, output.clone());
-            lut.save(&path).map_err(|e| e.to_string())?;
-            println!("✔ Saved output to {path:?} in {:.2?}", start.elapsed());
         }
+
+        // generate lut for full palette set
+        let lut =
+            lut_algorithm.generate("extracted", palette_set.into_iter().collect::<Vec<_>>())?;
+
+        // save lut
+        let start = Instant::now();
+        let path = output.unwrap_or("extracted.png".into());
+        lut.save(&path).map_err(|e| e.to_string())?;
+        println!("✔ Saved output to {path:?} in {:.2?}", start.elapsed());
 
         Ok("extracting ".into())
     }
