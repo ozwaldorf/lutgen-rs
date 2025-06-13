@@ -21,6 +21,7 @@ use lutgen::interpolation::{
 use lutgen::{GenerateLut, RgbImage, RgbaImage};
 use lutgen_palettes::Palette;
 use oklab::{srgb_to_oklab, Oklab};
+use quantette::{ColorSpace, PalettePipeline, QuantizeMethod};
 use rayon::iter::Either;
 use regex::{Captures, Regex};
 
@@ -525,6 +526,27 @@ enum Lutgen {
         #[bpaf(external(Color::extra_colors))]
         extra_colors: Vec<Color>,
     },
+    /// Extract an existing image's palette and generate a LUT to replicate it
+    #[bpaf(command, short('e'), fallback_to_usage)]
+    Extract {
+        /// Palette size to extract from an image
+        #[bpaf(long, fallback(128), display_fallback)]
+        color_count: u8,
+        /// Path to write output to.
+        #[bpaf(short, long, argument("PATH"), complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }))]
+        output: Option<PathBuf>,
+        #[bpaf(external)]
+        lut_algorithm: LutAlgorithm,
+        /// Images to generate hald cluts for.
+        #[bpaf(
+            positional("IMAGES"),
+            non_strict,
+            guard(|v| v.exists(), "No such file or directory"),
+            complete_shell(ShellComp::File { mask: Some(IMAGE_GLOB) }),
+            some("At least one image is needed to apply"),
+        )]
+        input: Vec<PathBuf>,
+    },
     /// Apply a generated or provided Hald CLUT to images.
     #[bpaf(command, short('a'), fallback_to_usage)]
     Apply {
@@ -747,6 +769,12 @@ impl Lutgen {
                 input,
                 extra_colors,
             ),
+            Lutgen::Extract {
+                color_count,
+                output,
+                lut_algorithm,
+                input,
+            } => Lutgen::extract(color_count, output, lut_algorithm, input),
             Lutgen::Palette(args) => Lutgen::palette(args),
         }
     }
@@ -764,6 +792,48 @@ impl Lutgen {
         lut.save(&path).map_err(|e| e.to_string())?;
         println!("✔ Saved output to {path:?} in {:.2?}", time.elapsed());
         Ok("generating ".into())
+    }
+
+    fn extract(
+        color_count: u8,
+        output: Option<PathBuf>,
+        lut_algorithm: LutAlgorithm,
+        inputs: Vec<PathBuf>,
+    ) -> Result<String, String> {
+        let len = inputs.len();
+        for input in inputs {
+            // load image
+            let image = image::open(&input)
+                .map_err(|e| format!("failed to read image: {e:?}"))?
+                .to_rgb8();
+
+            // extract palette
+            let start = Instant::now();
+            let mut pipeline = PalettePipeline::try_from(&image).unwrap();
+            let palette = pipeline
+                .colorspace(ColorSpace::Oklab)
+                .quantize_method(QuantizeMethod::kmeans())
+                .palette_size(color_count)
+                .palette_par()
+                .into_iter()
+                .map(|color| [color.red, color.green, color.blue])
+                .collect::<Vec<_>>();
+            println!(
+                "✔ Extracted {color_count} colors in {:.2?}",
+                start.elapsed()
+            );
+
+            // generate lut for palette
+            let lut = lut_algorithm.generate("extracted", palette)?;
+
+            // save lut
+            let start = Instant::now();
+            let path = Lutgen::find_path(len, false, "extracted", &input, output.clone());
+            lut.save(&path).map_err(|e| e.to_string())?;
+            println!("✔ Saved output to {path:?} in {:.2?}", start.elapsed());
+        }
+
+        Ok("extracting ".into())
     }
 
     fn apply(
