@@ -9,6 +9,7 @@ permalink: cli
 
   * [`lutgen`↴](#lutgen)
   * [`lutgen generate`↴](#lutgen-generate)
+  * [`lutgen extract`↴](#lutgen-extract)
   * [`lutgen apply`↴](#lutgen-apply)
   * [`lutgen patch`↴](#lutgen-patch)
   * [`lutgen palette`↴](#lutgen-palette)
@@ -34,6 +35,8 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
 **Available commands:**
 - **`generate`**, **`g`** &mdash; 
   Generate and save a Hald CLUT to disk.
+- **`extract`**, **`e`** &mdash; 
+  Extract colors and generate a LUT from existing image(s).
 - **`apply`**, **`a`** &mdash; 
   Apply a generated or provided Hald CLUT to images.
 - **`patch`**, **`p`** &mdash; 
@@ -71,6 +74,84 @@ Generate and save a Hald CLUT to disk.
   - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
 
   Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+   
+  [default: 1.0]
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
+- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
+  Number of nearest colors to consider when interpolating. 0 uses all available colors.
+   
+  [default: 16]
+- **`-P`**, **`--preserve`** &mdash; 
+  Preserve the original image's luminocity values after interpolation.
+   
+  [default: false]
+- **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
+  Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
+   
+  [default: 128.0]
+### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+- **`-S`**, **`--shepards-method`** &mdash; 
+  Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+- **`-p`**, **`--power`**=_`POWER`_ &mdash; 
+  Power parameter for shepard's method.
+   
+  [default: 4.0]
+
+
+### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+- **`-G`**, **`--gaussian-sampling`** &mdash; 
+  Enable using Gaussian sampling for interpolation (slow).
+- **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
+  Average amount of noise to apply in each iteration.
+   
+  [default: 0.0]
+- **`-s`**, **`--std-dev`**=_`STD_DEV`_ &mdash; 
+  Standard deviation parameter for the noise applied in each iteration.
+   
+  [default: 20.0]
+- **`-i`**, **`--iterations`**=_`ITERS`_ &mdash; 
+  Number of iterations of noise to apply to each pixel.
+   
+  [default: 512]
+- **`-S`**, **`--seed`**=_`SEED`_ &mdash; 
+  Seed for noise rng.
+   
+  [default: 42080085]
+
+
+### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+- **`-N`**, **`--nearest-neighbor`** &mdash; 
+  Disable interpolation completely.
+
+
+- **`-h`**, **`--help`** &mdash; 
+  Prints help information
+
+
+## lutgen extract
+
+Extract colors and generate a LUT from existing image(s). Can be used for replicating an images look directly (copying a colorscheme, film emulation).
+
+**Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_...
+
+**Available positional items:**
+- _`IMAGES`_ &mdash; 
+  Images to extract colors from for generating the hald clut
+
+
+
+**Available options:**
+- **`    --color-count`**=_`ARG`_ &mdash; 
+  Palette size to extract from an image
+   
+  [default: 128]
+- **`-o`**, **`--output`**=_`PATH`_ &mdash; 
+  Path to write output to
 - **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
   Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
    
