@@ -79,73 +79,11 @@ Cache is provided via https://garnix.io
 
 ### Documentation
 
-Detailed documentation is available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
-
-### Examples
-
-Correcting an image
-
-```bash
-# Builtin palette
-lutgen apply -p catppuccin-mocha docs/assets/example-image.jpg -o mocha_version.jpg
-
-# Custom colors
-lutgen apply docs/assets/example-image.jpg -- "#ABCDEF" ffffff 000000
-
-# Custom palette file with whitespace separated hex colors (linux example shown)
-echo "fff 555 000 abcdef deadbe" > ~/.config/lutgen/my-palette-name
-lutgen apply docs/assets/example-image.jpg -p my-palette-name
-
-# Multiple images
-lutgen apply image1.png image2.png *.jpg -p catppuccin-mocha
-
-# Using an external LUT
-lutgen apply --hald-clut mocha_lut.png docs/assets/example-image.jpg
-```
-
-Generating a standalone LUT for external or manual usage
-
-```bash
-# Builtin palette
-lutgen generate -p catppuccin-mocha -o mocha_lut.png
-
-# Custom colors
-lutgen generate -o custom.png -- "#ABCDEF" ffffff 000000
-
-# Custom palette file with whitespace separated hex colors (linux example shown)
-echo "fff 555 000 abcdef deadbe" > ~/.config/lutgen/my-palette-name
-lutgen generate -p my-palette-name
-```
-
-Preview palletes
-
-```bash
-# Preview all palettes
-lutgen palette all
-
-# Copy a palette to the custom palette dir for modifying and overriding
-lutgen palette carburetor > ~/.config/lutgen/carburetor
-
-# Finding a palette name with grep
-lutgen palette names | grep 'gruvbox'
-```
-
-Correcting videos (using ffmpeg):
-
-```bash
-ffmpeg -i input.mkv -i hald_clut.png -filter_complex '[0][1] haldclut' output.mp4
-```
-
-Zsh Completions:
-
-```bash
-lutgen --bpaf-complete-style-zsh > _lutgen
-sudo mv _lutgen /usr/local/share/zsh/site-functions/
-```
+Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
 
 ## Library
 
-See the latest documentation on [docs.rs](https://docs.rs/lutgen)
+See the latest rust documentation on [docs.rs/lutgen](https://docs.rs/lutgen)
 
 ## Planned features
 

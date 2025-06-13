@@ -65,3 +65,17 @@ lutgen patch ./**/*.css --palette catppuccin > catppuccin.patch
 # apply changes directly, with no patchfile output
 lutgen patch -wn ./**/*.css -p catppuccin
 ```
+
+## Setting up shell auto-completions
+
+Lutgen supports completions for bash, zsh, and fish.
+Most package managers will setup the completions when installing the package,
+but can also be manually done.
+
+#### ZSH
+
+```bash
+lutgen --bpaf-complete-style-zsh > _lutgen
+sudo mv _lutgen /usr/local/share/zsh/site-functions/
+```
+
