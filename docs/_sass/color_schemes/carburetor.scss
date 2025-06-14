@@ -1,0 +1,39 @@
+// Carburetor colors
+$white: #f4f4f4;
+$grey-dk-000: #525252;
+$grey-dk-100: #393939;
+$grey-dk-200: #262626;
+$grey-dk-250: #161616;
+$grey-dk-300: #0b0b0b;
+$grey-lt-000: #f4f4f4;
+$grey-lt-100: #e0e0e0;
+$grey-lt-200: #c6c6c6;
+$grey-lt-300: #a8a8a8;
+$purple-000: #d4bbff;
+$purple-100: #d4bbff;
+$purple-200: #be95ff;
+$purple-300: #be95ff;
+$blue-000: #82cfff;
+$blue-100: #78a9ff;
+$blue-200: #4589ff;
+$blue-300: #4589ff;
+$green-000: #42be65;
+$green-100: #42be65;
+$green-200: #42be65;
+$green-300: #42be65;
+$yellow-000: #fddc69;
+$yellow-100: #fddc69;
+$yellow-200: #ff832b;
+$yellow-300: #ff832b;
+$red-000: #ffd7d9;
+$red-100: #ffb3b8;
+$red-200: #ff8389;
+$red-300: #fa4d56;
+
+// Apply default scheme
+@import "./color_schemes/dark";
+
+// Overrides
+$link-color: $blue-200;
+$body-background-color: $grey-dk-250;
+$sidebar-color: $grey-dk-300;

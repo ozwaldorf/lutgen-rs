@@ -1,7 +1,7 @@
 title: Lutgen Wiki
 description: Documentation, tips, and lore for lutgen-rs
 theme: just-the-docs
-color_scheme: dark
+color_scheme: carburetor
 aux_links:
   Github: https://github.com/ozwaldorf/lutgen-rs
 exclude:
