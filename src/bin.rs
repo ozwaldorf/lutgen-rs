@@ -623,7 +623,13 @@ enum Lutgen {
         }),
         fallback_to_usage
     )]
-    Palette(#[bpaf(external(palette_args))] PaletteArgs),
+    Palette {
+        /// Force printing ansi colors
+        #[bpaf(long)]
+        ansi: bool,
+        #[bpaf(external(palette_args))]
+        args: PaletteArgs,
+    },
 }
 
 fn load_image<P: AsRef<Path>>(path: P) -> Result<DynamicImage, String> {
@@ -777,7 +783,7 @@ impl Lutgen {
                 lut_algorithm,
                 input,
             } => Lutgen::extract(color_count, output, lut_algorithm, input),
-            Lutgen::Palette(args) => Lutgen::palette(args),
+            Lutgen::Palette { ansi, args } => Lutgen::palette(args, ansi),
         }
     }
 
@@ -1115,13 +1121,13 @@ impl Lutgen {
         ))
     }
 
-    fn palette(args: PaletteArgs) -> Result<String, String> {
+    fn palette(args: PaletteArgs, ansi: bool) -> Result<String, String> {
         if matches!(args, PaletteArgs::Names) {
             Palette::VARIANTS.iter().for_each(|p| println!("{p}"));
             return Ok(Default::default());
         }
 
-        let is_terminal = stdout().is_terminal();
+        let is_terminal = ansi || stdout().is_terminal();
         let print = move |palette: DynamicPalette| {
             // Print palette name with underline
             if is_terminal {
