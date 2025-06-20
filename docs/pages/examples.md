@@ -52,15 +52,28 @@ lutgen apply --hald-clut polaroid-669-clut.png another-image.png
 
 ## Color palettes
 
+#### Preview all palettes (there's a lot)
+
 ```bash
-# Preview all palettes (there's a lot)
 lutgen palette all
+```
 
-# Finding a palette name with grep
-lutgen palette names | grep 'gruvbox'
+#### View a palette's colors
 
-# View a palette's colors
+```bash
 lutgen palette catppuccin-mocha
+```
+
+#### Searching and previewing palettes with fzf
+
+```bash
+lutgen palette names | fzf --preview 'lutgen palette --ansi {}'
+```
+
+#### Finding a palette name with grep
+
+```bash
+lutgen palette names | grep 'gruvbox'
 ```
 
 ## Custom color palettes
@@ -76,11 +89,15 @@ lutgen generate -p my-palette-name
 
 ## Patching text files
 
-```bash
-# create a patch file
-lutgen patch ./**/*.css --palette catppuccin > catppuccin.patch
+#### Creating a patch file
 
-# apply changes directly, with no patchfile output
+```bash
+lutgen patch ./**/*.css --palette catppuccin > catppuccin.patch
+```
+
+#### Apply changes directly, with no patchfile output
+
+```bash
 lutgen patch -wn ./**/*.css -p catppuccin
 ```
 
