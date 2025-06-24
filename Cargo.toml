@@ -20,7 +20,7 @@ default-run = "lutgen"
 
 [workspace]
 members = ["palettes", "studio"]
-default-members = ["palettes", "studio"]
+default-members = [".", "studio"]
 
 [workspace.dependencies]
 regex = "1.11"
