@@ -2,7 +2,15 @@ name: Release Builds
 on: [push, workflow_dispatch]
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Delete old prerelease tags
+      if: ${{ startsWith(github.ref, 'refs/tags/') }}
+      run: gh release delete ${{ github.ref_name }} --cleanup-tag || 0
+
   build:
+    needs: cleanup
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
