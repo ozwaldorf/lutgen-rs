@@ -1,12 +1,12 @@
 [package]
 name = "lutgen-studio"
 version = "0.1.0"
-description = "Offical GUI for Lutgen"
+description = "Offical GUI for Lutgen, the best way to apply popular colorschemes to any image or wallpaper!"
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
-repository = "https://github.com/ozwaldorf/lutgen-rs/tree/main/studio"
-homepage = "https://github.com/ozwaldorf/lutgen-rs/tree/main/studio"
+repository = "https://github.com/ozwaldorf/lutgen-rs"
+homepage = "https://github.com/ozwaldorf/lutgen-rs"
 keywords = [
   "image-processing",
   "color",
@@ -18,11 +18,15 @@ categories = ["multimedia::images"]
 include = ["Cargo.toml", "**/*.rs", "assets"]
 
 [dependencies]
-# local
-lutgen = { path = "..", version = "0.12", default-features = false }
+lutgen = { path = "../lib", version = "0.12" }
 lutgen-palettes = { path = "../palettes", version = "0.4.0" }
 
-# egui
+image.workspace = true
+strum.workspace = true
+serde.workspace = true
+
+env_logger = "0.11.8"
+log = "0.4.27"
 egui = "0.31"
 egui_extras = { version = "0.31.1", features = ["all_loaders"] }
 eframe = { version = "0.31", default-features = false, features = [
@@ -32,17 +36,6 @@ eframe = { version = "0.31", default-features = false, features = [
     "wayland",       # To support Linux (and CI)
     "x11",           # To support older Linux distributions (restores one of the default features)
 ] }
-
-env_logger = "0.11.8"
-log = "0.4.27"
-
 rfd = "0.15"
-image.workspace = true
-strum.workspace = true
-serde.workspace = true
 uuid = { version = "1.17.0", features = ["v4"] }
-
-[[bin]]
-name = "lutgen-studio"
-path = "src/bin.rs"
 

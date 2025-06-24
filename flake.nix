@@ -30,12 +30,12 @@
         craneLib = stableCraneLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
+        version = "1.0.0";
 
         lutgen = stableCraneLib.buildPackage {
-          inherit src;
+          inherit src version;
           doCheck = false;
           pname = "lutgen";
-
           strictDeps = true;
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
           nativeBuildInputs = [ pkgs.installShellFiles ];
@@ -49,9 +49,11 @@
           '';
         };
 
+        # Common args with dependencies for all packages
         commonArgs = with pkgs; rec {
-          inherit src;
+          inherit src version;
           strictDeps = true;
+          pname = "lutgen";
           nativeBuildInputs = [
             pkg-config
           ];
@@ -78,6 +80,7 @@
           // {
             doCheck = false;
             pname = "lutgen-studio";
+            version = "0.1.0";
             cargoExtraArgs = "--locked --bin lutgen-studio";
           }
         );
@@ -118,6 +121,7 @@
               }
             );
           };
+
         packages = {
           inherit lutgen lutgen-studio;
           default = lutgen;

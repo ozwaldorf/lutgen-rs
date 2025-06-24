@@ -1,0 +1,48 @@
+[package]
+name = "lutgen-cli"
+version = "1.0.0"
+keywords = [
+  "image-processing",
+  "color",
+  "hald-clut",
+  "lookup-tables",
+  "gaussian",
+]
+description = "A blazingly fast interpolated LUT utility for arbitrary and popular color palettes."
+edition = "2021"
+license = "MIT"
+authors = ["Ossian Mapes <self@ossian.dev>"]
+repository = "https://github.com/ozwaldorf/lutgen-rs"
+homepage = "https://github.com/ozwaldorf/lutgen-rs"
+categories = ["multimedia::images"]
+
+[dependencies]
+lutgen = { version = "0.12.1", path = "../lib" }
+
+image.workspace = true
+regex.workspace = true
+oklab.workspace = true
+rayon.workspace = true
+
+imara-diff = "0.2"
+lutgen-palettes = { version = "0.4", path = "../palettes" }
+strsim = "0.11"
+dirs = "6.0"
+quantette = { version = "0.3", features = ["colorspaces", "kmeans"] }
+bpaf = { version = "0.9", features = ["derive", "dull-color", "autocomplete", "docgen"] }
+
+[[bin]]
+name = "lutgen"
+path = "src/main.rs"
+
+[package.metadata.aur]
+custom = [
+  "# Generate and install shell completions",
+  "mkdir completions",
+  "./lutgen --bpaf-complete-style-bash > completions/$_pkgname",
+  "./lutgen --bpaf-complete-style-zsh > completions/_$_pkgname",
+  "./lutgen --bpaf-complete-style-fish > completions/$_pkgname.fish",
+  "install -Dm644 completions/$_pkgname -t \"$pkgdir/usr/share/bash-completion/completions\"",
+  "install -Dm644 completions/_$_pkgname -t \"$pkgdir/usr/share/zsh/site-functions\"",
+  "install -Dm644 completions/$_pkgname.fish -t \"$pkgdir/usr/share/fish/vendor_completions.d\"",
+]

@@ -1,70 +1,15 @@
-[package]
-name = "lutgen"
-version = "0.12.1"
-documentation = "https://docs.rs/lutgen"
-keywords = [
-  "image-processing",
-  "color",
-  "hald-clut",
-  "lookup-tables",
-  "gaussian",
-]
-description = "A blazingly fast interpolated LUT utility for arbitrary and popular color palettes."
-edition = "2021"
-license = "MIT"
-authors = ["Ossian Mapes <self@ossian.dev>"]
-repository = "https://github.com/ozwaldorf/lutgen-rs"
-homepage = "https://github.com/ozwaldorf/lutgen-rs"
-categories = ["multimedia::images"]
-default-run = "lutgen"
-
 [workspace]
-members = ["palettes", "studio"]
-default-members = [".", "studio"]
+resolver = "2"
+members = ["crates/*"]
+default-members = ["crates/cli", "crates/studio"]
 
 [workspace.dependencies]
 regex = "1.11"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.27", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 image = "0.25"
-
-[dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports"] }
-
-[dependencies]
-image.workspace = true
-rand = "0.9"
-rand_distr = "0.5"
-rayon = "1.10"
-kiddo = "5.0"
 oklab = "1.1"
-arrayref = "0.3"
-
-# Bin dependencies
-lutgen-palettes = { version = "0.4", path = "palettes", optional = true }
-strsim = { version = "0.11", optional = true }
-dirs = { version = "6.0", optional = true }
-regex = { workspace = true, optional = true }
-imara-diff = { version = "0.2", optional = true }
-quantette = { version = "0.3", features = ["colorspaces", "kmeans"], optional = true }
-
-[dependencies.bpaf]
-version = "0.9.15"
-features = ["derive", "dull-color", "autocomplete", "docgen"]
-optional = true
-
-[features]
-default = ["bin"]
-bin = ["lutgen-palettes", "bpaf", "strsim", "dirs", "regex", "imara-diff", "quantette"]
-
-[[bin]]
-name = "lutgen"
-path = "src/bin.rs"
-required-features = ["bin"]
-
-[[bench]]
-name = "main"
-harness = false
+rayon = "1.10"
 
 [profile.release]
 opt-level = 3
@@ -73,15 +18,3 @@ panic = "abort"
 
 [profile.test]
 inherits = "release"
-
-[package.metadata.aur]
-custom = [
-  "# Generate and install shell completions",
-  "mkdir completions",
-  "./lutgen --bpaf-complete-style-bash > completions/$_pkgname",
-  "./lutgen --bpaf-complete-style-zsh > completions/_$_pkgname",
-  "./lutgen --bpaf-complete-style-fish > completions/$_pkgname.fish",
-  "install -Dm644 completions/$_pkgname -t \"$pkgdir/usr/share/bash-completion/completions\"",
-  "install -Dm644 completions/_$_pkgname -t \"$pkgdir/usr/share/zsh/site-functions\"",
-  "install -Dm644 completions/$_pkgname.fish -t \"$pkgdir/usr/share/fish/vendor_completions.d\"",
-]

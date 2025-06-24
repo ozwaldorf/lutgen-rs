@@ -1,0 +1,36 @@
+[package]
+name = "lutgen"
+version = "0.12.1"
+documentation = "https://docs.rs/lutgen"
+keywords = [
+  "image-processing",
+  "color",
+  "hald-clut",
+  "lookup-tables",
+  "gaussian",
+]
+description = "A blazingly fast interpolated LUT utility for arbitrary and popular color palettes."
+edition = "2021"
+license = "MIT"
+authors = ["Ossian Mapes <self@ossian.dev>"]
+repository = "https://github.com/ozwaldorf/lutgen-rs"
+homepage = "https://github.com/ozwaldorf/lutgen-rs"
+categories = ["multimedia::images"]
+
+[dev-dependencies]
+criterion = { version = "0.6", features = ["html_reports"] }
+lutgen-palettes = { path = "../palettes" }
+
+[dependencies]
+image.workspace = true
+oklab.workspace = true
+rayon.workspace = true
+
+rand = "0.9"
+rand_distr = "0.5"
+kiddo = "5.0"
+arrayref = "0.3"
+
+[[bench]]
+name = "main"
+harness = false
