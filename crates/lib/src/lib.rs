@@ -63,7 +63,7 @@
 //!     .unwrap();
 //!
 //! // Open an image to correct
-//! let mut external_image = open(".../../docs/assets/example-image.jpg")
+//! let mut external_image = open("../../docs/assets/example-image.jpg")
 //!     .unwrap()
 //!     .to_rgba8();
 //!
