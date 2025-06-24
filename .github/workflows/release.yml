@@ -1,5 +1,5 @@
 name: Release Builds
-on: workflow_dispatch
+on: [push, workflow_dispatch]
 
 jobs:
   build:
@@ -52,13 +52,13 @@ jobs:
 
     - name: Rename
       run: |
-        cp target/${{ matrix.TARGET }}/release/lutgen${{ matrix.EXTENSION }} lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        cp target/${{ matrix.TARGET }}/release/lutgen${{ matrix.EXTENSION }} lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         cp target/${{ matrix.TARGET }}/release/lutgen-studio${{ matrix.EXTENSION }} lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
 
     - uses: actions/upload-artifact@v4
       with:
-        name: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        path: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        name: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        path: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
 
     - uses: actions/upload-artifact@v4
       with:
@@ -69,8 +69,8 @@ jobs:
       name: Upload lutgen to release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        asset_name: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        file: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        asset_name: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         tag: ${{ github.ref }}
         prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
         overwrite: true
