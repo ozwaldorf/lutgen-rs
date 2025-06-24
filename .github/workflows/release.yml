@@ -37,8 +37,10 @@ jobs:
     - name: Rust Cache
       uses: Swatinem/rust-cache@v2
       with:
+        cache-directories: "~/.cargo/bin"
         key: "${{ matrix.TARGET }}"
         cache-all-crates: "true"
+        cache-bin: false
 
     - name: Install rust tools
       run: |
