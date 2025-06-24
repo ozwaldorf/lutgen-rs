@@ -1,0 +1,36 @@
+[package]
+name = "lutgen-studio"
+version = "0.1.0"
+authors = ["Ossian Mapes <self@ossian.dev>"]
+edition = "2021"
+include = ["LICENSE", "**/*.rs", "Cargo.toml"]
+
+[dependencies]
+# local
+lutgen = { path = "..", version = "0.12", default-features = false }
+lutgen-palettes = { path = "../palettes", version = "0.4.0" }
+
+# egui
+egui = "0.31"
+egui_extras = { version = "0.31.1", features = ["all_loaders"] }
+eframe = { version = "0.31", default-features = false, features = [
+    "default_fonts", # Embed the default egui fonts.
+    "glow",          # Use the glow rendering backend. Alternative: "wgpu".
+    "persistence",   # Enable restoring app state when restarting the app.
+    "wayland",       # To support Linux (and CI)
+    "x11",           # To support older Linux distributions (restores one of the default features)
+] }
+
+env_logger = "0.11.8"
+log = "0.4.27"
+
+rfd = "0.15"
+image.workspace = true
+strum.workspace = true
+serde.workspace = true
+uuid = { version = "1.17.0", features = ["v4"] }
+
+[[bin]]
+name = "lutgen-studio"
+path = "src/bin.rs"
+

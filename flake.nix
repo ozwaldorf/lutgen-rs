@@ -30,24 +30,55 @@
         craneLib = stableCraneLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
-        commonArgs = {
+
+        lutgen = stableCraneLib.buildPackage {
           inherit src;
+          doCheck = false;
+          pname = "lutgen";
+
           strictDeps = true;
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
           nativeBuildInputs = [ pkgs.installShellFiles ];
+          cargoExtraArgs = "--locked --bin lutgen";
+          postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
+            installManPage docs/man/lutgen.1
+            installShellCompletion --cmd lutgen \
+              --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
+              --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
+              --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
+          '';
         };
 
-        lutgen = stableCraneLib.buildPackage (
+        commonArgs = with pkgs; rec {
+          inherit src;
+          strictDeps = true;
+          nativeBuildInputs = [
+            pkg-config
+          ];
+          buildInputs = (
+            [
+              openssl
+              libxkbcommon
+              libGL
+              fontconfig
+              wayland
+              xorg.libXcursor
+              xorg.libXrandr
+              xorg.libXi
+              xorg.libX11
+              zenity # file dialog
+            ]
+            ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ]
+          );
+          LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath buildInputs}";
+        };
+
+        lutgen-studio = stableCraneLib.buildPackage (
           commonArgs
           // {
             doCheck = false;
-            postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
-              installManPage docs/man/lutgen.1
-              installShellCompletion --cmd lutgen \
-                --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
-                --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
-                --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
-            '';
+            pname = "lutgen-studio";
+            cargoExtraArgs = "--locked --bin lutgen-studio";
           }
         );
       in
@@ -88,10 +119,10 @@
             );
           };
         packages = {
-          inherit lutgen;
+          inherit lutgen lutgen-studio;
           default = lutgen;
         };
-        apps.default = flake-utils.lib.mkApp { drv = lutgen; };
+
         devShells.default = craneLib.devShell {
           checks = self.checks.${system};
           packages = with pkgs; [
@@ -99,6 +130,7 @@
             jekyll
             bundler
           ];
+          inherit (commonArgs) LD_LIBRARY_PATH;
         };
         formatter = pkgs.nixfmt-rfc-style;
       }
