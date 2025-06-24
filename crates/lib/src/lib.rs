@@ -59,18 +59,20 @@
 //!
 //! // Save the LUT for later
 //! hald_clut
-//!     .save("docs/assets/gruvbox-dark-hald-clut.png")
+//!     .save("../../docs/assets/gruvbox-dark-hald-clut.png")
 //!     .unwrap();
 //!
 //! // Open an image to correct
-//! let mut external_image = open("docs/assets/example-image.jpg").unwrap().to_rgba8();
+//! let mut external_image = open(".../../docs/assets/example-image.jpg")
+//!     .unwrap()
+//!     .to_rgba8();
 //!
 //! // Correct the image using the hald clut we generated
 //! correct_image(&mut external_image, &hald_clut);
 //!
 //! // Save the edited image
 //! let rgbimage: image::RgbImage = external_image.convert();
-//! rgbimage.save("docs/assets/gruvbox-dark.jpg").unwrap()
+//! rgbimage.save("../../docs/assets/gruvbox-dark.jpg").unwrap()
 //! ```
 //!
 //! #### Remapping an image directly
