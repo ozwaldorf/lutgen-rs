@@ -1093,20 +1093,26 @@ impl Lutgen {
                 if !no_patch {
                     // Compute and print diff for the file
                     let time = Instant::now();
-                    let input = imara_diff::intern::InternedInput::new(
-                        contents.as_str(),
-                        replaced.as_str(),
-                    );
-                    let diff = imara_diff::diff(
-                        imara_diff::Algorithm::Histogram,
-                        &input,
-                        imara_diff::UnifiedDiffBuilder::new(&input),
-                    );
+                    let input =
+                        imara_diff::InternedInput::new(contents.as_str(), replaced.as_str());
+                    let mut diff =
+                        imara_diff::Diff::compute(imara_diff::Algorithm::Histogram, &input);
 
-                    println!(
-                        "--- a/{file}\n+++ b/{file}\n{diff}\n",
-                        file = file.to_string_lossy()
-                    );
+                    if diff.count_removals() + diff.count_additions() > 0 {
+                        diff.postprocess_lines(&input);
+                        let printer = imara_diff::BasicLineDiffPrinter(&input.interner);
+                        let unified = diff.unified_diff(
+                            &printer,
+                            imara_diff::UnifiedDiffConfig::default(),
+                            &input,
+                        );
+
+                        println!(
+                            "--- a/{file}\n+++ b/{file}\n{unified}",
+                            file = file.to_string_lossy(),
+                        );
+                    }
+
                     eprintln!("✔ Computed diff in {:.2?}", time.elapsed());
                 }
             }

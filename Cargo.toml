@@ -16,6 +16,7 @@ authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
 homepage = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
+default-run = "lutgen"
 
 [workspace]
 members = ["palettes"]
@@ -41,7 +42,7 @@ lutgen-palettes = { version = "0.4", path = "palettes", optional = true }
 strsim = { version = "0.11", optional = true }
 dirs = { version = "6.0", optional = true }
 regex = { workspace = true, optional = true }
-imara-diff = { version = "0.1", optional = true }
+imara-diff = { version = "0.2", optional = true }
 quantette = { version = "0.3", features = ["colorspaces", "kmeans"], optional = true }
 
 [dependencies.bpaf]
