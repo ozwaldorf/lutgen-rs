@@ -1,7 +1,7 @@
 <header>
     <br>
     <div align="center">
-        <img width="30%" src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/4163e179-ee73-4b24-8ad8-6c373e1d8711" />
+        <img width="30%" src="./studio/assets/logo.png" />
     </div>
     <h2 align="center">lutgen-rs</h2>
     <p align="center">
@@ -53,13 +53,13 @@
     <img src="docs/assets/nord.png" />
 </details>
 
-## CLI
+## Lutgen CLI
 
-### Installation
+### Package Repositories
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen.svg)](https://repology.org/project/lutgen/versions)
 
-#### Source
+### Install from source
 
 ```bash
 git clone https://github.com/ozwaldorf/lutgen-rs
@@ -67,23 +67,53 @@ cd lutgen-rs
 cargo install --path .
 ```
 
-#### Nix flake
-
-A nix flake is available and can be run easily with:
-
-```bash
-nix run github:ozwaldorf/lutgen-rs
-```
-
-Cache is provided via https://garnix.io
-
 ### Documentation
 
 Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
 
-## Library
+## Lutgen Studio
+
+### Package Repositories
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg)](https://repology.org/project/lutgen-studio/versions)
+
+### Install from source
+
+```bash
+git clone https://github.com/ozwaldorf/lutgen-rs
+cd lutgen-rs
+cargo install --path studio
+```
+
+## Rust Library
 
 See the latest rust documentation on [docs.rs/lutgen](https://docs.rs/lutgen)
+
+## Nix flake
+
+A nix flake is available providing both lutgen and lutgen-studio packages.
+The flake can be easily run via:
+
+```bash
+nix run github:ozwaldorf/lutgen-rs
+nix run github:ozwaldorf/lutgen-rs#lutgen-studio
+```
+
+Cache is provided via https://garnix.io
+
+### Development Shell
+
+A development environment is also provided in the flake:
+
+```bash
+git clone https://github.com/ozwaldorf/lutgen-rs
+cd lutgen-rs
+nix develop
+
+# inside dev shell
+cargo run -r --bin lutgen
+cargo run -r --bin lutgen-studio
+```
 
 ## Planned features
 
