@@ -15,6 +15,7 @@ authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
 homepage = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
+default-run = "lutgen"
 
 [dependencies]
 lutgen = { version = "0.12.1", path = "../lib" }
