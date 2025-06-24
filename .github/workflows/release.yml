@@ -4,10 +4,12 @@ on: [push, workflow_dispatch]
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
     - name: Delete old prerelease tags
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      run: gh release delete ${{ github.ref_name }} --cleanup-tag || 0
+      run: gh release delete ${{ github.ref_name }} --cleanup-tag || true
 
   build:
     needs: cleanup
