@@ -2,69 +2,85 @@ name: Release Builds
 on: workflow_dispatch
 
 jobs:
-  release-windows:
-    name: Build Windows (10+) release
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build Binary
-        shell: powershell
-        run: |
-          & cargo build --locked --release
-      - name: Upload Files
-        uses: actions/upload-artifact@v4
-        with:
-          name: lutgen-x86_64-windows
-          path: target/release/lutgen.exe
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - os: macos-latest
+          TARGET: aarch64-apple-darwin
 
-  release-legacy-windows:
-    name: Build legacy Windows (7+) release
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-        name: Checkout
-      - uses: actions-rs/toolchain@v1
-        with:
-          # 1.78 disables windows 7 support: https://blog.rust-lang.org/2024/02/26/Windows-7.html
-          toolchain: 1.77.2
-          override: true
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build Binary
-        shell: powershell
-        run: |
-          & cargo build --locked --release
-      - name: Upload Files
-        uses: actions/upload-artifact@v4
-        with:
-          name: lutgen-x86_64-legacy-windows
-          path: target/release/lutgen.exe
+        - os: ubuntu-latest
+          TARGET: aarch64-unknown-linux-gnu
 
-  release-aur:
-    name: Build AUR release
-    runs-on: ubuntu-latest
+        - os: ubuntu-latest
+          TARGET: armv7-unknown-linux-gnueabihf
+
+        - os: ubuntu-latest
+          TARGET: x86_64-unknown-linux-gnu
+
+        - os: windows-latest
+          TARGET: x86_64-pc-windows-msvc
+          EXTENSION: .exe
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build aur release
-        run: |
-          cargo install cargo-aur
-          cargo aur -o aur
-      - name: Upload Files
-        uses: actions/upload-artifact@v4
-        with:
-          name: lutgen-aur
-          path: aur
+    - name: Building ${{ matrix.TARGET }}
+      run: echo "${{ matrix.TARGET }}"
+
+    - uses: actions/checkout@master
+    - name: Install build dependencies - Rustup
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable --profile default --target ${{ matrix.TARGET }} -y
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Rust Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        key: "${{ matrix.TARGET }}"
+        cache-all-crates: "true"
+
+    - name: Install rust tools
+      run: |
+        cargo install cargo-binstall
+        cargo binstall cross
+
+    - name: Build
+      run: |
+        cross build --release --target=${{ matrix.TARGET }} --bin lutgen
+        cross build --release --target=${{ matrix.TARGET }} --bin lutgen-studio
+
+    - name: Rename
+      run: |
+        cp target/${{ matrix.TARGET }}/release/lutgen${{ matrix.EXTENSION }} lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        cp target/${{ matrix.TARGET }}/release/lutgen-studio${{ matrix.EXTENSION }} lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        path: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        path: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+
+    - uses: svenstaro/upload-release-action@v2
+      name: Upload lutgen to release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        asset_name: lutgen-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        tag: ${{ github.ref }}
+        prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        overwrite: true
+
+    - uses: svenstaro/upload-release-action@v2
+      name: Upload lutgen-studio to release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        asset_name: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
+        tag: ${{ github.ref }}
+        prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        overwrite: true
