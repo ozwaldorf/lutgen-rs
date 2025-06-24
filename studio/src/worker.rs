@@ -11,7 +11,7 @@ use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, She
 pub enum FrontendEvent {
     PickFile,
     LoadFile(PathBuf),
-    Apply(Vec<[u8; 3]>, LutAlgorithmArgs),
+    Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs),
 }
 
 pub enum BackendEvent {
@@ -23,22 +23,17 @@ pub enum BackendEvent {
 
 pub enum LutAlgorithmArgs {
     GaussianRbf {
-        common: Common,
         rbf: CommonRbf,
         args: GaussianRbfArgs,
     },
     ShepardsMethod {
-        common: Common,
         rbf: CommonRbf,
         args: ShepardsMethodArgs,
     },
     GaussianSampling {
-        common: Common,
         args: GaussianSamplingArgs,
     },
-    NearestNeighbor {
-        common: Common,
-    },
+    NearestNeighbor,
 }
 
 impl Display for BackendEvent {
@@ -72,9 +67,9 @@ impl WorkerHandle {
             .expect("failed to send load file to worker");
     }
 
-    pub fn apply_palette(&self, palette: Vec<[u8; 3]>, args: LutAlgorithmArgs) {
+    pub fn apply_palette(&self, palette: Vec<[u8; 3]>, common: Common, args: LutAlgorithmArgs) {
         self.tx
-            .send(FrontendEvent::Apply(palette, args))
+            .send(FrontendEvent::Apply(palette, common, args))
             .expect("failed to send apply request to worker");
     }
 
@@ -102,7 +97,9 @@ impl Worker {
                 let res = match event {
                     FrontendEvent::PickFile => worker.pick_file(),
                     FrontendEvent::LoadFile(path) => worker.load_file(&path),
-                    FrontendEvent::Apply(palette, args) => worker.apply_palette(palette, args),
+                    FrontendEvent::Apply(palette, common, args) => {
+                        worker.apply_palette(palette, common, args)
+                    },
                 };
                 if let Err(e) = res {
                     worker
@@ -166,7 +163,12 @@ impl Worker {
     }
 
     /// Apply a palette to the currently loaded image
-    fn apply_palette(&self, palette: Vec<[u8; 3]>, args: LutAlgorithmArgs) -> Result<(), String> {
+    fn apply_palette(
+        &self,
+        palette: Vec<[u8; 3]>,
+        common: Common,
+        args: LutAlgorithmArgs,
+    ) -> Result<(), String> {
         // get image or return
         let Some(mut image) = self.current_image.clone() else {
             // do nothing if no image is loaded
@@ -175,7 +177,7 @@ impl Worker {
 
         // generate lut from arguments
         let lut = match args {
-            LutAlgorithmArgs::GaussianRbf { common, rbf, args } => {
+            LutAlgorithmArgs::GaussianRbf { rbf, args } => {
                 lutgen::interpolation::GaussianRemapper::new(
                     &palette,
                     *args.shape,
@@ -185,7 +187,7 @@ impl Worker {
                 )
                 .generate_lut(common.level)
             },
-            LutAlgorithmArgs::ShepardsMethod { common, rbf, args } => {
+            LutAlgorithmArgs::ShepardsMethod { rbf, args } => {
                 lutgen::interpolation::ShepardRemapper::new(
                     &palette,
                     *args.power,
@@ -195,7 +197,7 @@ impl Worker {
                 )
                 .generate_lut(common.level)
             },
-            LutAlgorithmArgs::GaussianSampling { common, args } => {
+            LutAlgorithmArgs::GaussianSampling { args } => {
                 lutgen::interpolation::GaussianSamplingRemapper::new(
                     &palette,
                     *args.mean,
@@ -206,7 +208,7 @@ impl Worker {
                 )
                 .generate_lut(common.level)
             },
-            LutAlgorithmArgs::NearestNeighbor { common } => {
+            LutAlgorithmArgs::NearestNeighbor => {
                 lutgen::interpolation::NearestNeighborRemapper::new(&palette, *common.lum_factor)
                     .generate_lut(common.level)
             },

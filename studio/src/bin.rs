@@ -84,24 +84,20 @@ impl App {
     fn apply(&self) {
         let args = match self.state.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
-                common: self.state.common,
                 rbf: self.state.common_rbf,
                 args: self.state.guassian_rbf,
             },
             LutAlgorithm::ShepardsMethod => LutAlgorithmArgs::ShepardsMethod {
-                common: self.state.common,
                 rbf: self.state.common_rbf,
                 args: self.state.shepards_method,
             },
             LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
-                common: self.state.common,
                 args: self.state.guassian_sampling,
             },
-            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor {
-                common: self.state.common,
-            },
+            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
         };
-        self.worker.apply_palette(self.state.palette.clone(), args);
+        self.worker
+            .apply_palette(self.state.palette.clone(), self.state.common, args);
     }
 }
 

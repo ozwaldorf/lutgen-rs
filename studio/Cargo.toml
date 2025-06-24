@@ -1,9 +1,21 @@
 [package]
 name = "lutgen-studio"
 version = "0.1.0"
-authors = ["Ossian Mapes <self@ossian.dev>"]
+description = "Offical GUI for Lutgen"
 edition = "2021"
-include = ["LICENSE", "**/*.rs", "Cargo.toml"]
+license = "MIT"
+authors = ["Ossian Mapes <self@ossian.dev>"]
+repository = "https://github.com/ozwaldorf/lutgen-rs/tree/main/studio"
+homepage = "https://github.com/ozwaldorf/lutgen-rs/tree/main/studio"
+keywords = [
+  "image-processing",
+  "color",
+  "hald-clut",
+  "lookup-tables",
+  "gaussian",
+]
+categories = ["multimedia::images"]
+include = ["Cargo.toml", "**/*.rs", "assets"]
 
 [dependencies]
 # local
