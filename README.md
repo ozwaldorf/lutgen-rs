@@ -1,7 +1,7 @@
 <header>
     <br>
     <div align="center">
-        <img width="30%" src="./studio/assets/logo.png" />
+        <img width="30%" src="./crates/studio/assets/logo.png" />
     </div>
     <h2 align="center">lutgen-rs</h2>
     <p align="center">
