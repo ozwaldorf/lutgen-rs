@@ -1186,18 +1186,16 @@ fn main() {
 #[cfg(test)]
 #[test]
 fn generate_docs() {
-    let app = env!("CARGO_PKG_NAME");
     let options = lutgen();
 
-    let roff = options.render_manpage(app, bpaf::doc::Section::General, None, None, None);
-    std::fs::write("docs/man/lutgen.1", roff).expect("failed to write manpage");
+    let roff = options.render_manpage("lutgen", bpaf::doc::Section::General, None, None, None);
+    std::fs::write("../../docs/man/lutgen.1", roff).expect("failed to write manpage");
 
     let md = options
         .header("")
-        .render_markdown(app)
+        .render_markdown("lutgen")
         .replace('|', "&#124;");
     let header = "---\nlayout: page\ntitle: Command summary\npermalink: cli\n---";
-
-    std::fs::write("docs/pages/cli.md", format!("{header}{md}"))
+    std::fs::write("../../docs/pages/cli.md", format!("{header}{md}"))
         .expect("failed to write markdown docs");
 }

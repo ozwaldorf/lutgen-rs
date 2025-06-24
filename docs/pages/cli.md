@@ -395,7 +395,7 @@ Generate a patch for colors inside text files.
 
 Print palette names and colors
 
-**Usage**: **`lutgen`** **`palette`** (_`COMMAND ...`_ &#124; _`PALETTE`_...)
+**Usage**: **`lutgen`** **`palette`** \[**`--ansi`**\] (_`COMMAND ...`_ &#124; _`PALETTE`_...)
 
 **Examples:**
  $ **`lutgen palette all`**
@@ -417,6 +417,8 @@ Print palette names and colors
 
 
 **Available options:**
+- **`    --ansi`** &mdash; 
+  Force printing ansi colors
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
