@@ -133,6 +133,7 @@
             rust-analyzer
             jekyll
             bundler
+            jq
           ];
           inherit (commonArgs) LD_LIBRARY_PATH;
         };
