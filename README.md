@@ -64,7 +64,7 @@
 ```bash
 git clone https://github.com/ozwaldorf/lutgen-rs
 cd lutgen-rs
-cargo install --path .
+cargo install --path crates/cli
 ```
 
 ### Documentation
@@ -93,7 +93,7 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 ```bash
 git clone https://github.com/ozwaldorf/lutgen-rs
 cd lutgen-rs
-cargo install --path studio
+cargo install --path crates/studio
 ```
 
 ## Rust Library
