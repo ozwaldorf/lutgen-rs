@@ -1,8 +1,11 @@
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use egui::Context;
+use image::ColorType;
 use lutgen::GenerateLut;
 use uuid::Uuid;
 
@@ -12,13 +15,7 @@ pub enum FrontendEvent {
     PickFile,
     LoadFile(PathBuf),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs),
-}
-
-pub enum BackendEvent {
-    Error(String),
-    PickFile(PathBuf),
-    Applied(f64),
-    SetImage(Vec<u8>, u32, u32, String),
+    SaveAs,
 }
 
 pub enum LutAlgorithmArgs {
@@ -36,14 +33,21 @@ pub enum LutAlgorithmArgs {
     NearestNeighbor,
 }
 
+pub enum BackendEvent {
+    Error(String),
+    PickFile(PathBuf, Duration),
+    Applied(Duration),
+    SetImage(Arc<[u8]>, u32, u32, String),
+}
+
 impl Display for BackendEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BackendEvent::Error(e) => f.write_str(&format!("Error: {e}")),
-            BackendEvent::PickFile(path_buf) => f.write_str(&format!("Loaded {path_buf:?}")),
-            BackendEvent::Applied(palette) => {
-                f.write_str(&format!("Applied palette \"{palette}\" to image"))
+            BackendEvent::PickFile(path_buf, time) => {
+                f.write_str(&format!("Loaded {path_buf:?} in {time:.2?}"))
             },
+            BackendEvent::Applied(time) => f.write_str(&format!("Corrected image in {time:.2?}")),
             BackendEvent::SetImage(_, _, _, _) => Ok(()),
         }
     }
@@ -59,6 +63,12 @@ impl WorkerHandle {
         self.tx
             .send(FrontendEvent::PickFile)
             .expect("failed to send to worker");
+    }
+
+    pub fn save_as(&self) {
+        self.tx
+            .send(FrontendEvent::SaveAs)
+            .expect("failed to send save as request to worker");
     }
 
     pub fn load_file(&self, path: &Path) {
@@ -81,6 +91,7 @@ impl WorkerHandle {
 pub struct Worker {
     tx: Sender<BackendEvent>,
     current_image: Option<lutgen::RgbaImage>,
+    last_render: Arc<[u8]>,
 }
 
 impl Worker {
@@ -92,10 +103,12 @@ impl Worker {
             let mut worker = Worker {
                 tx: worker_tx,
                 current_image: None,
+                last_render: Default::default(),
             };
             while let Ok(event) = worker_rx.recv() {
                 let res = match event {
                     FrontendEvent::PickFile => worker.pick_file(),
+                    FrontendEvent::SaveAs => worker.save_as(),
                     FrontendEvent::LoadFile(path) => worker.load_file(&path),
                     FrontendEvent::Apply(palette, common, args) => {
                         worker.apply_palette(palette, common, args)
@@ -114,10 +127,11 @@ impl Worker {
         WorkerHandle { tx, rx }
     }
 
-    fn send_set_image(&self, image: Vec<u8>, width: u32, height: u32, path: Option<PathBuf>) {
+    fn send_set_image(&mut self, image: Vec<u8>, width: u32, height: u32, path: Option<PathBuf>) {
+        self.last_render = image.into();
         self.tx
             .send(BackendEvent::SetImage(
-                image,
+                self.last_render.clone(),
                 width,
                 height,
                 format!(
@@ -135,10 +149,31 @@ impl Worker {
             .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
             .pick_file()
         {
+            let time = Instant::now();
             self.load_file(&path)?;
             self.tx
-                .send(BackendEvent::PickFile(path))
+                .send(BackendEvent::PickFile(path, time.elapsed()))
                 .map_err(|_| "failed to send file path to ui thread".to_string())?;
+        }
+
+        Ok(())
+    }
+
+    fn save_as(&self) -> Result<(), String> {
+        if let Some(image) = &self.current_image {
+            if let Some(path) = rfd::FileDialog::new()
+                .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
+                .save_file()
+            {
+                image::save_buffer(
+                    path,
+                    &self.last_render,
+                    image.width(),
+                    image.height(),
+                    ColorType::Rgba8,
+                )
+                .map_err(|e| format!("failed to encode image: {e}"))?
+            }
         }
 
         Ok(())
@@ -164,11 +199,13 @@ impl Worker {
 
     /// Apply a palette to the currently loaded image
     fn apply_palette(
-        &self,
+        &mut self,
         palette: Vec<[u8; 3]>,
         common: Common,
         args: LutAlgorithmArgs,
     ) -> Result<(), String> {
+        let time = Instant::now();
+
         // get image or return
         let Some(mut image) = self.current_image.clone() else {
             // do nothing if no image is loaded
@@ -226,10 +263,9 @@ impl Worker {
 
         self.send_set_image(image.to_vec(), image.height(), image.width(), None);
         self.tx
-            .send(BackendEvent::Applied(0.))
+            .send(BackendEvent::Applied(time.elapsed()))
             .expect("failed to send applied event to ui thread");
 
-        println!("applied palette");
         Ok(())
     }
 }

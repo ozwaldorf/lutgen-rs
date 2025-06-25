@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use egui::Widget;
+use log::{debug, error};
 use strum::VariantArray;
 
 use crate::palette::DynamicPalette;
@@ -60,11 +61,13 @@ impl App {
     fn poll_worker_events(&mut self, ctx: &egui::Context) {
         if let Some(event) = self.worker.poll_event() {
             self.state.last_event = event.to_string();
+            debug!("{}", self.state.last_event);
+
             match event {
                 BackendEvent::Error(e) => {
-                    eprintln!("Error: {e}");
+                    error!("{e}");
                 },
-                BackendEvent::PickFile(path_buf) => {
+                BackendEvent::PickFile(path_buf, _) => {
                     self.state.current_image = Some(path_buf);
                 },
                 BackendEvent::SetImage(image, width, height, uri) => {
@@ -119,12 +122,17 @@ impl eframe::App for App {
                     if ui.button("Open").clicked() {
                         self.worker.pick_file();
                     }
+                    if ui.button("Save As").clicked() {
+                        self.worker.save_as();
+                    }
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
 
-                egui::widgets::global_theme_preference_buttons(ui);
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    egui::widgets::global_theme_preference_buttons(ui);
+                });
             });
         });
 
