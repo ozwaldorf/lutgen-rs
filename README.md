@@ -77,6 +77,17 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg)](https://repology.org/project/lutgen-studio/versions)
 
+### Required Dependencies
+
+(For this example, Ubuntu packages are listed)
+
+- libxcb-render0-dev
+- libxcb-shape0-dev
+- libxcb-xfixes0-dev
+- libxkbcommon-dev
+- libssl-dev
+- wayland
+
 ### Install from source
 
 ```bash
