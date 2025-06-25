@@ -18,7 +18,7 @@ categories = ["multimedia::images"]
 default-run = "lutgen"
 
 [dependencies]
-lutgen = { version = "0.12.1", path = "../lib" }
+lutgen = { version = "0.13", path = "../lib" }
 
 image.workspace = true
 regex.workspace = true
