@@ -101,6 +101,10 @@
 //! // hald_clut.save("output.png").unwrap();
 //! ```
 
+use std::ops::Not;
+use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
+
 use image::buffer::ConvertBuffer;
 use interpolation::InterpolatedRemapper;
 
@@ -116,5 +120,16 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
         let mut identity = identity::generate(level).convert();
         self.remap_image(&mut identity);
         identity.convert()
+    }
+
+    /// Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the given boolean
+    /// is true.
+    fn generate_lut_with_interrupt(&self, level: u8, abort: Arc<AtomicBool>) -> Option<RgbImage> {
+        let mut identity = identity::generate(level).convert();
+        self.remap_image_with_interrupt(&mut identity, abort.clone());
+        abort
+            .load(std::sync::atomic::Ordering::Relaxed)
+            .not()
+            .then_some(identity.convert())
     }
 }

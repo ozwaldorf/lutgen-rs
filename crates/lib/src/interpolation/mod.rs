@@ -1,5 +1,8 @@
 //! Interpolated remapping algorithms.
 
+use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
+
 pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgba;
 use kiddo::float::kdtree::KdTree;
@@ -23,6 +26,15 @@ pub trait InterpolatedRemapper<'a>: Sync {
     fn remap_image(&self, image: &mut RgbaImage) {
         image.par_pixels_mut().for_each(|pixel| {
             self.remap_pixel(pixel);
+        });
+    }
+
+    /// Remap an image in place, aborting if the given atomic boolean is true.
+    fn remap_image_with_interrupt(&self, image: &mut RgbaImage, abort: Arc<AtomicBool>) {
+        image.par_pixels_mut().for_each(|pixel| {
+            if !abort.load(std::sync::atomic::Ordering::Relaxed) {
+                self.remap_pixel(pixel);
+            }
         });
     }
 }
