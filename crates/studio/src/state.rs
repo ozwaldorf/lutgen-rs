@@ -7,13 +7,16 @@ use std::str::FromStr;
 use egui::TextureHandle;
 
 use crate::palette::DynamicPalette;
+use crate::worker::LutAlgorithmArgs;
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
+    // main window state
     pub palette_selection: DynamicPalette,
     pub palette: Vec<[u8; 3]>,
     pub current_image: Option<PathBuf>,
 
+    // side panel state
     pub current_alg: LutAlgorithm,
     pub guassian_rbf: GaussianRbfArgs,
     pub shepards_method: ShepardsMethodArgs,
@@ -21,6 +24,7 @@ pub struct UiState {
     pub common_rbf: CommonRbf,
     pub common: Common,
 
+    // currently loaded images
     #[serde(skip)]
     pub image_texture: Option<TextureHandle>,
     #[serde(skip)]
@@ -50,6 +54,25 @@ impl Default for UiState {
             edited_texture: None,
             show_original: false,
             last_event: "Started.".to_string(),
+        }
+    }
+}
+
+impl UiState {
+    pub fn lut_args(&self) -> LutAlgorithmArgs {
+        match self.current_alg {
+            LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
+                rbf: self.common_rbf,
+                args: self.guassian_rbf,
+            },
+            LutAlgorithm::ShepardsMethod => LutAlgorithmArgs::ShepardsMethod {
+                rbf: self.common_rbf,
+                args: self.shepards_method,
+            },
+            LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
+                args: self.guassian_sampling,
+            },
+            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
         }
     }
 }

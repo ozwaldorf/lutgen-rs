@@ -8,7 +8,7 @@ use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
 use crate::state::{LutAlgorithm, UiState};
-use crate::worker::{BackendEvent, LutAlgorithmArgs, Worker, WorkerHandle};
+use crate::worker::{BackendEvent, Worker, WorkerHandle};
 
 mod palette;
 mod state;
@@ -109,20 +109,7 @@ impl App {
 
     /// Get the currently set lut arguments for worker requests
     fn apply(&mut self) {
-        let args = match self.state.current_alg {
-            LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
-                rbf: self.state.common_rbf,
-                args: self.state.guassian_rbf,
-            },
-            LutAlgorithm::ShepardsMethod => LutAlgorithmArgs::ShepardsMethod {
-                rbf: self.state.common_rbf,
-                args: self.state.shepards_method,
-            },
-            LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
-                args: self.state.guassian_sampling,
-            },
-            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
-        };
+        let args = self.state.lut_args();
         self.worker
             .apply_palette(self.state.palette.clone(), self.state.common, args);
     }
