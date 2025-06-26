@@ -26,7 +26,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs.lib) optionals;
 
-        stableCraneLib = crane.mkLib pkgs;
+        stableCraneLib = (crane.mkLib pkgs).overrideToolchain fenix.packages.${system}.nightly.toolchain;
         craneLib = stableCraneLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
@@ -130,7 +130,7 @@
         devShells.default = craneLib.devShell {
           checks = self.checks.${system};
           packages = with pkgs; [
-            rust-analyzer
+            # rust-analyzer
             jekyll
             bundler
             jq
