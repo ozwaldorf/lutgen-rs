@@ -37,7 +37,11 @@ pub enum BackendEvent {
     Error(String),
     PickFile(PathBuf, Duration),
     Applied(Duration),
-    SetImage(Arc<[u8]>, u32, u32, String),
+    SetImage {
+        path: Option<PathBuf>,
+        image: Arc<[u8]>,
+        dim: (u32, u32),
+    },
 }
 
 impl Display for BackendEvent {
@@ -48,7 +52,7 @@ impl Display for BackendEvent {
                 f.write_str(&format!("Loaded {path_buf:?} in {time:.2?}"))
             },
             BackendEvent::Applied(time) => f.write_str(&format!("Corrected image in {time:.2?}")),
-            BackendEvent::SetImage(_, _, _, _) => Ok(()),
+            BackendEvent::SetImage { .. } => Ok(()),
         }
     }
 }
@@ -135,22 +139,17 @@ impl Worker {
             }
         });
 
-        WorkerHandle { tx, rx }
+        WorkerHandle { tx, rx, abort }
     }
 
-    fn send_set_image(&mut self, image: Vec<u8>, width: u32, height: u32, path: Option<PathBuf>) {
+    fn send_set_image(&mut self, path: Option<PathBuf>, image: Vec<u8>, dim: (u32, u32)) {
         self.last_render = image.into();
         self.tx
-            .send(BackendEvent::SetImage(
-                self.last_render.clone(),
-                width,
-                height,
-                format!(
-                    "bytes://{}",
-                    path.map(|p| p.display().to_string())
-                        .unwrap_or(Uuid::new_v4().to_string())
-                ),
-            ))
+            .send(BackendEvent::SetImage {
+                image: self.last_render.clone(),
+                path,
+                dim,
+            })
             .expect("failed to send image to ui thread")
     }
 
@@ -171,20 +170,19 @@ impl Worker {
     }
 
     fn save_as(&self) -> Result<(), String> {
-        if let Some(image) = &self.current_image {
-            if let Some(path) = rfd::FileDialog::new()
+        if let Some(image) = &self.current_image
+            && let Some(path) = rfd::FileDialog::new()
                 .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
                 .save_file()
-            {
-                image::save_buffer(
-                    path,
-                    &self.last_render,
-                    image.width(),
-                    image.height(),
-                    ColorType::Rgba8,
-                )
-                .map_err(|e| format!("failed to encode image: {e}"))?
-            }
+        {
+            image::save_buffer(
+                path,
+                &self.last_render,
+                image.width(),
+                image.height(),
+                ColorType::Rgba8,
+            )
+            .map_err(|e| format!("failed to encode image: {e}"))?
         }
 
         Ok(())
@@ -199,10 +197,9 @@ impl Worker {
             .map_err(|e| format!("failed to encode image: {e}"))?;
 
         self.send_set_image(
-            image.to_vec(),
-            image.height(),
-            image.width(),
             Some(path.to_path_buf()),
+            image.to_vec(),
+            (image.height(), image.width()),
         );
         self.current_image = Some(image);
         Ok(())
@@ -274,7 +271,7 @@ impl Worker {
             .write_to(&mut buf, image::ImageFormat::Png)
             .map_err(|e| format!("failed to encode image: {e}"))?;
 
-        self.send_set_image(image.to_vec(), image.height(), image.width(), None);
+        self.send_set_image(None, image.to_vec(), (image.height(), image.width()));
         self.tx
             .send(BackendEvent::Applied(time.elapsed()))
             .expect("failed to send applied event to ui thread");

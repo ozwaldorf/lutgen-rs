@@ -23,6 +23,10 @@ pub struct UiState {
 
     #[serde(skip)]
     pub image_texture: Option<TextureHandle>,
+    #[serde(skip)]
+    pub edited_texture: Option<TextureHandle>,
+    #[serde(skip)]
+    pub show_original: bool,
 
     #[serde(skip)]
     pub last_event: String,
@@ -43,6 +47,8 @@ impl Default for UiState {
             common: Default::default(),
 
             image_texture: None,
+            edited_texture: None,
+            show_original: false,
             last_event: "Started.".to_string(),
         }
     }

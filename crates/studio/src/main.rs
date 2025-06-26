@@ -4,6 +4,7 @@
 use egui::Widget;
 use log::{debug, error};
 use strum::VariantArray;
+use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
 use crate::state::{LutAlgorithm, UiState};
@@ -70,13 +71,36 @@ impl App {
                 BackendEvent::PickFile(path_buf, _) => {
                     self.state.current_image = Some(path_buf);
                 },
-                BackendEvent::SetImage(image, width, height, uri) => {
-                    let ci = egui::ColorImage::from_rgba_unmultiplied(
-                        [height as usize, width as usize],
-                        &image,
+                BackendEvent::SetImage {
+                    path,
+                    image,
+                    dim: (width, height),
+                } => {
+                    // load image into a new egui texture
+                    let texture = ctx.load_texture(
+                        format!(
+                            "bytes://{}",
+                            path.as_ref()
+                                .map(|p| p.display().to_string())
+                                .unwrap_or(Uuid::new_v4().to_string())
+                        ),
+                        egui::ColorImage::from_rgba_unmultiplied(
+                            [height as usize, width as usize],
+                            &image,
+                        ),
+                        egui::TextureOptions::default(),
                     );
-                    let texture = ctx.load_texture(uri, ci, egui::TextureOptions::default());
-                    self.state.image_texture = Some(texture);
+
+                    if let Some(path) = path {
+                        // for newly opened images from file picker
+                        self.state.current_image = Some(path);
+                        self.state.image_texture = Some(texture);
+                        self.state.show_original = true;
+                    } else {
+                        // for edited output
+                        self.state.edited_texture = Some(texture);
+                        self.state.show_original = false;
+                    }
                 },
                 _ => {},
             }
@@ -138,13 +162,13 @@ impl eframe::App for App {
 
         // side panel for lut args
         egui::SidePanel::left("args")
-            .resizable(false)
+            .resizable(true)
+            .min_width(150.)
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.horizontal_wrapped(|ui| {
                         ui.label("Palette:");
                         egui::ComboBox::from_id_salt("palette")
-                            .width(150.)
                             .selected_text(format!("{}", self.state.palette_selection))
                             .show_ui(ui, |ui| {
                                 let val = ui.selectable_value(
@@ -172,6 +196,7 @@ impl eframe::App for App {
                             });
                     });
 
+                    // color palette
                     ui.group(|ui| {
                         ui.horizontal_wrapped(|ui| {
                             let mut res = Vec::new();
@@ -239,6 +264,7 @@ impl eframe::App for App {
                             self.apply()
                         }
 
+                        // shared rbf args
                         match self.state.current_alg {
                             LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
                                 ui.separator();
@@ -264,6 +290,7 @@ impl eframe::App for App {
                             _ => {},
                         }
 
+                        // unique algorithm args
                         match self.state.current_alg {
                             LutAlgorithm::GaussianRbf => {
                                 ui.separator();
@@ -315,7 +342,6 @@ impl eframe::App for App {
                                 if res.drag_stopped() || res.lost_focus() {
                                     self.apply()
                                 }
-
                                 ui.label("Iterations");
                                 let res = ui.add(egui::Slider::new(
                                     &mut self.state.guassian_sampling.iterations,
@@ -326,10 +352,10 @@ impl eframe::App for App {
                                 }
 
                                 ui.label("RNG Seed");
-                                let res = ui.add(egui::Slider::new(
-                                    &mut self.state.guassian_sampling.seed,
-                                    0..=u64::MAX,
-                                ));
+                                let res = ui.add(
+                                    egui::DragValue::new(&mut self.state.guassian_sampling.seed)
+                                        .speed(2i32.pow(20)),
+                                );
                                 if res.drag_stopped() || res.lost_focus() {
                                     self.apply()
                                 }
@@ -351,14 +377,32 @@ impl eframe::App for App {
             ui.vertical_centered(|ui| {
                 let available_size = ui.available_size();
 
-                let rect = if let Some(texture) = &self.state.image_texture {
-                    ui.add(
+                let rect = if !self.state.show_original
+                    && let Some(texture) = &self.state.edited_texture
+                {
+                    let res = ui.add(
                         egui::Image::from_texture(texture)
                             .max_size(available_size)
                             .fit_to_exact_size(available_size)
-                            .corner_radius(10.0),
-                    )
-                    .rect
+                            .corner_radius(10.0)
+                            .sense(egui::Sense::click()),
+                    );
+                    if res.clicked() {
+                        self.state.show_original = true;
+                    }
+                    res.rect
+                } else if let Some(texture) = &self.state.image_texture {
+                    let res = ui.add(
+                        egui::Image::from_texture(texture)
+                            .max_size(available_size)
+                            .fit_to_exact_size(available_size)
+                            .corner_radius(10.0)
+                            .sense(egui::Sense::click()),
+                    );
+                    if res.clicked() {
+                        self.state.show_original = false;
+                    }
+                    res.rect
                 } else {
                     let (rect, _response) =
                         ui.allocate_exact_size(available_size, egui::Sense::hover());

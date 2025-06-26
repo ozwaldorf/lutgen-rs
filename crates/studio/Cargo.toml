@@ -1,8 +1,8 @@
 [package]
 name = "lutgen-studio"
-version = "0.1.0"
+version = "0.1.1"
 description = "Offical GUI for Lutgen, the best way to apply popular colorschemes to any image or wallpaper!"
-edition = "2021"
+edition = "2024"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
 repository = "https://github.com/ozwaldorf/lutgen-rs"
