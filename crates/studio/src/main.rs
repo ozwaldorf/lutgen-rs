@@ -2,9 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use egui::{include_image, Widget};
-use log::{debug, error};
 use strum::VariantArray;
-use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
 use crate::state::{LutAlgorithm, UiState};
@@ -58,60 +56,13 @@ impl App {
         this
     }
 
-    /// Handle any incoming events from the backend
-    fn poll_worker_events(&mut self, ctx: &egui::Context) {
-        if let Some(event) = self.worker.poll_event() {
-            self.state.last_event = event.to_string();
-            debug!("{}", self.state.last_event);
-
-            match event {
-                BackendEvent::Error(e) => {
-                    error!("{e}");
-                },
-                BackendEvent::PickFile(path_buf, _) => {
-                    self.state.current_image = Some(path_buf);
-                },
-                BackendEvent::SetImage {
-                    path,
-                    image,
-                    dim: (width, height),
-                } => {
-                    // load image into a new egui texture
-                    let texture = ctx.load_texture(
-                        format!(
-                            "bytes://{}",
-                            path.as_ref()
-                                .map(|p| p.display().to_string())
-                                .unwrap_or(Uuid::new_v4().to_string())
-                        ),
-                        egui::ColorImage::from_rgba_unmultiplied(
-                            [height as usize, width as usize],
-                            &image,
-                        ),
-                        egui::TextureOptions::default(),
-                    );
-
-                    if let Some(path) = path {
-                        // for newly opened images from file picker
-                        self.state.current_image = Some(path);
-                        self.state.image_texture = Some(texture);
-                        self.state.show_original = true;
-                    } else {
-                        // for edited output
-                        self.state.edited_texture = Some(texture);
-                        self.state.show_original = false;
-                    }
-                },
-                _ => {},
-            }
-        }
-    }
-
     /// Get the currently set lut arguments for worker requests
     fn apply(&mut self) {
-        let args = self.state.lut_args();
-        self.worker
-            .apply_palette(self.state.palette.clone(), self.state.common, args);
+        self.worker.apply_palette(
+            self.state.palette.clone(),
+            self.state.common,
+            self.state.lut_args(),
+        );
     }
 }
 
@@ -123,7 +74,10 @@ impl eframe::App for App {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        self.poll_worker_events(ctx);
+        // Handle any incoming events from the backend
+        if let Some(event) = self.worker.poll_event() {
+            self.state.handle_event(ctx, event);
+        }
 
         if self.state.show_about {
             let id = egui::ViewportId(egui::Id::new("help"));

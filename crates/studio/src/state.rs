@@ -5,9 +5,11 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use egui::TextureHandle;
+use log::{debug, error};
+use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
-use crate::worker::LutAlgorithmArgs;
+use crate::worker::{BackendEvent, LutAlgorithmArgs};
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
@@ -66,6 +68,52 @@ impl Default for UiState {
 }
 
 impl UiState {
+    pub fn handle_event(&mut self, ctx: &egui::Context, event: BackendEvent) {
+        self.last_event = event.to_string();
+        debug!("{}", self.last_event);
+
+        match event {
+            BackendEvent::Error(e) => {
+                error!("{e}");
+            },
+            BackendEvent::PickFile(path_buf, _) => {
+                self.current_image = Some(path_buf);
+            },
+            BackendEvent::SetImage {
+                path,
+                image,
+                dim: (width, height),
+            } => {
+                // load image into a new egui texture
+                let texture = ctx.load_texture(
+                    format!(
+                        "bytes://{}",
+                        path.as_ref()
+                            .map(|p| p.display().to_string())
+                            .unwrap_or(Uuid::new_v4().to_string())
+                    ),
+                    egui::ColorImage::from_rgba_unmultiplied(
+                        [height as usize, width as usize],
+                        &image,
+                    ),
+                    egui::TextureOptions::default(),
+                );
+
+                if let Some(path) = path {
+                    // for newly opened images from file picker
+                    self.current_image = Some(path);
+                    self.image_texture = Some(texture);
+                    self.show_original = true;
+                } else {
+                    // for edited output
+                    self.edited_texture = Some(texture);
+                    self.show_original = false;
+                }
+            },
+            _ => {},
+        }
+    }
+
     pub fn lut_args(&self) -> LutAlgorithmArgs {
         match self.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
