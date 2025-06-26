@@ -31,58 +31,61 @@
         craneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
-        version = "1.0.0";
 
-        lutgen = stableCraneLib.buildPackage {
-          inherit src version;
-          doCheck = false;
-          pname = "lutgen";
+        # Common args
+        commonArgs = {
+          inherit src;
           strictDeps = true;
+          pname = "lutgen";
+          version = "1.0.0";
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
-          nativeBuildInputs = [ pkgs.installShellFiles ];
-          cargoExtraArgs = "--locked --bin lutgen";
-          postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
-            installManPage docs/man/lutgen.1
-            installShellCompletion --cmd lutgen \
-              --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
-              --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
-              --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
-          '';
         };
 
-        # Common args with dependencies for all packages
-        commonArgs = with pkgs; rec {
-          inherit src version;
-          strictDeps = true;
-          pname = "lutgen";
-          nativeBuildInputs = [
-            pkg-config
-          ];
-          buildInputs = (
-            [
-              openssl
-              libxkbcommon
-              libGL
-              fontconfig
-              wayland
-              xorg.libXcursor
-              xorg.libXrandr
-              xorg.libXi
-              xorg.libX11
-              zenity # file dialog
-            ]
-            ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ]
-          );
-          LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath buildInputs}";
-        };
-
-        lutgen-studio = stableCraneLib.buildPackage (
+        lutgen = stableCraneLib.buildPackage (
           commonArgs
           // {
             doCheck = false;
+            strictDeps = true;
+            nativeBuildInputs = [ pkgs.installShellFiles ];
+            cargoExtraArgs = "--locked --bin lutgen";
+            postInstall = pkgs.lib.optionalString (pkgs.stdenv.buildPlatform.canExecute pkgs.stdenv.hostPlatform) ''
+              installManPage docs/man/lutgen.1
+              installShellCompletion --cmd lutgen \
+                --bash <($out/bin/lutgen --bpaf-complete-style-bash) \
+                --fish <($out/bin/lutgen --bpaf-complete-style-fish) \
+                --zsh <($out/bin/lutgen --bpaf-complete-style-zsh)
+            '';
+          }
+        );
+
+        # runtime libraries for studio
+        LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (
+          with pkgs;
+          [
+            openssl
+            libxkbcommon
+            libGL
+            fontconfig
+            wayland
+            xorg.libXcursor
+            xorg.libXrandr
+            xorg.libXi
+            xorg.libX11
+          ]
+        )}";
+
+        lutgen-studio = stableCraneLib.buildPackage (
+          commonArgs
+          // rec {
+            doCheck = false;
             pname = "lutgen-studio";
             version = "0.1.0";
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            buildInputs = commonArgs.buildInputs ++ [ pkgs.zenity ]; # file picker
             cargoExtraArgs = "--locked --bin lutgen-studio";
+            postInstall = ''
+              wrapProgram "$out/bin/${pname}" --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
+            '';
           }
         );
       in
@@ -129,19 +132,21 @@
         };
 
         devShells.default = craneLib.devShell {
+          inherit LD_LIBRARY_PATH;
           checks = self.checks.${system};
           packages = with pkgs; [
-            # rust-analyzer
             jekyll
             bundler
-            jq
           ];
-          inherit (commonArgs) LD_LIBRARY_PATH;
+
         };
         formatter = pkgs.nixfmt-rfc-style;
       }
     )
     // {
-      overlays.default = _: prev: { lutgen = self.packages.${prev.system}.default; };
+      overlays.default = _: prev: {
+        lutgen = self.packages.${prev.system}.default;
+        lutgen-studio = self.packages.${prev.system}.default;
+      };
     };
 }
