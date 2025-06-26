@@ -26,8 +26,9 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs.lib) optionals;
 
-        stableCraneLib = (crane.mkLib pkgs).overrideToolchain fenix.packages.${system}.nightly.toolchain;
-        craneLib = stableCraneLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
+        cLib = crane.mkLib pkgs;
+        stableCraneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
+        craneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
         src = craneLib.path ./.;
         version = "1.0.0";
