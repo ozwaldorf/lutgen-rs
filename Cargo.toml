@@ -15,5 +15,10 @@ opt-level = 3
 lto = true
 panic = "abort"
 
+[profile.dev]
+opt-level = 1
+lto = false
+panic = "abort"
+
 [profile.test]
 inherits = "release"
