@@ -6,7 +6,7 @@
     <h2 align="center">lutgen-rs</h2>
     <p align="center">
         <a href="https://crates.io/crates/lutgen-cli"><img alt="crate" src="https://img.shields.io/crates/v/lutgen-cli?label=lutgen%20cli&style=for-the-badge" /></a>
-        <a href="./LICENSE.md"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" /></a>
+        <a href="https://crates.io/crates/lutgen-studio"><img alt="crate" src="https://img.shields.io/crates/v/lutgen-studio?label=lutgen%20studio&style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/release.yml"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/release.yml?label=Build&style=for-the-badge" /></a>
         <a href="https://garnix.io"><img alt="ci" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fozwaldorf%2Flutgen-rs&style=for-the-badge&logo=%20&label=garnix&labelColor=grey" /></a>
     </p>
@@ -67,6 +67,12 @@ cd lutgen-rs
 cargo install --path crates/cli
 ```
 
+### Crates.io
+
+```bash
+cargo install lutgen-cli
+```
+
 ### Documentation
 
 Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
@@ -94,6 +100,12 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 git clone https://github.com/ozwaldorf/lutgen-rs
 cd lutgen-rs
 cargo install --path crates/studio
+```
+
+### Crates.io
+
+```bash
+cargo install lutgen-studio
 ```
 
 ## Rust Library
