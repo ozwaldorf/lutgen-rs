@@ -178,13 +178,15 @@ impl eframe::App for App {
         // side panel for lut args
         egui::SidePanel::left("args")
             .resizable(true)
-            .min_width(150.)
             .show(ctx, |ui| {
                 egui::ScrollArea::vertical().show(ui, |ui| {
+                    ui.style_mut().spacing.slider_width = ui.available_width() - 62.;
+
                     ui.horizontal_wrapped(|ui| {
-                        ui.label("Palette:");
+                        let label_width = ui.label("Palette:").rect.width();
                         egui::ComboBox::from_id_salt("palette")
                             .selected_text(format!("{}", self.state.palette_selection))
+                            .width(ui.available_width() - ui.spacing().item_spacing.x - label_width)
                             .show_ui(ui, |ui| {
                                 let val = ui.selectable_value(
                                     &mut self.state.palette_selection,
@@ -242,26 +244,28 @@ impl eframe::App for App {
                         });
                     });
 
-                    ui.separator();
-
-                    egui::ComboBox::from_id_salt("algorithm")
-                        .width(200.)
-                        .selected_text(format!("{:?}", self.state.current_alg))
-                        .show_ui(ui, |ui| {
-                            for alg in LutAlgorithm::VARIANTS {
-                                let val = ui.selectable_value(
-                                    &mut self.state.current_alg,
-                                    *alg,
-                                    alg.to_string(),
-                                );
-                                val.clicked().then(|| self.apply());
-                                val.gained_focus()
-                                    .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
-                            }
-                        });
+                    ui.horizontal_wrapped(|ui| {
+                        let label_width = ui.label("Algorithm:").rect.width();
+                        egui::ComboBox::from_id_salt("algorithm")
+                            .selected_text(format!("{:?}", self.state.current_alg))
+                            .width(ui.available_width() - ui.spacing().item_spacing.x - label_width)
+                            .show_ui(ui, |ui| {
+                                for alg in LutAlgorithm::VARIANTS {
+                                    let val = ui.selectable_value(
+                                        &mut self.state.current_alg,
+                                        *alg,
+                                        alg.to_string(),
+                                    );
+                                    val.clicked().then(|| self.apply());
+                                    val.gained_focus()
+                                        .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
+                                }
+                            });
+                    });
 
                     ui.group(|ui| {
                         ui.heading("Common Arguments");
+
                         ui.add_space(10.);
 
                         ui.label("Hald-Clut Level");
@@ -286,13 +290,6 @@ impl eframe::App for App {
                                 ui.heading("Rbf Arguments");
                                 ui.add_space(10.);
 
-                                ui.toggle_value(
-                                    &mut self.state.common_rbf.preserve,
-                                    "Preserve Luminosity",
-                                )
-                                .changed()
-                                .then(|| self.apply());
-
                                 ui.label("Nearest Colors");
                                 let res = ui.add(
                                     egui::Slider::new(&mut self.state.common_rbf.nearest, 0..=32)
@@ -301,6 +298,13 @@ impl eframe::App for App {
                                 if res.drag_stopped() || res.lost_focus() {
                                     self.apply()
                                 }
+
+                                ui.checkbox(
+                                    &mut self.state.common_rbf.preserve,
+                                    "Preserve Luminosity",
+                                )
+                                .changed()
+                                .then(|| self.apply());
                             },
                             _ => {},
                         }
@@ -378,6 +382,8 @@ impl eframe::App for App {
                             _ => {},
                         }
                     });
+
+                    ui.style_mut().spacing.slider_width = ui.available_width() - 16.;
                 });
             });
 
