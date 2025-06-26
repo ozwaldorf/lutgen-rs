@@ -33,6 +33,9 @@ pub struct UiState {
     pub show_original: bool,
 
     #[serde(skip)]
+    pub show_help: bool,
+
+    #[serde(skip)]
     pub last_event: String,
 }
 
@@ -53,6 +56,7 @@ impl Default for UiState {
             image_texture: None,
             edited_texture: None,
             show_original: false,
+            show_help: false,
             last_event: "Started.".to_string(),
         }
     }

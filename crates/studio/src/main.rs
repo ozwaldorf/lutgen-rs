@@ -125,6 +125,31 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.poll_worker_events(ctx);
 
+        if self.state.show_help {
+            let id = egui::ViewportId(egui::Id::new("help"));
+            let vp = egui::ViewportBuilder::default()
+                .with_title("Lutgen Studio Help")
+                .with_active(true);
+
+            ctx.show_viewport_immediate(id, vp, |ctx, _| {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    let style = ui.style_mut();
+                    style.spacing.window_margin = egui::Margin::symmetric(10, 10);
+
+                    ui.heading("Lutgen Studio Help");
+                    ui.separator();
+                    ui.label("- Images can be opened and saved in the `File` dialog button");
+                    ui.label("- Left-click the image preview to toggle between the original and edited images");
+                    ui.label("- Left-click palette colors to edit, right-click to delete");
+                });
+                ctx.input(|state| {
+                    if state.viewport().close_requested() {
+                        self.state.show_help = false;
+                    }
+                });
+            });
+        }
+
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
                 ui.label("Lutgen Studio");
@@ -135,6 +160,9 @@ impl eframe::App for App {
                     }
                     if ui.button("Save As").clicked() {
                         self.worker.save_as();
+                    }
+                    if ui.button("Help").clicked() {
+                        self.state.show_help = true;
                     }
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
