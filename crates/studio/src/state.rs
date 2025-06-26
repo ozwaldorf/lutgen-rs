@@ -24,6 +24,9 @@ pub struct UiState {
     pub common_rbf: CommonRbf,
     pub common: Common,
 
+    // about dialog
+    pub show_about: bool,
+
     // currently loaded images
     #[serde(skip)]
     pub image_texture: Option<TextureHandle>,
@@ -31,9 +34,6 @@ pub struct UiState {
     pub edited_texture: Option<TextureHandle>,
     #[serde(skip)]
     pub show_original: bool,
-
-    #[serde(skip)]
-    pub show_help: bool,
 
     #[serde(skip)]
     pub last_event: String,
@@ -53,10 +53,13 @@ impl Default for UiState {
             common_rbf: Default::default(),
             common: Default::default(),
 
+            // default is true for first starts
+            show_about: true,
+
             image_texture: None,
             edited_texture: None,
             show_original: false,
-            show_help: false,
+
             last_event: "Started.".to_string(),
         }
     }

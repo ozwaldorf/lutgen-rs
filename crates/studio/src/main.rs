@@ -1,7 +1,7 @@
 #![warn(clippy::all)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use egui::Widget;
+use egui::{include_image, Widget};
 use log::{debug, error};
 use strum::VariantArray;
 use uuid::Uuid;
@@ -125,26 +125,48 @@ impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.poll_worker_events(ctx);
 
-        if self.state.show_help {
+        if self.state.show_about {
             let id = egui::ViewportId(egui::Id::new("help"));
             let vp = egui::ViewportBuilder::default()
-                .with_title("Lutgen Studio Help")
-                .with_active(true);
-
+                .with_title("About Lutgen Studio")
+                .with_active(true)
+                .with_resizable(false)
+                .with_inner_size((200.0, 200.0));
             ctx.show_viewport_immediate(id, vp, |ctx, _| {
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    let style = ui.style_mut();
-                    style.spacing.window_margin = egui::Margin::symmetric(10, 10);
+                    ui.horizontal_centered(|ui| {
+                        ui.vertical_centered(|ui| {
+                            ui.add_space(30.);
+                            ui.add(
+                                egui::Image::new(egui::include_image!("../assets/logo.png"))
+                                    .max_width(100.),
+                            );
+                            ui.add_space(20.);
+                            ui.heading("Lutgen Studio");
+                            ui.add_space(5.);
+                            ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
 
-                    ui.heading("Lutgen Studio Help");
-                    ui.separator();
-                    ui.label("- Images can be opened and saved in the `File` dialog button");
-                    ui.label("- Left-click the image preview to toggle between the original and edited images");
-                    ui.label("- Left-click palette colors to edit, right-click to delete");
+                            ui.add_space(20.);
+                            ui.add(egui::Separator::default().shrink(50.));
+                            ui.add_space(20.);
+
+                            ui.heading("Basic Help");
+                            ui.add_space(20.);
+                            ui.label("Images can be opened and saved in the `File` dialog");
+                            ui.add_space(5.);
+                            ui.label(
+                                "Left-click the preview to toggle between original and edited",
+                            );
+                            ui.add_space(5.);
+                            ui.label(
+                                "Left-click the palette colors to edit, right-click to delete",
+                            );
+                        });
+                    });
                 });
                 ctx.input(|state| {
                     if state.viewport().close_requested() {
-                        self.state.show_help = false;
+                        self.state.show_about = false;
                     }
                 });
             });
@@ -152,6 +174,7 @@ impl eframe::App for App {
 
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
+                ui.add(egui::Image::new(include_image!("../assets/logo.png")).max_height(16.));
                 ui.label("Lutgen Studio");
                 ui.add_space(5.);
                 ui.menu_button("File", |ui| {
@@ -161,8 +184,8 @@ impl eframe::App for App {
                     if ui.button("Save As").clicked() {
                         self.worker.save_as();
                     }
-                    if ui.button("Help").clicked() {
-                        self.state.show_help = true;
+                    if ui.button("About").clicked() {
+                        self.state.show_about = true;
                     }
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
