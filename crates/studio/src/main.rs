@@ -6,7 +6,7 @@ use strum::VariantArray;
 
 use crate::palette::DynamicPalette;
 use crate::state::{LutAlgorithm, UiState};
-use crate::worker::{BackendEvent, Worker, WorkerHandle};
+use crate::worker::WorkerHandle;
 
 mod palette;
 mod state;
@@ -43,7 +43,7 @@ impl App {
             .unwrap_or_default();
 
         // Spawn background worker thread
-        let worker = Worker::spawn(cc.egui_ctx.clone());
+        let worker = WorkerHandle::new(cc.egui_ctx.clone());
 
         let mut this = Self { state, worker };
 

@@ -64,6 +64,10 @@ pub struct WorkerHandle {
 }
 
 impl WorkerHandle {
+    pub fn new(ctx: egui::Context) -> Self {
+        Worker::spawn(ctx)
+    }
+
     pub fn pick_file(&self) {
         self.tx
             .send(FrontendEvent::PickFile)
@@ -109,7 +113,7 @@ pub struct Worker {
 }
 
 impl Worker {
-    pub fn spawn(ctx: Context) -> WorkerHandle {
+    fn spawn(ctx: Context) -> WorkerHandle {
         let (tx, worker_rx) = channel();
         let (worker_tx, rx) = channel();
         let abort = Arc::new(AtomicBool::new(false));
