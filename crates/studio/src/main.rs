@@ -46,7 +46,7 @@ impl App {
         // Spawn background worker thread
         let worker = Worker::spawn(cc.egui_ctx.clone());
 
-        let this = Self { state, worker };
+        let mut this = Self { state, worker };
 
         // Load last opened image and apply settings
         if let Some(path) = &this.state.current_image {
@@ -84,7 +84,7 @@ impl App {
     }
 
     /// Get the currently set lut arguments for worker requests
-    fn apply(&self) {
+    fn apply(&mut self) {
         let args = match self.state.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
                 rbf: self.state.common_rbf,

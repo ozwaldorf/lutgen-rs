@@ -1,5 +1,6 @@
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -7,14 +8,13 @@ use std::time::{Duration, Instant};
 use egui::Context;
 use image::ColorType;
 use lutgen::GenerateLut;
-use uuid::Uuid;
 
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
 
 pub enum FrontendEvent {
     PickFile,
     LoadFile(PathBuf),
-    Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs),
+    Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
     SaveAs,
 }
 
@@ -56,6 +56,7 @@ impl Display for BackendEvent {
 pub struct WorkerHandle {
     tx: Sender<FrontendEvent>,
     rx: Receiver<BackendEvent>,
+    abort: Arc<AtomicBool>,
 }
 
 impl WorkerHandle {
@@ -77,9 +78,18 @@ impl WorkerHandle {
             .expect("failed to send load file to worker");
     }
 
-    pub fn apply_palette(&self, palette: Vec<[u8; 3]>, common: Common, args: LutAlgorithmArgs) {
+    pub fn apply_palette(&mut self, palette: Vec<[u8; 3]>, common: Common, args: LutAlgorithmArgs) {
+        // cancel previous run and init a new abort signal
+        self.abort.store(true, std::sync::atomic::Ordering::Relaxed);
+        self.abort = Arc::new(AtomicBool::new(false));
+
         self.tx
-            .send(FrontendEvent::Apply(palette, common, args))
+            .send(FrontendEvent::Apply(
+                palette,
+                common,
+                args,
+                self.abort.clone(),
+            ))
             .expect("failed to send apply request to worker");
     }
 
@@ -98,6 +108,7 @@ impl Worker {
     pub fn spawn(ctx: Context) -> WorkerHandle {
         let (tx, worker_rx) = channel();
         let (worker_tx, rx) = channel();
+        let abort = Arc::new(AtomicBool::new(false));
 
         std::thread::spawn(move || {
             let mut worker = Worker {
@@ -110,8 +121,8 @@ impl Worker {
                     FrontendEvent::PickFile => worker.pick_file(),
                     FrontendEvent::SaveAs => worker.save_as(),
                     FrontendEvent::LoadFile(path) => worker.load_file(&path),
-                    FrontendEvent::Apply(palette, common, args) => {
-                        worker.apply_palette(palette, common, args)
+                    FrontendEvent::Apply(palette, common, args, abort) => {
+                        worker.apply_palette(palette, common, args, abort)
                     },
                 };
                 if let Err(e) = res {
@@ -203,6 +214,7 @@ impl Worker {
         palette: Vec<[u8; 3]>,
         common: Common,
         args: LutAlgorithmArgs,
+        abort: Arc<AtomicBool>,
     ) -> Result<(), String> {
         let time = Instant::now();
 
@@ -222,7 +234,7 @@ impl Worker {
                     *common.lum_factor,
                     rbf.preserve,
                 )
-                .generate_lut(common.level)
+                .generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::ShepardsMethod { rbf, args } => {
                 lutgen::interpolation::ShepardRemapper::new(
@@ -232,7 +244,7 @@ impl Worker {
                     *common.lum_factor,
                     rbf.preserve,
                 )
-                .generate_lut(common.level)
+                .generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::GaussianSampling { args } => {
                 lutgen::interpolation::GaussianSamplingRemapper::new(
@@ -243,13 +255,14 @@ impl Worker {
                     *common.lum_factor,
                     args.seed,
                 )
-                .generate_lut(common.level)
+                .generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::NearestNeighbor => {
                 lutgen::interpolation::NearestNeighborRemapper::new(&palette, *common.lum_factor)
-                    .generate_lut(common.level)
+                    .generate_lut_with_interrupt(common.level, abort)
             },
-        };
+        }
+        .ok_or("aborted".to_string())?;
 
         // remap image
         lutgen::identity::correct_image(&mut image, &lut);
