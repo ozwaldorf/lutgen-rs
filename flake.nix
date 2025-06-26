@@ -81,10 +81,11 @@
             pname = "lutgen-studio";
             version = "0.1.0";
             nativeBuildInputs = [ pkgs.makeWrapper ];
-            buildInputs = commonArgs.buildInputs ++ [ pkgs.zenity ]; # file picker
             cargoExtraArgs = "--locked --bin lutgen-studio";
             postInstall = ''
-              wrapProgram "$out/bin/${pname}" --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
+              wrapProgram "$out/bin/${pname}" \
+                --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}" \
+                --set PATH "${pkgs.zenity}/bin"
             '';
           }
         );
@@ -137,6 +138,7 @@
           packages = with pkgs; [
             jekyll
             bundler
+            zenity
           ];
 
         };
