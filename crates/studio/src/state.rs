@@ -68,7 +68,9 @@ impl UiState {
     /// Handle incoming backend events from the worker
     pub fn handle_event(&mut self, ctx: &egui::Context, event: BackendEvent) {
         self.last_event = event.to_string();
-        debug!("{}", self.last_event);
+        if !self.last_event.is_empty() {
+            debug!("{}", self.last_event);
+        }
 
         match event {
             BackendEvent::Error(e) => {
