@@ -30,14 +30,17 @@
         stableCraneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
         craneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
 
+        # source and package versions
         src = craneLib.path ./.;
+        vlutgen = (builtins.fromTOML (builtins.readFile ./crates/cli/Cargo.toml)).package.version;
+        vlutgenStudio = (builtins.fromTOML (builtins.readFile ./crates/studio/Cargo.toml)).package.version;
 
         # Common args
         commonArgs = {
           inherit src;
           strictDeps = true;
           pname = "lutgen";
-          version = "1.0.0";
+          version = vlutgen;
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
         };
 
@@ -79,7 +82,7 @@
           // rec {
             doCheck = false;
             pname = "lutgen-studio";
-            version = "0.1.0";
+            version = vlutgenStudio;
             nativeBuildInputs = [ pkgs.makeWrapper ];
             cargoExtraArgs = "--locked --bin lutgen-studio";
             postInstall = ''
