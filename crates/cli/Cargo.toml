@@ -12,6 +12,7 @@ description = "A blazingly fast interpolated LUT utility for arbitrary and popul
 edition = "2021"
 license = "MIT"
 authors = ["Ossian Mapes <self@ossian.dev>"]
+readme = "../../README.md"
 repository = "https://github.com/ozwaldorf/lutgen-rs"
 homepage = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
