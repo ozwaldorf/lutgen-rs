@@ -9,16 +9,22 @@ use log::{debug, error};
 use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
-use crate::worker::{BackendEvent, LutAlgorithmArgs};
+use crate::worker::{BackendEvent, LutAlgorithmArgs, WorkerHandle};
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
     // main window state
-    pub palette_selection: DynamicPalette,
-    pub palette: Vec<[u8; 3]>,
     pub current_image: Option<PathBuf>,
+    #[serde(skip)]
+    pub image_texture: Option<TextureHandle>,
+    #[serde(skip)]
+    pub edited_texture: Option<TextureHandle>,
+    #[serde(skip)]
+    pub show_original: bool,
 
     // side panel state
+    pub palette_selection: DynamicPalette,
+    pub palette: Vec<[u8; 3]>,
     pub current_alg: LutAlgorithm,
     pub guassian_rbf: GaussianRbfArgs,
     pub shepards_method: ShepardsMethodArgs,
@@ -29,14 +35,6 @@ pub struct UiState {
     // about dialog
     pub show_about: bool,
 
-    // currently loaded images
-    #[serde(skip)]
-    pub image_texture: Option<TextureHandle>,
-    #[serde(skip)]
-    pub edited_texture: Option<TextureHandle>,
-    #[serde(skip)]
-    pub show_original: bool,
-
     #[serde(skip)]
     pub last_event: String,
 }
@@ -44,10 +42,13 @@ pub struct UiState {
 impl Default for UiState {
     fn default() -> Self {
         Self {
+            current_image: None,
+            image_texture: None,
+            edited_texture: None,
+            show_original: false,
+
             palette_selection: DynamicPalette::Builtin(lutgen_palettes::Palette::Carburetor),
             palette: lutgen_palettes::Palette::Carburetor.get().to_vec(),
-            current_image: None,
-
             current_alg: LutAlgorithm::GaussianRbf,
             guassian_rbf: Default::default(),
             shepards_method: Default::default(),
@@ -58,16 +59,13 @@ impl Default for UiState {
             // default is true for first starts
             show_about: true,
 
-            image_texture: None,
-            edited_texture: None,
-            show_original: false,
-
             last_event: "Started.".to_string(),
         }
     }
 }
 
 impl UiState {
+    /// Handle incoming backend events from the worker
     pub fn handle_event(&mut self, ctx: &egui::Context, event: BackendEvent) {
         self.last_event = event.to_string();
         debug!("{}", self.last_event);
@@ -96,7 +94,8 @@ impl UiState {
                         [height as usize, width as usize],
                         &image,
                     ),
-                    egui::TextureOptions::default(),
+                    egui::TextureOptions::default()
+                        .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
                 if let Some(path) = path {
@@ -114,8 +113,9 @@ impl UiState {
         }
     }
 
-    pub fn lut_args(&self) -> LutAlgorithmArgs {
-        match self.current_alg {
+    /// Collect arguments and send apply request to the worker
+    pub fn apply(&self, worker: &mut WorkerHandle) {
+        let args = match self.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
                 rbf: self.common_rbf,
                 args: self.guassian_rbf,
@@ -128,7 +128,8 @@ impl UiState {
                 args: self.guassian_sampling,
             },
             LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
-        }
+        };
+        worker.apply_palette(self.palette.clone(), self.common, args);
     }
 }
 
