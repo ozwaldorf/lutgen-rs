@@ -57,7 +57,7 @@
 
 ### Package Repositories
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen.svg)](https://repology.org/project/lutgen/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen.svg?exclude_unsupported=1)](https://repology.org/project/lutgen/versions)
 
 ### Install from source
 
@@ -81,7 +81,7 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 
 ### Package Repositories
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg)](https://repology.org/project/lutgen-studio/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg?exclude_unsupported=1)](https://repology.org/project/lutgen-studio/versions)
 
 ### Required Dependencies
 
@@ -93,6 +93,7 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 - libxkbcommon-dev
 - libssl-dev
 - wayland
+- zenity (file picker)
 
 ### Install from source
 
