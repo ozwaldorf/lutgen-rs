@@ -1,17 +1,27 @@
 #![warn(clippy::all)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use crate::state::UiState;
-use crate::worker::WorkerHandle;
+use egui_file_dialog::FileDialog;
+
+use crate::state::{LutAlgorithm, UiState};
+use crate::worker::{LutAlgorithmArgs, WorkerHandle};
 
 mod palette;
 mod state;
 mod ui;
 mod worker;
 
+const IMAGE_EXTENSIONS: &[&str] = &[
+    "avif", "bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpg", "jpeg", "png", "pnm", "qoi",
+    "tga", "tiff", "webp",
+];
+
 pub struct App {
     state: UiState,
     worker: WorkerHandle,
+
+    pub open_picker: FileDialog,
+    pub save_picker: FileDialog,
 }
 
 impl App {
@@ -41,15 +51,50 @@ impl App {
             .unwrap_or_default();
 
         // Spawn background worker thread
-        let mut worker = WorkerHandle::new(cc.egui_ctx.clone());
+        let worker = WorkerHandle::new(cc.egui_ctx.clone());
+        let mut this = Self {
+            state,
+            worker,
+            open_picker: FileDialog::new()
+                .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
+                .default_file_filter("Images")
+                .title("Open Image"),
+            save_picker: FileDialog::new().title("Save Image As"),
+        };
 
-        if let Some(path) = &state.current_image {
-            // Load last opened image and apply settings
-            worker.load_file(path);
-            state.apply(&mut worker);
+        // setup save extensions
+        for &ext in IMAGE_EXTENSIONS {
+            this.save_picker = this.save_picker.add_save_extension(ext, ext);
+        }
+        this.save_picker = this.save_picker.default_save_extension("png");
+
+        // Load last opened image and apply settings
+        if let Some(path) = &this.state.current_image {
+            this.worker.load_file(path);
+            this.apply();
         }
 
-        Self { state, worker }
+        this
+    }
+
+    /// Collect arguments and send apply request to the worker
+    pub fn apply(&mut self) {
+        let args = match self.state.current_alg {
+            LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
+                rbf: self.state.common_rbf,
+                args: self.state.guassian_rbf,
+            },
+            LutAlgorithm::ShepardsMethod => LutAlgorithmArgs::ShepardsMethod {
+                rbf: self.state.common_rbf,
+                args: self.state.shepards_method,
+            },
+            LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
+                args: self.state.guassian_sampling,
+            },
+            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
+        };
+        self.worker
+            .apply_palette(self.state.palette.clone(), self.state.common, args);
     }
 }
 
@@ -63,8 +108,20 @@ impl eframe::App for App {
         if let Some(event) = self.worker.poll_event() {
             self.state.handle_event(ctx, event);
         }
+
+        self.open_picker.update(ctx);
+        if let Some(path) = self.open_picker.take_picked() {
+            self.worker.load_file(&path);
+            self.state.current_image = Some(path);
+        }
+
+        self.save_picker.update(ctx);
+        if let Some(path) = self.save_picker.take_picked() {
+            self.worker.save_as(path);
+        }
+
         // Show UI
-        self.state.show(ctx, &mut self.worker);
+        self.show(ctx);
     }
 }
 

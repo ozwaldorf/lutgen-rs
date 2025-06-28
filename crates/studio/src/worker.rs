@@ -12,10 +12,9 @@ use lutgen::GenerateLut;
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
 
 pub enum FrontendEvent {
-    PickFile(Option<PathBuf>),
     LoadFile(PathBuf),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
-    SaveAs(Option<PathBuf>),
+    SaveAs(PathBuf),
 }
 
 pub enum LutAlgorithmArgs {
@@ -35,7 +34,6 @@ pub enum LutAlgorithmArgs {
 
 pub enum BackendEvent {
     Error(String),
-    PickFile(PathBuf, Duration),
     Applied(Duration),
     SetImage {
         path: Option<PathBuf>,
@@ -48,9 +46,6 @@ impl Display for BackendEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BackendEvent::Error(e) => f.write_str(&format!("Error: {e}")),
-            BackendEvent::PickFile(path_buf, time) => {
-                f.write_str(&format!("Loaded {path_buf:?} in {time:.2?}"))
-            },
             BackendEvent::Applied(time) => f.write_str(&format!("Corrected image in {time:.2?}")),
             BackendEvent::SetImage { .. } => Ok(()),
         }
@@ -68,13 +63,7 @@ impl WorkerHandle {
         Worker::spawn(ctx)
     }
 
-    pub fn pick_file(&self, path: Option<PathBuf>) {
-        self.tx
-            .send(FrontendEvent::PickFile(path))
-            .expect("failed to send to worker");
-    }
-
-    pub fn save_as(&self, path: Option<PathBuf>) {
+    pub fn save_as(&self, path: PathBuf) {
         self.tx
             .send(FrontendEvent::SaveAs(path))
             .expect("failed to send save as request to worker");
@@ -126,7 +115,6 @@ impl Worker {
             };
             while let Ok(event) = worker_rx.recv() {
                 let res = match event {
-                    FrontendEvent::PickFile(path) => worker.pick_file(path),
                     FrontendEvent::SaveAs(path) => worker.save_as(path),
                     FrontendEvent::LoadFile(path) => worker.load_file(&path),
                     FrontendEvent::Apply(palette, common, args, abort) => {
@@ -157,47 +145,16 @@ impl Worker {
             .expect("failed to send image to ui thread")
     }
 
-    /// Open a file dialog and load the image into the window
-    fn pick_file(&mut self, path: Option<PathBuf>) -> Result<(), String> {
-        let mut dialog = rfd::FileDialog::new()
-            .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
-            .set_title("Open Image");
-
-        if let Some(path) = path {
-            dialog = dialog.set_file_name(path.display().to_string());
-        }
-
-        if let Some(path) = dialog.pick_file() {
-            let time = Instant::now();
-            self.load_file(&path)?;
-            self.tx
-                .send(BackendEvent::PickFile(path, time.elapsed()))
-                .map_err(|_| "failed to send file path to ui thread".to_string())?;
-        }
-
-        Ok(())
-    }
-
-    fn save_as(&self, path: Option<PathBuf>) -> Result<(), String> {
+    fn save_as(&self, path: PathBuf) -> Result<(), String> {
         if let Some(image) = &self.current_image {
-            let mut dialog = rfd::FileDialog::new()
-                .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
-                .set_title("Save As");
-
-            if let Some(path) = path {
-                dialog = dialog.set_file_name(path.display().to_string());
-            }
-
-            if let Some(path) = dialog.save_file() {
-                image::save_buffer(
-                    path,
-                    &self.last_render,
-                    image.width(),
-                    image.height(),
-                    ColorType::Rgba8,
-                )
-                .map_err(|e| format!("failed to encode image: {e}"))?;
-            }
+            image::save_buffer(
+                path,
+                &self.last_render,
+                image.width(),
+                image.height(),
+                ColorType::Rgba8,
+            )
+            .map_err(|e| format!("failed to encode image: {e}"))?;
         }
 
         Ok(())

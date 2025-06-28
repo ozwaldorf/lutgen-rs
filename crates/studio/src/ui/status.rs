@@ -1,12 +1,12 @@
 use egui::Context;
 
-use crate::state::UiState;
+use crate::App;
 
-impl UiState {
+impl App {
     pub fn show_statusline(&self, ctx: &Context) {
         // statusline with events and other info
         egui::TopBottomPanel::bottom("statusline").show(ctx, |ui| {
-            ui.label(&self.last_event);
+            ui.label(&self.state.last_event);
         });
     }
 }

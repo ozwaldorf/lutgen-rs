@@ -9,7 +9,7 @@ use log::{debug, error};
 use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
-use crate::worker::{BackendEvent, LutAlgorithmArgs, WorkerHandle};
+use crate::worker::BackendEvent;
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
@@ -76,9 +76,6 @@ impl UiState {
             BackendEvent::Error(e) => {
                 error!("{e}");
             },
-            BackendEvent::PickFile(path_buf, _) => {
-                self.current_image = Some(path_buf);
-            },
             BackendEvent::SetImage {
                 path,
                 image,
@@ -113,25 +110,6 @@ impl UiState {
             },
             _ => {},
         }
-    }
-
-    /// Collect arguments and send apply request to the worker
-    pub fn apply(&self, worker: &mut WorkerHandle) {
-        let args = match self.current_alg {
-            LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
-                rbf: self.common_rbf,
-                args: self.guassian_rbf,
-            },
-            LutAlgorithm::ShepardsMethod => LutAlgorithmArgs::ShepardsMethod {
-                rbf: self.common_rbf,
-                args: self.shepards_method,
-            },
-            LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
-                args: self.guassian_sampling,
-            },
-            LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
-        };
-        worker.apply_palette(self.palette.clone(), self.common, args);
     }
 }
 

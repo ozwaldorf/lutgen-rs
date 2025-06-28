@@ -1,14 +1,14 @@
-use crate::state::UiState;
+use crate::App;
 
-impl UiState {
+impl App {
+    /// Main app panel
     pub fn show_central_panel(&mut self, ctx: &egui::Context) {
-        // main app panel
         egui::CentralPanel::default().show(ctx, |ui| {
             // current image
             ui.vertical_centered(|ui| {
                 let available_size = ui.available_size();
-                let rect = if !self.show_original
-                    && let Some(texture) = &self.edited_texture
+                let rect = if !self.state.show_original
+                    && let Some(texture) = &self.state.edited_texture
                 {
                     let res = ui.add(
                         egui::Image::from_texture(texture)
@@ -18,10 +18,10 @@ impl UiState {
                             .sense(egui::Sense::click()),
                     );
                     if res.clicked() {
-                        self.show_original = true;
+                        self.state.show_original = true;
                     }
                     res.rect
-                } else if let Some(texture) = &self.image_texture {
+                } else if let Some(texture) = &self.state.image_texture {
                     let res = ui.add(
                         egui::Image::from_texture(texture)
                             .max_size(available_size)
@@ -30,7 +30,7 @@ impl UiState {
                             .sense(egui::Sense::click()),
                     );
                     if res.clicked() {
-                        self.show_original = false;
+                        self.state.show_original = false;
                     }
 
                     // draw "original" indicator

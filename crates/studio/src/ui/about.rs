@@ -1,8 +1,8 @@
-use crate::state::UiState;
+use crate::App;
 
-impl UiState {
+impl App {
     pub fn show_about_dialog(&mut self, ctx: &egui::Context) {
-        if self.show_about {
+        if self.state.show_about {
             let id = egui::ViewportId(egui::Id::new("about"));
             let vp = egui::ViewportBuilder::default()
                 .with_title("About Lutgen Studio")
@@ -44,7 +44,7 @@ impl UiState {
                 });
                 ctx.input(|state| {
                     if state.viewport().close_requested() {
-                        self.show_about = false;
+                        self.state.show_about = false;
                     }
                 });
             });
