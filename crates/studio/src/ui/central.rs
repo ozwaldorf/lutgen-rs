@@ -32,6 +32,25 @@ impl UiState {
                     if res.clicked() {
                         self.show_original = false;
                     }
+
+                    // draw "original" indicator
+                    let painter = ui.painter();
+                    let pos = res.rect.min + egui::Vec2::splat(8.);
+                    let galley = painter.layout_no_wrap(
+                        "Original".to_string(),
+                        egui::TextStyle::Body.resolve(ui.style()),
+                        egui::Color32::WHITE,
+                    );
+                    let text_rect = egui::Rect::from_min_size(pos, galley.size());
+                    let padding = egui::Vec2::splat(6.0);
+                    let bg_rect = text_rect.expand2(padding);
+                    painter.rect_filled(
+                        bg_rect,
+                        4.0,
+                        egui::Color32::from_rgba_unmultiplied(0x16, 0x16, 0x16, 172),
+                    );
+                    painter.galley(pos, galley, egui::Color32::WHITE);
+
                     res.rect
                 } else {
                     let (rect, _response) =
