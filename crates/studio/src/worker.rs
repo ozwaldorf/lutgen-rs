@@ -12,10 +12,10 @@ use lutgen::GenerateLut;
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
 
 pub enum FrontendEvent {
-    PickFile,
+    PickFile(Option<PathBuf>),
     LoadFile(PathBuf),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
-    SaveAs,
+    SaveAs(Option<PathBuf>),
 }
 
 pub enum LutAlgorithmArgs {
@@ -68,15 +68,15 @@ impl WorkerHandle {
         Worker::spawn(ctx)
     }
 
-    pub fn pick_file(&self) {
+    pub fn pick_file(&self, path: Option<PathBuf>) {
         self.tx
-            .send(FrontendEvent::PickFile)
+            .send(FrontendEvent::PickFile(path))
             .expect("failed to send to worker");
     }
 
-    pub fn save_as(&self) {
+    pub fn save_as(&self, path: Option<PathBuf>) {
         self.tx
-            .send(FrontendEvent::SaveAs)
+            .send(FrontendEvent::SaveAs(path))
             .expect("failed to send save as request to worker");
     }
 
@@ -126,8 +126,8 @@ impl Worker {
             };
             while let Ok(event) = worker_rx.recv() {
                 let res = match event {
-                    FrontendEvent::PickFile => worker.pick_file(),
-                    FrontendEvent::SaveAs => worker.save_as(),
+                    FrontendEvent::PickFile(path) => worker.pick_file(path),
+                    FrontendEvent::SaveAs(path) => worker.save_as(path),
                     FrontendEvent::LoadFile(path) => worker.load_file(&path),
                     FrontendEvent::Apply(palette, common, args, abort) => {
                         worker.apply_palette(palette, common, args, abort)
@@ -158,11 +158,16 @@ impl Worker {
     }
 
     /// Open a file dialog and load the image into the window
-    fn pick_file(&mut self) -> Result<(), String> {
-        if let Some(path) = rfd::FileDialog::new()
+    fn pick_file(&mut self, path: Option<PathBuf>) -> Result<(), String> {
+        let mut dialog = rfd::FileDialog::new()
             .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
-            .pick_file()
-        {
+            .set_title("Open Image");
+
+        if let Some(path) = path {
+            dialog = dialog.set_file_name(path.display().to_string());
+        }
+
+        if let Some(path) = dialog.pick_file() {
             let time = Instant::now();
             self.load_file(&path)?;
             self.tx
@@ -173,20 +178,26 @@ impl Worker {
         Ok(())
     }
 
-    fn save_as(&self) -> Result<(), String> {
-        if let Some(image) = &self.current_image
-            && let Some(path) = rfd::FileDialog::new()
+    fn save_as(&self, path: Option<PathBuf>) -> Result<(), String> {
+        if let Some(image) = &self.current_image {
+            let mut dialog = rfd::FileDialog::new()
                 .add_filter("image", &["png", "jpg", "jpeg", "gif", "bmp", "webp"])
-                .save_file()
-        {
-            image::save_buffer(
-                path,
-                &self.last_render,
-                image.width(),
-                image.height(),
-                ColorType::Rgba8,
-            )
-            .map_err(|e| format!("failed to encode image: {e}"))?
+                .set_title("Save As");
+
+            if let Some(path) = path {
+                dialog = dialog.set_file_name(path.display().to_string());
+            }
+
+            if let Some(path) = dialog.save_file() {
+                image::save_buffer(
+                    path,
+                    &self.last_render,
+                    image.width(),
+                    image.height(),
+                    ColorType::Rgba8,
+                )
+                .map_err(|e| format!("failed to encode image: {e}"))?;
+            }
         }
 
         Ok(())

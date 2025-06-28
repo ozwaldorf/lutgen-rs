@@ -12,10 +12,10 @@ impl UiState {
                 ui.add_space(5.);
                 ui.menu_button("File", |ui| {
                     if ui.button("Open").clicked() {
-                        worker.pick_file();
+                        worker.pick_file(self.current_image.clone());
                     }
                     if ui.button("Save As").clicked() {
-                        worker.save_as();
+                        worker.save_as(self.current_image.clone());
                     }
                     if ui.button("About").clicked() {
                         self.show_about = true;
