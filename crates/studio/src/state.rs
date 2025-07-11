@@ -93,7 +93,7 @@ impl UiState {
                         [height as usize, width as usize],
                         &image,
                     ),
-                    egui::TextureOptions::default()
+                    egui::TextureOptions::NEAREST
                         .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
