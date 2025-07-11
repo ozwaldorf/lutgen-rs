@@ -87,8 +87,7 @@
             cargoExtraArgs = "--locked --bin lutgen-studio";
             postInstall = ''
               wrapProgram "$out/bin/${pname}" \
-                --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}" \
-                --set PATH "${pkgs.zenity}/bin"
+                --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
             '';
           }
         );
@@ -141,7 +140,6 @@
           packages = with pkgs; [
             jekyll
             bundler
-            zenity
           ];
 
         };
