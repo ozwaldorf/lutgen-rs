@@ -4,11 +4,10 @@ use std::path::PathBuf;
 
 use egui::TextureHandle;
 use log::{debug, error};
-use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
 use crate::utils::Hashed;
-use crate::worker::BackendEvent;
+use crate::worker::{BackendEvent, ImageSource};
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
@@ -76,18 +75,14 @@ impl UiState {
                 error!("{e}");
             },
             BackendEvent::SetImage {
-                path,
+                source,
                 image,
                 dim: (width, height),
+                ..
             } => {
                 // load image into a new egui texture
                 let texture = ctx.load_texture(
-                    format!(
-                        "bytes://{}",
-                        path.as_ref()
-                            .map(|p| p.display().to_string())
-                            .unwrap_or(Uuid::new_v4().to_string())
-                    ),
+                    format!("bytes://{source}",),
                     egui::ColorImage::from_rgba_unmultiplied(
                         [height as usize, width as usize],
                         &image,
@@ -96,18 +91,20 @@ impl UiState {
                         .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
-                if let Some(path) = path {
-                    // for newly opened images from file picker
-                    self.current_image = Some(path);
-                    self.image_texture = Some(texture);
-                    self.show_original = true;
-                } else {
-                    // for edited output
-                    self.edited_texture = Some(texture);
-                    self.show_original = false;
+                match source {
+                    ImageSource::Image(path) => {
+                        // for newly opened images from file picker
+                        self.current_image = Some(path);
+                        self.image_texture = Some(texture);
+                        self.show_original = true;
+                    },
+                    ImageSource::Edited(_) => {
+                        // for edited output
+                        self.edited_texture = Some(texture);
+                        self.show_original = false;
+                    },
                 }
             },
-            _ => {},
         }
     }
 }
