@@ -18,6 +18,7 @@ impl App {
                             }
                         }
                         self.open_picker.pick_file();
+                        ui.close_menu();
                     }
                     if ui.button("Save As").clicked() {
                         if let Some(path) = self.state.current_image.clone() {
@@ -30,12 +31,15 @@ impl App {
                             }
                         }
                         self.save_picker.save_file();
+                        ui.close_menu();
                     }
                     if ui.button("About").clicked() {
                         self.state.show_about = true;
+                        ui.close_menu();
                     }
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+                        ui.close_menu();
                     }
                 });
 
