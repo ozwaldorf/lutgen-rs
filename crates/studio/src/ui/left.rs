@@ -87,7 +87,7 @@ impl App {
                                         *alg,
                                         alg.to_string(),
                                     );
-                                    val.clicked().then(|| apply = true);
+                                    apply |= val.clicked();
                                     val.gained_focus()
                                         .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
                                 }
@@ -101,18 +101,14 @@ impl App {
 
                         ui.label("Hald-Clut Level");
                         let res = ui.add(egui::Slider::new(&mut self.state.common.level, 4..=16));
-                        if res.drag_stopped() || res.lost_focus() {
-                            apply = true
-                        }
+                        apply |= res.drag_stopped() | res.lost_focus();
 
                         ui.label("Luminosity Factor");
                         let res = ui.add(egui::Slider::new(
                             &mut self.state.common.lum_factor.0,
                             0.0001..=2.,
                         ));
-                        if res.drag_stopped() || res.lost_focus() {
-                            apply = true
-                        }
+                        apply |= res.drag_stopped() | res.lost_focus();
 
                         // shared rbf args
                         match self.state.current_alg {
@@ -126,16 +122,14 @@ impl App {
                                     egui::Slider::new(&mut self.state.common_rbf.nearest, 0..=32)
                                         .step_by(1.),
                                 );
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
 
-                                ui.checkbox(
-                                    &mut self.state.common_rbf.preserve,
-                                    "Preserve Luminosity",
-                                )
-                                .changed()
-                                .then(|| apply = true);
+                                apply |= ui
+                                    .checkbox(
+                                        &mut self.state.common_rbf.preserve,
+                                        "Preserve Luminosity",
+                                    )
+                                    .changed();
                             },
                             _ => {},
                         }
@@ -152,9 +146,7 @@ impl App {
                                     &mut self.state.guassian_rbf.shape.0,
                                     0.0001..=512.,
                                 ));
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
                             },
                             LutAlgorithm::ShepardsMethod => {
                                 ui.separator();
@@ -164,11 +156,9 @@ impl App {
                                 ui.label("Power");
                                 let res = ui.add(egui::Slider::new(
                                     &mut self.state.shepards_method.power.0,
-                                    0.0001..=512.,
+                                    0.0001..=64.,
                                 ));
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
                             },
                             LutAlgorithm::GaussianSampling => {
                                 ui.separator();
@@ -180,35 +170,28 @@ impl App {
                                     &mut self.state.guassian_sampling.mean.0,
                                     -128.0..=128.,
                                 ));
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
 
                                 ui.label("Standard Deviation");
                                 let res = ui.add(egui::Slider::new(
                                     &mut self.state.guassian_sampling.std_dev.0,
                                     1.0..=128.,
                                 ));
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
+
                                 ui.label("Iterations");
                                 let res = ui.add(egui::Slider::new(
                                     &mut self.state.guassian_sampling.iterations,
                                     1..=1024,
                                 ));
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
 
                                 ui.label("RNG Seed");
                                 let res = ui.add(
                                     egui::DragValue::new(&mut self.state.guassian_sampling.seed)
                                         .speed(2i32.pow(20)),
                                 );
-                                if res.drag_stopped() || res.lost_focus() {
-                                    apply = true
-                                }
+                                apply |= res.drag_stopped() | res.lost_focus();
                             },
                             _ => {},
                         }

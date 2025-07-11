@@ -49,7 +49,7 @@ impl Default for UiState {
 
             palette_selection: DynamicPalette::Builtin(lutgen_palettes::Palette::Carburetor),
             palette: lutgen_palettes::Palette::Carburetor.get().to_vec(),
-            current_alg: LutAlgorithm::GaussianRbf,
+            current_alg: Default::default(),
             guassian_rbf: Default::default(),
             shepards_method: Default::default(),
             guassian_sampling: Default::default(),
@@ -117,6 +117,7 @@ impl UiState {
     Clone,
     Copy,
     Debug,
+    Default,
     Hash,
     PartialEq,
     serde::Deserialize,
@@ -125,6 +126,7 @@ impl UiState {
     strum::VariantArray,
 )]
 pub enum LutAlgorithm {
+    #[default]
     GaussianRbf,
     ShepardsMethod,
     GaussianSampling,
@@ -194,7 +196,7 @@ impl Default for CommonRbf {
     fn default() -> Self {
         Self {
             nearest: 16,
-            preserve: false,
+            preserve: true,
         }
     }
 }
@@ -223,7 +225,7 @@ pub struct ShepardsMethodArgs {
 
 impl Default for ShepardsMethodArgs {
     fn default() -> Self {
-        Self { power: Hashed(64.) }
+        Self { power: Hashed(4.) }
     }
 }
 
