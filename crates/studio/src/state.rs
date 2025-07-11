@@ -1,14 +1,13 @@
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::hash::Hash;
-use std::ops::Deref;
 use std::path::PathBuf;
-use std::str::FromStr;
 
 use egui::TextureHandle;
 use log::{debug, error};
 use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
+use crate::utils::Hashed;
 use crate::worker::BackendEvent;
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
@@ -131,39 +130,6 @@ pub enum LutAlgorithm {
     ShepardsMethod,
     GaussianSampling,
     NearestNeighbor,
-}
-
-/// Utility to wrap non-hashable types with their string impl
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-pub struct Hashed<T: Clone + Debug>(pub T);
-impl<T: Clone + Copy + Debug> Copy for Hashed<T> {}
-impl<T: Clone + Debug + ToString> Hash for Hashed<T> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.to_string().hash(state);
-    }
-}
-impl<T: Clone + Debug + FromStr> FromStr for Hashed<T> {
-    type Err = T::Err;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        T::from_str(s).map(Hashed)
-    }
-}
-impl<T: Clone + Debug> AsRef<T> for Hashed<T> {
-    fn as_ref(&self) -> &T {
-        &self.0
-    }
-}
-impl<T: Clone + Debug> Display for Hashed<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-impl<T: Clone + Copy + Debug> Deref for Hashed<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
 }
 
 #[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]
