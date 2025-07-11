@@ -19,6 +19,7 @@ const IMAGE_EXTENSIONS: &[&str] = &[
 pub struct App {
     state: UiState,
     worker: WorkerHandle,
+    scene_rect: egui::Rect,
 
     pub open_picker: FileDialog,
     pub save_picker: FileDialog,
@@ -55,6 +56,7 @@ impl App {
         let mut this = Self {
             state,
             worker,
+            scene_rect: egui::Rect::ZERO,
             open_picker: FileDialog::new()
                 .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
                 .default_file_filter("Images")
