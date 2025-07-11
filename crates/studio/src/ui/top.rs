@@ -5,7 +5,7 @@ use crate::App;
 impl App {
     pub fn show_topbar(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            egui::menu::bar(ui, |ui| {
+            egui::MenuBar::new().ui(ui, |ui| {
                 ui.add(egui::Image::new(include_image!("../../assets/logo.png")).max_height(16.));
                 ui.label("Lutgen Studio");
                 ui.add_space(5.);
@@ -18,7 +18,7 @@ impl App {
                             }
                         }
                         self.open_picker.pick_file();
-                        ui.close_menu();
+                        ui.close();
                     }
                     if ui.button("Save As").clicked() {
                         if let Some(path) = self.state.current_image.clone() {
@@ -31,15 +31,15 @@ impl App {
                             }
                         }
                         self.save_picker.save_file();
-                        ui.close_menu();
+                        ui.close();
                     }
                     if ui.button("About").clicked() {
                         self.state.show_about = true;
-                        ui.close_menu();
+                        ui.close();
                     }
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        ui.close_menu();
+                        ui.close();
                     }
                 });
 

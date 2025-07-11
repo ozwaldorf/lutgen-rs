@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-studio"
-version = "0.1.1"
+version = "0.1.2"
 description = "Offical GUI for Lutgen, the best way to apply popular colorschemes to any image or wallpaper!"
 edition = "2024"
 license = "MIT"
@@ -28,10 +28,10 @@ serde.workspace = true
 
 env_logger = "0.11"
 log = "0.4"
-egui = "0.31"
-egui_extras = { version = "0.31", features = ["all_loaders"] }
-egui-file-dialog = "0.10.0"
-eframe = { version = "0.31", default-features = false, features = [
+egui = "0.32"
+egui_extras = { version = "0.32", features = ["all_loaders"] }
+egui-file-dialog = "0.11.0"
+eframe = { version = "0.32", default-features = false, features = [
     "default_fonts", # Embed the default egui fonts.
     "glow",          # Use the glow rendering backend. Alternative: "wgpu".
     "persistence",   # Enable restoring app state when restarting the app.
