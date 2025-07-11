@@ -96,6 +96,7 @@ impl UiState {
                         // for newly opened images from file picker
                         self.current_image = Some(path);
                         self.image_texture = Some(texture);
+                        self.edited_texture = None;
                         self.show_original = true;
                     },
                     ImageSource::Edited(_) => {
