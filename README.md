@@ -67,6 +67,19 @@ cd lutgen-rs
 cargo install --path crates/cli
 ```
 
+### Docker image
+
+Build the Docker image:
+```sh
+sh <(curl -L https://raw.githubusercontent.com/ozwaldorf/lutgen-rs/main/scripts/build.sh)
+```
+
+Run with volume mounted for file access:
+```sh
+docker run --rm -v $PWD:/workspace lutgen:latest --help
+docker run --rm -v $PWD:/workspace lutgen:latest apply -p=catppuccin-mocha /workspace/example.png
+```
+
 ### Crates.io
 
 ```bash
@@ -159,4 +172,3 @@ cargo run -r --bin lutgen-studio
 - [The Catppuccin Org](https://github.com/catppuccin) for continual feedback and support along the way
 - [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
 - All the nixpkgs maintainers
-
