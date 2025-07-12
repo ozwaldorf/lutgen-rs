@@ -6,7 +6,8 @@ permalink: /
 
 Welcome to the Lutgen wiki!
 
-- [Command Summary](./cli): Detailed CLI documentation for every subcommand
+- [CLI](./cli): Detailed CLI documentation for every subcommand
 - [Examples](./examples): Example usages
 - [Lore](./lore): History of the program, algorithms, and more
+- [Studio](./studio): Help for Lutgen Studio, the official GUI
 - [Tips](./tips): Tips and tricks for getting the best outputs
