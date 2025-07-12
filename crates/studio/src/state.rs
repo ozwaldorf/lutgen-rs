@@ -66,7 +66,7 @@ impl UiState {
     /// Handle incoming backend events from the worker
     pub fn handle_event(&mut self, ctx: &egui::Context, event: BackendEvent) {
         self.last_event = event.to_string();
-        info!("{}", self.last_event);
+        info!("Received event: {}", self.last_event);
 
         match event {
             BackendEvent::Error(e) => {
@@ -106,6 +106,81 @@ impl UiState {
             },
         }
     }
+
+    /// Collect the lutgen cli arguments used to replicate the current parameters
+    pub fn cli_args(&self) -> Vec<String> {
+        macro_rules! arg {
+            ($args:expr, $flag:expr, $arg:expr, $default:expr) => {
+                if $arg != $default {
+                    $args.push($flag.to_string());
+                    $args.push($arg.to_string());
+                }
+            };
+            ($args:expr, $flag:expr, bool $arg:expr, $default:expr) => {
+                if $arg != $default {
+                    $args.push($flag.to_string());
+                }
+            };
+        }
+
+        let mut args = Vec::new();
+
+        // common rbf
+        match self.current_alg {
+            LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
+                arg!(args, "-n", self.common_rbf.nearest, 16);
+                arg!(args, "-P", bool self.common_rbf.preserve, false);
+            },
+            _ => {},
+        }
+
+        // common
+        arg!(args, "-L", self.common.lum_factor.0, 0.7);
+        arg!(args, "-l", self.common.level, 12);
+
+        // algorithm specific
+        match self.current_alg {
+            LutAlgorithm::GaussianRbf => {
+                arg!(args, "-s", self.guassian_rbf.shape.0, 128.);
+            },
+            LutAlgorithm::ShepardsMethod => {
+                arg!(args, "-p", self.shepards_method.power.0, 4.);
+            },
+            LutAlgorithm::GaussianSampling => {
+                arg!(args, "-m", self.guassian_sampling.mean.0, 0.);
+                arg!(args, "-s", self.guassian_sampling.std_dev.0, 20.);
+                arg!(args, "-i", self.guassian_sampling.iterations, 512);
+                arg!(args, "-S", self.guassian_sampling.seed, 42080085);
+            },
+            LutAlgorithm::NearestNeighbor => {},
+        }
+
+        args
+    }
+
+    /// Reset the current arguments based on the selected algorithm
+    pub fn reset_current_args(&mut self) {
+        let default = Self::default();
+        self.common = default.common;
+        match self.current_alg {
+            LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
+                self.common_rbf = default.common_rbf;
+            },
+            _ => {},
+        }
+        match self.current_alg {
+            LutAlgorithm::GaussianRbf => {
+                self.guassian_rbf = default.guassian_rbf;
+            },
+            LutAlgorithm::ShepardsMethod => {
+                self.shepards_method = default.shepards_method;
+            },
+            LutAlgorithm::GaussianSampling => {
+                self.guassian_sampling = default.guassian_sampling;
+            },
+            LutAlgorithm::NearestNeighbor => {},
+        }
+    }
 }
 
 #[derive(
@@ -141,7 +216,7 @@ impl Default for Common {
     fn default() -> Self {
         Self {
             lum_factor: Hashed(0.7),
-            level: 2,
+            level: 12,
         }
     }
 }

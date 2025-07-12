@@ -197,6 +197,20 @@ impl App {
                         }
                     });
 
+                    ui.group(|ui| {
+                        ui.horizontal(|ui| {
+                            if ui.button("Reset").clicked() {
+                                self.state.reset_current_args();
+                                self.apply();
+                            }
+                            if ui.button("Copy CLI Arguments").clicked() {
+                                let args = self.state.cli_args();
+                                ui.ctx()
+                                    .copy_text("lutgen apply ".to_string() + &args.join(" "));
+                            }
+                        });
+                    });
+
                     ui.style_mut().spacing.slider_width = ui.available_width() - 16.;
                 });
             });

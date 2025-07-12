@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 
 use egui::Context;
 use image::ColorType;
+use log::{debug, info};
 use lutgen::GenerateLut;
 
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
@@ -18,7 +19,7 @@ pub enum FrontendEvent {
     SaveAs(PathBuf),
 }
 
-#[derive(Hash)]
+#[derive(Hash, Debug)]
 pub enum LutAlgorithmArgs {
     GaussianRbf {
         rbf: CommonRbf,
@@ -32,20 +33,6 @@ pub enum LutAlgorithmArgs {
         args: GaussianSamplingArgs,
     },
     NearestNeighbor,
-}
-
-pub enum ImageSource {
-    Image(PathBuf),
-    Edited(u64),
-}
-
-impl Display for ImageSource {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ImageSource::Image(path_buf) => Display::fmt(&path_buf.display(), f),
-            ImageSource::Edited(hash) => Display::fmt(hash, f),
-        }
-    }
 }
 
 pub enum BackendEvent {
@@ -73,6 +60,20 @@ impl Display for BackendEvent {
                     format!("Generated and applied LUT to image in {time:.2?}").fmt(f)
                 },
             },
+        }
+    }
+}
+
+pub enum ImageSource {
+    Image(PathBuf),
+    Edited(u64),
+}
+
+impl Display for ImageSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ImageSource::Image(path_buf) => Display::fmt(&path_buf.display(), f),
+            ImageSource::Edited(hash) => Display::fmt(hash, f),
         }
     }
 }
@@ -234,6 +235,9 @@ impl Worker {
         let hash = hasher.finish();
 
         // generate lut from arguments
+        info!("Generating LUT with args:\n{common:?}\n{args:?}");
+        debug!("LUT input palette ({} colors):\n{palette:?}", palette.len());
+
         let lut = match args {
             LutAlgorithmArgs::GaussianRbf { rbf, args } => {
                 lutgen::interpolation::GaussianRemapper::new(

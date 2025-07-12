@@ -6,7 +6,7 @@ impl App {
     pub fn show_topbar(&mut self, ctx: &egui::Context) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::MenuBar::new().ui(ui, |ui| {
-                ui.add(egui::Image::new(include_image!("../../assets/logo.png")).max_height(16.));
+                ui.add(egui::Image::new(include_image!("../../assets/lutgen.png")).max_height(16.));
                 ui.label("Lutgen Studio");
                 ui.add_space(5.);
                 ui.menu_button("File", |ui| {
