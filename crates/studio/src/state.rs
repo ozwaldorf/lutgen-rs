@@ -125,7 +125,12 @@ impl UiState {
 
         let mut args = Vec::new();
 
-        // common rbf
+        // builtin palettes
+        if let DynamicPalette::Builtin(palette) = self.palette_selection {
+            arg!(args, "-p", palette.to_string(), "");
+        }
+
+        // common rbf args
         match self.current_alg {
             LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
                 arg!(args, "-n", self.common_rbf.nearest, 16);
@@ -134,11 +139,11 @@ impl UiState {
             _ => {},
         }
 
-        // common
+        // common args
         arg!(args, "-L", self.common.lum_factor.0, 0.7);
         arg!(args, "-l", self.common.level, 12);
 
-        // algorithm specific
+        // algorithm specific args
         match self.current_alg {
             LutAlgorithm::GaussianRbf => {
                 arg!(args, "-s", self.guassian_rbf.shape.0, 128.);
@@ -153,6 +158,19 @@ impl UiState {
                 arg!(args, "-S", self.guassian_sampling.seed, 42080085);
             },
             LutAlgorithm::NearestNeighbor => {},
+        }
+
+        // image path
+        if let Some(path) = &self.current_image {
+            args.push(path.display().to_string());
+        }
+
+        // finally custom palette colors
+        if self.palette_selection == DynamicPalette::Custom {
+            args.push("--".to_string());
+            for [r, g, b] in &self.palette {
+                args.push(format!("{r:0x}{g:0x}{b:0x}"));
+            }
         }
 
         args
