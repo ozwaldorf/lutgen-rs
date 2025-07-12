@@ -38,6 +38,4 @@ eframe = { version = "0.32", default-features = false, features = [
     "wayland",       # To support Linux (and CI)
     "x11",           # To support older Linux distributions (restores one of the default features)
 ] }
-rfd = "0.15"
-uuid = { version = "1.17", features = ["v4"] }
 

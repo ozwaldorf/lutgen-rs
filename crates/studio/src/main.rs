@@ -9,6 +9,7 @@ use crate::worker::{LutAlgorithmArgs, WorkerHandle};
 mod palette;
 mod state;
 mod ui;
+mod utils;
 mod worker;
 
 const IMAGE_EXTENSIONS: &[&str] = &[

@@ -106,7 +106,6 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 - libxkbcommon-dev
 - libssl-dev
 - wayland
-- zenity (file picker)
 
 ### Install from source
 

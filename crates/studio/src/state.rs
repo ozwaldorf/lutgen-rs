@@ -1,15 +1,13 @@
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::hash::Hash;
-use std::ops::Deref;
 use std::path::PathBuf;
-use std::str::FromStr;
 
 use egui::TextureHandle;
 use log::{debug, error};
-use uuid::Uuid;
 
 use crate::palette::DynamicPalette;
-use crate::worker::BackendEvent;
+use crate::utils::Hashed;
+use crate::worker::{BackendEvent, ImageSource};
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
@@ -77,18 +75,14 @@ impl UiState {
                 error!("{e}");
             },
             BackendEvent::SetImage {
-                path,
+                source,
                 image,
                 dim: (width, height),
+                ..
             } => {
                 // load image into a new egui texture
                 let texture = ctx.load_texture(
-                    format!(
-                        "bytes://{}",
-                        path.as_ref()
-                            .map(|p| p.display().to_string())
-                            .unwrap_or(Uuid::new_v4().to_string())
-                    ),
+                    format!("bytes://{source}",),
                     egui::ColorImage::from_rgba_unmultiplied(
                         [height as usize, width as usize],
                         &image,
@@ -97,18 +91,21 @@ impl UiState {
                         .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
-                if let Some(path) = path {
-                    // for newly opened images from file picker
-                    self.current_image = Some(path);
-                    self.image_texture = Some(texture);
-                    self.show_original = true;
-                } else {
-                    // for edited output
-                    self.edited_texture = Some(texture);
-                    self.show_original = false;
+                match source {
+                    ImageSource::Image(path) => {
+                        // for newly opened images from file picker
+                        self.current_image = Some(path);
+                        self.image_texture = Some(texture);
+                        self.edited_texture = None;
+                        self.show_original = true;
+                    },
+                    ImageSource::Edited(_) => {
+                        // for edited output
+                        self.edited_texture = Some(texture);
+                        self.show_original = false;
+                    },
                 }
             },
-            _ => {},
         }
     }
 }
@@ -131,39 +128,6 @@ pub enum LutAlgorithm {
     ShepardsMethod,
     GaussianSampling,
     NearestNeighbor,
-}
-
-/// Utility to wrap non-hashable types with their string impl
-#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-pub struct Hashed<T: Clone + Debug>(pub T);
-impl<T: Clone + Copy + Debug> Copy for Hashed<T> {}
-impl<T: Clone + Debug + ToString> Hash for Hashed<T> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.0.to_string().hash(state);
-    }
-}
-impl<T: Clone + Debug + FromStr> FromStr for Hashed<T> {
-    type Err = T::Err;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        T::from_str(s).map(Hashed)
-    }
-}
-impl<T: Clone + Debug> AsRef<T> for Hashed<T> {
-    fn as_ref(&self) -> &T {
-        &self.0
-    }
-}
-impl<T: Clone + Debug> Display for Hashed<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-impl<T: Clone + Copy + Debug> Deref for Hashed<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
 }
 
 #[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]

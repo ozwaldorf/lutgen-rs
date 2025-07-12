@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
 use std::sync::mpsc::{channel, Receiver, Sender};
@@ -17,6 +18,7 @@ pub enum FrontendEvent {
     SaveAs(PathBuf),
 }
 
+#[derive(Hash)]
 pub enum LutAlgorithmArgs {
     GaussianRbf {
         rbf: CommonRbf,
@@ -32,11 +34,25 @@ pub enum LutAlgorithmArgs {
     NearestNeighbor,
 }
 
+pub enum ImageSource {
+    Image(PathBuf),
+    Edited(u64),
+}
+
+impl Display for ImageSource {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ImageSource::Image(path_buf) => Display::fmt(&path_buf.display(), f),
+            ImageSource::Edited(hash) => Display::fmt(hash, f),
+        }
+    }
+}
+
 pub enum BackendEvent {
     Error(String),
-    Applied(Duration),
     SetImage {
-        path: Option<PathBuf>,
+        time: Duration,
+        source: ImageSource,
         image: Arc<[u8]>,
         dim: (u32, u32),
     },
@@ -45,9 +61,18 @@ pub enum BackendEvent {
 impl Display for BackendEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BackendEvent::Error(e) => f.write_str(&format!("Error: {e}")),
-            BackendEvent::Applied(time) => f.write_str(&format!("Corrected image in {time:.2?}")),
-            BackendEvent::SetImage { .. } => Ok(()),
+            BackendEvent::Error(e) => format!("Error: {e}").fmt(f),
+            BackendEvent::SetImage {
+                time,
+                dim: (x, y),
+                source: path,
+                ..
+            } => match path {
+                ImageSource::Image(_) => format!("Opened {x}x{y} image in {time:.2?}").fmt(f),
+                ImageSource::Edited(_) => {
+                    format!("Generated and applied LUT to image in {time:.2?}").fmt(f)
+                },
+            },
         }
     }
 }
@@ -98,6 +123,7 @@ impl WorkerHandle {
 pub struct Worker {
     tx: Sender<BackendEvent>,
     current_image: Option<lutgen::RgbaImage>,
+    hasher: DefaultHasher,
     last_render: Arc<[u8]>,
 }
 
@@ -111,6 +137,7 @@ impl Worker {
             let mut worker = Worker {
                 tx: worker_tx,
                 current_image: None,
+                hasher: DefaultHasher::new(),
                 last_render: Default::default(),
             };
             while let Ok(event) = worker_rx.recv() {
@@ -134,12 +161,18 @@ impl Worker {
         WorkerHandle { tx, rx, abort }
     }
 
-    fn send_set_image(&mut self, path: Option<PathBuf>, image: Vec<u8>, dim: (u32, u32)) {
-        self.last_render = image.into();
+    fn send_set_image(
+        &mut self,
+        time: Duration,
+        source: ImageSource,
+        image: Arc<[u8]>,
+        dim: (u32, u32),
+    ) {
         self.tx
             .send(BackendEvent::SetImage {
-                image: self.last_render.clone(),
-                path,
+                time,
+                source,
+                image,
                 dim,
             })
             .expect("failed to send image to ui thread")
@@ -161,16 +194,17 @@ impl Worker {
     }
 
     fn load_file(&mut self, path: &Path) -> Result<(), String> {
+        let time = Instant::now();
         let image = image::open(path).map_err(|e| e.to_string())?.to_rgba8();
 
-        let mut buf = std::io::Cursor::new(Vec::new());
-        image
-            .write_to(&mut buf, image::ImageFormat::Png)
-            .map_err(|e| format!("failed to encode image: {e}"))?;
+        // hash image
+        self.hasher = DefaultHasher::new();
+        image.hash(&mut self.hasher);
 
         self.send_set_image(
-            Some(path.to_path_buf()),
-            image.to_vec(),
+            time.elapsed(),
+            ImageSource::Image(path.to_path_buf()),
+            image.to_vec().into(),
             (image.height(), image.width()),
         );
         self.current_image = Some(image);
@@ -187,11 +221,17 @@ impl Worker {
     ) -> Result<(), String> {
         let time = Instant::now();
 
-        // get image or return
         let Some(mut image) = self.current_image.clone() else {
             // do nothing if no image is loaded
             return Ok(());
         };
+
+        // hash arguments with existing image hash
+        let mut hasher = self.hasher.clone();
+        palette.hash(&mut hasher);
+        common.hash(&mut hasher);
+        args.hash(&mut hasher);
+        let hash = hasher.finish();
 
         // generate lut from arguments
         let lut = match args {
@@ -236,17 +276,12 @@ impl Worker {
         // remap image
         lutgen::identity::correct_image(&mut image, &lut);
 
-        // encode edited image
-        // TODO: figure out how the hell to load raw bytes
-        let mut buf = std::io::Cursor::new(Vec::new());
-        image
-            .write_to(&mut buf, image::ImageFormat::Png)
-            .map_err(|e| format!("failed to encode image: {e}"))?;
-
-        self.send_set_image(None, image.to_vec(), (image.height(), image.width()));
-        self.tx
-            .send(BackendEvent::Applied(time.elapsed()))
-            .expect("failed to send applied event to ui thread");
+        self.send_set_image(
+            time.elapsed(),
+            ImageSource::Edited(hash),
+            image.to_vec().into(),
+            (image.height(), image.width()),
+        );
 
         Ok(())
     }
