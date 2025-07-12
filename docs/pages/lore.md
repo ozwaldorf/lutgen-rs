@@ -61,3 +61,7 @@ In the end, Guassian RBF is the fastest, looks exceptionally similar to the orig
 ## Fine tuning
 
 Now that we have the speed and quality, the next thing was allowing users to additionally fine tune the LUT other than the algorithm's specific parameters. Luminosity factor was added to support this, which allows shifting the LUT to prefer more color or brightness when matching. Shortly after, the `--preserve` flag was added to retain the original image's brightness and contrast.
+
+## To GUI, and beyond!
+
+In an effort to make Lutgen more approachable by new users, as well as exposing the parameters to users that would never use them otherwise, an interactive GUI was created. This also proved to be a great exploration for me personally into egui, an immediate mode gui framework. Lutgen Studio follows the same values as the rest of the project; opting for minimal dependencies and low-level oriented code. The GUI in its current form is very simple, allowing the user to open a single image, edit the palette and LUT algorithm parameters in realtime, and save it to disk.
