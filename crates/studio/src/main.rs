@@ -1,6 +1,8 @@
 #![warn(clippy::all)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::path::PathBuf;
+
 use bpaf::Bpaf;
 use egui_file_dialog::FileDialog;
 use log::LevelFilter;
@@ -31,6 +33,9 @@ pub struct Cli {
         })
     )]
     verbosity: LevelFilter,
+    /// Image to open on startup
+    #[bpaf(positional, guard(|p| p.exists(), "Image path not found"), optional)]
+    input: Option<PathBuf>,
 }
 
 pub struct App {
@@ -43,7 +48,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+    pub fn new(cc: &eframe::CreationContext<'_>, input: Option<PathBuf>) -> Self {
         egui_extras::install_image_loaders(&cc.egui_ctx);
 
         // Theming
@@ -86,6 +91,11 @@ impl App {
             this.save_picker = this.save_picker.add_save_extension(ext, ext);
         }
         this.save_picker = this.save_picker.default_save_extension("png");
+
+        // Set current image if provided
+        if let Some(path) = input {
+            this.state.current_image = Some(path);
+        }
 
         // Load last opened image and apply settings
         if let Some(path) = &this.state.current_image {
@@ -145,27 +155,26 @@ impl eframe::App for App {
 }
 
 fn main() -> eframe::Result {
-    let cli = cli().run();
+    let args = cli().run();
+
     env_logger::builder()
-        .filter_level(cli.verbosity)
+        .filter_level(args.verbosity)
         .parse_env("RUST_LOG")
         .init();
 
-    let native_options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([400.0, 300.0])
-            .with_min_inner_size([300.0, 220.0])
-            .with_icon(
-                eframe::icon_data::from_png_bytes(&include_bytes!("../assets/logo.png")[..])
-                    .expect("Failed to load icon"),
-            ),
-        persist_window: true,
-        centered: true,
-        ..Default::default()
-    };
     eframe::run_native(
         "lutgen-studio",
-        native_options,
-        Box::new(|cc| Ok(Box::new(App::new(cc)))),
+        eframe::NativeOptions {
+            viewport: egui::ViewportBuilder::default()
+                .with_title("Lutgen Studio")
+                .with_icon(
+                    eframe::icon_data::from_png_bytes(include_bytes!("../assets/logo.png"))
+                        .expect("Failed to load icon"),
+                ),
+            persist_window: true,
+            centered: true,
+            ..Default::default()
+        },
+        Box::new(|cc| Ok(Box::new(App::new(cc, args.input)))),
     )
 }
