@@ -8,7 +8,7 @@ permalink: studio
 
 For those looking for an interactive experience, the official GUI is available. 
 
-<img width="75%" alt="Lutgen Studio" src="https://github.com/user-attachments/assets/adf2efb6-170b-451f-8cdf-e956af67b112" />
+<img alt="Lutgen Studio" src="https://github.com/user-attachments/assets/e6283a6e-dfff-45c6-8a7e-04cfdb972e03" />
 
 ## Help
 
