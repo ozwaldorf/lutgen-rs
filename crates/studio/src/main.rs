@@ -168,7 +168,7 @@ fn main() -> eframe::Result {
             viewport: egui::ViewportBuilder::default()
                 .with_title("Lutgen Studio")
                 .with_icon(
-                    eframe::icon_data::from_png_bytes(include_bytes!("../assets/logo.png"))
+                    eframe::icon_data::from_png_bytes(include_bytes!("../assets/lutgen.png"))
                         .expect("Failed to load icon"),
                 ),
             persist_window: true,

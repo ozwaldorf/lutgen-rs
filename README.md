@@ -1,7 +1,7 @@
 <header>
     <br>
     <div align="center">
-        <img width="30%" src="./crates/studio/assets/logo.png" />
+        <img width="30%" src="https://github.com/ozwaldorf/lutgen-rs/assets/8976745/4163e179-ee73-4b24-8ad8-6c373e1d8711" />
     </div>
     <h2 align="center">lutgen-rs</h2>
     <p align="center">

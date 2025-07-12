@@ -16,7 +16,7 @@ impl App {
                         ui.vertical_centered(|ui| {
                             ui.add_space(30.);
                             ui.add(
-                                egui::Image::new(egui::include_image!("../../assets/logo.png"))
+                                egui::Image::new(egui::include_image!("../../assets/lutgen.png"))
                                     .max_width(100.),
                             );
                             ui.add_space(20.);
