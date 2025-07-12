@@ -79,6 +79,8 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 
 ## Lutgen Studio
 
+<img width="66%" alt="Lutgen Studio" src="https://github.com/user-attachments/assets/e6283a6e-dfff-45c6-8a7e-04cfdb972e03" />
+
 ### Package Repositories
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg?exclude_unsupported=1)](https://repology.org/project/lutgen-studio/versions)
