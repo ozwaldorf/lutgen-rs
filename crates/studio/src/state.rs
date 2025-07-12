@@ -3,7 +3,7 @@ use std::hash::Hash;
 use std::path::PathBuf;
 
 use egui::TextureHandle;
-use log::{debug, error};
+use log::{error, info};
 
 use crate::palette::DynamicPalette;
 use crate::utils::Hashed;
@@ -66,9 +66,7 @@ impl UiState {
     /// Handle incoming backend events from the worker
     pub fn handle_event(&mut self, ctx: &egui::Context, event: BackendEvent) {
         self.last_event = event.to_string();
-        if !self.last_event.is_empty() {
-            debug!("{}", self.last_event);
-        }
+        info!("{}", self.last_event);
 
         match event {
             BackendEvent::Error(e) => {

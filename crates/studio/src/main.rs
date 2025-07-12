@@ -1,7 +1,9 @@
 #![warn(clippy::all)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use bpaf::Bpaf;
 use egui_file_dialog::FileDialog;
+use log::LevelFilter;
 
 use crate::state::{LutAlgorithm, UiState};
 use crate::worker::{LutAlgorithmArgs, WorkerHandle};
@@ -16,6 +18,20 @@ const IMAGE_EXTENSIONS: &[&str] = &[
     "avif", "bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpg", "jpeg", "png", "pnm", "qoi",
     "tga", "tiff", "webp",
 ];
+
+#[derive(Bpaf)]
+#[bpaf(options, version)]
+pub struct Cli {
+    /// Verbosity level, repeat for more (ie, -vvv for maximum logging)
+    #[bpaf(
+        short, req_flag(()), count,
+        map(|l| {
+            use LevelFilter::*;
+            [Warn, Info, Debug, Trace][l.clamp(0, 3)]
+        })
+    )]
+    verbosity: LevelFilter,
+}
 
 pub struct App {
     state: UiState,
@@ -129,7 +145,12 @@ impl eframe::App for App {
 }
 
 fn main() -> eframe::Result {
-    env_logger::init();
+    let cli = cli().run();
+    env_logger::builder()
+        .filter_level(cli.verbosity)
+        .parse_env("RUST_LOG")
+        .init();
+
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([400.0, 300.0])
