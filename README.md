@@ -67,6 +67,12 @@ cd lutgen-rs
 cargo install --path crates/cli
 ```
 
+### Crates.io
+
+```bash
+cargo install lutgen-cli
+```
+
 ### Docker image
 
 Build the Docker image:
@@ -78,12 +84,6 @@ Run with volume mounted for file access:
 ```sh
 docker run --rm -v $PWD:/workspace lutgen:latest --help
 docker run --rm -v $PWD:/workspace lutgen:latest apply -p=catppuccin-mocha /workspace/example.png
-```
-
-### Crates.io
-
-```bash
-cargo install lutgen-cli
 ```
 
 ### Documentation
