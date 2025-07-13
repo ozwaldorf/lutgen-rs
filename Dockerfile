@@ -9,7 +9,7 @@ WORKDIR /lutgen
 
 COPY . .
 
-RUN RUSTFLAGS="-Ctarget-feature=-crt-static" cargo build --release
+RUN RUSTFLAGS="-Ctarget-feature=-crt-static" cargo build --release --bin lutgen
 
 FROM alpine:latest
 
