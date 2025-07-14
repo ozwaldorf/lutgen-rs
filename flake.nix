@@ -25,6 +25,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (pkgs.lib) optionals;
+        inherit (builtins) fromTOML readFile;
 
         cLib = crane.mkLib pkgs;
         stableCraneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
@@ -32,15 +33,14 @@
 
         # source and package versions
         src = craneLib.path ./.;
-        vlutgen = (builtins.fromTOML (builtins.readFile ./crates/cli/Cargo.toml)).package.version;
-        vlutgenStudio = (builtins.fromTOML (builtins.readFile ./crates/studio/Cargo.toml)).package.version;
+        version = (fromTOML (readFile ./crates/cli/Cargo.toml)).package.version;
+        studioVersion = (fromTOML (readFile ./crates/studio/Cargo.toml)).package.version;
 
         # Common args
         commonArgs = {
-          inherit src;
+          inherit src version;
           strictDeps = true;
           pname = "lutgen";
-          version = vlutgen;
           buildInputs = [ ] ++ optionals pkgs.stdenv.isDarwin [ pkgs.libiconv ];
         };
 
@@ -65,7 +65,6 @@
         LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (
           with pkgs;
           [
-            openssl
             libxkbcommon
             libGL
             fontconfig
@@ -82,7 +81,7 @@
           // rec {
             doCheck = false;
             pname = "lutgen-studio";
-            version = vlutgenStudio;
+            version = studioVersion;
             nativeBuildInputs = [ pkgs.makeWrapper ];
             cargoExtraArgs = "--locked --bin lutgen-studio";
             postInstall = ''
