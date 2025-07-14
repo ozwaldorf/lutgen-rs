@@ -7,9 +7,9 @@ use serde::Serialize;
 use tinytemplate::TinyTemplate;
 
 const TEMPLATE: &str = r#"
-use strum::\{Display, EnumString, VariantArray};
+use strum::\{Display, EnumString, IntoStaticStr, VariantArray};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Display, EnumString, VariantArray)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Display, EnumString, IntoStaticStr, VariantArray)]
 #[strum(serialize_all = "kebab-case")]
 pub enum Palette \{
   {{ for item in palettes }}

@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-palettes"
-version = "0.4.0"
+version = "0.4.1"
 documentation = "https://docs.rs/lutgen-palettes"
 keywords = ["colorschemes", "color", "palettes", "linux", "rice"]
 description = "Popular linux colorscheme palettes"
@@ -19,6 +19,6 @@ strum.workspace = true
 [build-dependencies]
 regex.workspace = true
 serde.workspace = true
-toml = "0.8"
+toml = "0.9"
 tinytemplate = "1.2"
 
