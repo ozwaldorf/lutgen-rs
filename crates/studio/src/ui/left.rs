@@ -1,49 +1,143 @@
+use std::rc::Rc;
+
 use strum::VariantArray;
 
 use crate::palette::DynamicPalette;
 use crate::state::LutAlgorithm;
 use crate::App;
 
-impl App {
-    pub fn show_sidebar(&mut self, ctx: &egui::Context) -> bool {
+pub struct PaletteFilterBox {
+    items: Vec<Rc<DynamicPalette>>,
+    idx: usize,
+    filter: String,
+    filtered: Vec<Rc<DynamicPalette>>,
+}
+
+impl PaletteFilterBox {
+    pub fn new(current: &DynamicPalette) -> Self {
+        // TODO: Load custom palettes from disk and sort into list
+        let items: Vec<_> = lutgen_palettes::Palette::VARIANTS
+            .iter()
+            .cloned()
+            .map(DynamicPalette::Builtin)
+            .map(Rc::new)
+            .collect();
+        Self {
+            filter: String::new(),
+            filtered: items.clone(),
+            idx: items
+                .iter()
+                .position(|v| **v == *current)
+                .unwrap_or_default(),
+            items,
+        }
+    }
+
+    pub fn show(&mut self, ui: &mut egui::Ui, current: &mut DynamicPalette) -> egui::Response {
         let mut apply = false;
+        let mut res = ui
+            .group(|ui| {
+                ui.horizontal(|ui| {
+                    if egui::TextEdit::singleline(&mut self.filter)
+                        .desired_width(ui.available_width() - 58.)
+                        .show(ui)
+                        .response
+                        .changed()
+                    {
+                        // update filtered items
+                        if self.filter.is_empty() {
+                            self.filtered = self.items.clone();
+                        } else {
+                            self.filtered = self
+                                .items
+                                .iter()
+                                .filter(|palette| {
+                                    palette.as_str().contains(&self.filter.to_lowercase())
+                                })
+                                .cloned()
+                                .collect();
+                        }
+                        if !self.filtered.is_empty() {
+                            self.idx = 0;
+                            *current = (*self.filtered[self.idx]).clone();
+                        }
+                    }
+
+                    if ui.button("<").clicked() && !self.filtered.is_empty() {
+                        if self.idx == 0 {
+                            self.idx = self.filtered.len() - 1;
+                        } else {
+                            self.idx -= 1;
+                        }
+                        *current = (*self.filtered[self.idx]).clone();
+                        apply = true;
+                    }
+                    if ui.button(">").clicked() && !self.filtered.is_empty() {
+                        if self.idx >= self.filtered.len() - 1 {
+                            self.idx = 0;
+                        } else {
+                            self.idx += 1;
+                        }
+                        *current = (*self.filtered[self.idx]).clone();
+                        apply = true;
+                    }
+                });
+
+                ui.separator();
+
+                egui::ScrollArea::new([false, true])
+                    .max_height(200.)
+                    .auto_shrink([false, true])
+                    .show(ui, |ui| {
+                        for (i, palette) in self.filtered.iter().enumerate() {
+                            let res =
+                                ui.selectable_value(current, (**palette).clone(), palette.as_str());
+                            // scroll when item is focused
+                            res.gained_focus()
+                                .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
+                            // scroll when we applied above
+                            if apply && *current == **palette {
+                                res.request_focus();
+                                ui.scroll_to_cursor(Some(egui::Align::Center));
+                            }
+                            if res.clicked() {
+                                self.idx = i;
+                                apply = true;
+                            }
+                        }
+                    });
+            })
+            .response;
+
+        // If we need to apply a new palette, mark the response as changed
+        if apply {
+            res.mark_changed();
+        }
+
+        res
+    }
+}
+
+impl App {
+    pub fn show_sidebar(&mut self, ctx: &egui::Context) {
         // side panel for lut args
         egui::SidePanel::left("args")
             .resizable(true)
+            .min_width(214.)
             .show(ctx, |ui| {
+                let mut apply = false;
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.style_mut().spacing.slider_width = ui.available_width() - 62.;
 
-                    ui.horizontal_wrapped(|ui| {
-                        let label_width = ui.label("Palette:").rect.width();
-                        egui::ComboBox::from_id_salt("palette")
-                            .selected_text(format!("{}", self.state.palette_selection))
-                            .width(ui.available_width() - ui.spacing().item_spacing.x - label_width)
-                            .show_ui(ui, |ui| {
-                                let val = ui.selectable_value(
-                                    &mut self.state.palette_selection,
-                                    DynamicPalette::Custom,
-                                    "- custom -",
-                                );
-                                val.gained_focus()
-                                    .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
-
-                                for p in lutgen_palettes::Palette::VARIANTS {
-                                    let val = ui.selectable_value(
-                                        &mut self.state.palette_selection,
-                                        DynamicPalette::Builtin(*p),
-                                        p.to_string(),
-                                    );
-                                    val.clicked().then(|| {
-                                        self.state.palette =
-                                            self.state.palette_selection.get().to_vec();
-                                        apply = true
-                                    });
-                                    val.gained_focus()
-                                        .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
-                                }
-                            });
-                    });
+                    // palette menu
+                    if self
+                        .palette_box
+                        .show(ui, &mut self.state.palette_selection)
+                        .changed()
+                    {
+                        self.state.palette = self.state.palette_selection.get().to_vec();
+                        apply = true;
+                    }
 
                     // color palette
                     ui.group(|ui| {
@@ -212,8 +306,11 @@ impl App {
                     });
 
                     ui.style_mut().spacing.slider_width = ui.available_width() - 16.;
+
+                    if apply {
+                        self.apply();
+                    }
                 });
             });
-        apply
     }
 }

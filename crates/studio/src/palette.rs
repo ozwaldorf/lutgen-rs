@@ -11,10 +11,7 @@ pub enum DynamicPalette {
 
 impl Display for DynamicPalette {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Builtin(p) => f.write_str(&p.to_string()),
-            Self::Custom => f.write_str("custom"),
-        }
+        f.write_str(self.as_str())
     }
 }
 
@@ -23,6 +20,13 @@ impl DynamicPalette {
         match self {
             DynamicPalette::Builtin(palette) => palette.get(),
             DynamicPalette::Custom => &[],
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        match self {
+            DynamicPalette::Builtin(palette) => palette.into(),
+            DynamicPalette::Custom => "custom",
         }
     }
 }
@@ -49,7 +53,7 @@ impl Serialize for DynamicPalette {
         S: serde::Serializer,
     {
         match self {
-            DynamicPalette::Builtin(palette) => serializer.serialize_str(&palette.to_string()),
+            DynamicPalette::Builtin(palette) => serializer.serialize_str(palette.into()),
             DynamicPalette::Custom => serializer.serialize_str("custom"),
         }
     }

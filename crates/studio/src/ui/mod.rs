@@ -4,7 +4,7 @@ use crate::App;
 
 mod about;
 mod central;
-mod left;
+pub mod left;
 mod status;
 mod top;
 
@@ -14,9 +14,7 @@ impl App {
         self.show_about_dialog(ctx);
         self.show_topbar(ctx);
         self.show_statusline(ctx);
-        if self.show_sidebar(ctx) {
-            self.apply();
-        }
+        self.show_sidebar(ctx);
         self.show_central_panel(ctx);
     }
 }

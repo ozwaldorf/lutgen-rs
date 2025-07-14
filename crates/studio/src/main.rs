@@ -8,6 +8,7 @@ use egui_file_dialog::FileDialog;
 use log::LevelFilter;
 
 use crate::state::{LutAlgorithm, UiState};
+use crate::ui::left::PaletteFilterBox;
 use crate::worker::{LutAlgorithmArgs, WorkerHandle};
 
 mod palette;
@@ -39,10 +40,15 @@ pub struct Cli {
 }
 
 pub struct App {
+    /// Main app state
     state: UiState,
+    /// Handle to background worker
     worker: WorkerHandle,
+    /// Rect for the image preview scene
     scene_rect: egui::Rect,
-
+    /// Filter box for selecting palettes
+    palette_box: PaletteFilterBox,
+    // File pickers
     pub open_picker: FileDialog,
     pub save_picker: FileDialog,
 }
@@ -76,14 +82,15 @@ impl App {
         // Spawn background worker thread
         let worker = WorkerHandle::new(cc.egui_ctx.clone());
         let mut this = Self {
-            state,
             worker,
+            palette_box: PaletteFilterBox::new(&state.palette_selection),
             scene_rect: egui::Rect::ZERO,
             open_picker: FileDialog::new()
                 .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
                 .default_file_filter("Images")
                 .title("Open Image"),
             save_picker: FileDialog::new().title("Save Image As"),
+            state,
         };
 
         // setup save extensions
