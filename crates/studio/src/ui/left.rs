@@ -398,15 +398,20 @@ impl App {
                             },
                             _ => {},
                         }
+                    });
 
-                        ui.separator();
-                        ui.horizontal(|ui| {
-                            if ui.button("Copy CLI Arguments").clicked() {
-                                let args = self.state.cli_args();
-                                ui.ctx()
-                                    .copy_text("lutgen apply ".to_string() + &args.join(" "));
-                            }
-                        });
+                    ui.horizontal(|ui| {
+                        if ui
+                            .add(
+                                egui::Button::new("Copy CLI Arguments")
+                                    .min_size(egui::Vec2::new(ui.available_width(), 16.)),
+                            )
+                            .clicked()
+                        {
+                            let args = self.state.cli_args();
+                            ui.ctx()
+                                .copy_text("lutgen apply ".to_string() + &args.join(" "));
+                        }
                     });
 
                     if apply {
