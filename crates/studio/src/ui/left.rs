@@ -65,6 +65,7 @@ impl PaletteFilterBox {
             .group(|ui| {
                 ui.horizontal(|ui| {
                     if egui::TextEdit::singleline(&mut self.filter)
+                        .hint_text("Search Palettes ...")
                         .desired_width(ui.available_width() - 58.)
                         .show(ui)
                         .response
