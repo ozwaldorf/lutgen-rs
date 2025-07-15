@@ -251,28 +251,34 @@ impl App {
                         );
                     }
 
-                    // Algorithm dropdown
-                    ui.horizontal_wrapped(|ui| {
-                        let label_width = ui.label("Algorithm:").rect.width();
-                        egui::ComboBox::from_id_salt("algorithm")
-                            .selected_text(format!("{:?}", self.state.current_alg))
-                            .width(ui.available_width() - ui.spacing().item_spacing.x - label_width)
-                            .show_ui(ui, |ui| {
-                                for alg in LutAlgorithm::VARIANTS {
-                                    let val = ui.selectable_value(
-                                        &mut self.state.current_alg,
-                                        *alg,
-                                        alg.to_string(),
-                                    );
-                                    apply |= val.clicked();
-                                    val.gained_focus()
-                                        .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
-                                }
-                            });
-                    });
-
                     // Algorithm arguments
                     ui.group(|ui| {
+                        // Algorithm dropdown
+                        ui.horizontal_wrapped(|ui| {
+                            let label_width = ui.label("Algorithm:").rect.width();
+                            egui::ComboBox::from_id_salt("algorithm")
+                                .selected_text(format!("{:?}", self.state.current_alg))
+                                .width(
+                                    ui.available_width()
+                                        - ui.spacing().item_spacing.x
+                                        - label_width,
+                                )
+                                .show_ui(ui, |ui| {
+                                    for alg in LutAlgorithm::VARIANTS {
+                                        let val = ui.selectable_value(
+                                            &mut self.state.current_alg,
+                                            *alg,
+                                            alg.to_string(),
+                                        );
+                                        apply |= val.clicked();
+                                        val.gained_focus().then(|| {
+                                            ui.scroll_to_cursor(Some(egui::Align::Center))
+                                        });
+                                    }
+                                });
+                        });
+                        ui.separator();
+
                         // common args
                         ui.heading("Common Arguments");
                         ui.add_space(10.);
