@@ -269,28 +269,32 @@ impl App {
                     // Algorithm arguments
                     ui.group(|ui| {
                         // Algorithm dropdown
-                        ui.horizontal_wrapped(|ui| {
-                            let label_width = ui.label("Algorithm:").rect.width();
-                            egui::ComboBox::from_id_salt("algorithm")
-                                .selected_text(format!("{:?}", self.state.current_alg))
-                                .width(
-                                    ui.available_width()
-                                        - ui.spacing().item_spacing.x
-                                        - label_width,
-                                )
-                                .show_ui(ui, |ui| {
-                                    for alg in LutAlgorithm::VARIANTS {
-                                        let val = ui.selectable_value(
-                                            &mut self.state.current_alg,
-                                            *alg,
-                                            alg.to_string(),
-                                        );
-                                        apply |= val.clicked();
-                                        val.gained_focus().then(|| {
-                                            ui.scroll_to_cursor(Some(egui::Align::Center))
-                                        });
+                        ui.horizontal(|ui| {
+                            ui.with_layout(
+                                egui::Layout::right_to_left(egui::Align::Center),
+                                |ui| {
+                                    if ui.button("Reset").clicked() {
+                                        self.state.reset_current_args();
+                                        self.apply();
                                     }
-                                });
+                                    egui::ComboBox::from_id_salt("algorithm")
+                                        .selected_text(format!("{:?}", self.state.current_alg))
+                                        .width(ui.available_width())
+                                        .show_ui(ui, |ui| {
+                                            for alg in LutAlgorithm::VARIANTS {
+                                                let val = ui.selectable_value(
+                                                    &mut self.state.current_alg,
+                                                    *alg,
+                                                    alg.to_string(),
+                                                );
+                                                apply |= val.clicked();
+                                                val.gained_focus().then(|| {
+                                                    ui.scroll_to_cursor(Some(egui::Align::Center))
+                                                });
+                                            }
+                                        });
+                                },
+                            );
                         });
                         ui.separator();
 
@@ -394,14 +398,9 @@ impl App {
                             },
                             _ => {},
                         }
-                    });
 
-                    ui.group(|ui| {
+                        ui.separator();
                         ui.horizontal(|ui| {
-                            if ui.button("Reset").clicked() {
-                                self.state.reset_current_args();
-                                self.apply();
-                            }
                             if ui.button("Copy CLI Arguments").clicked() {
                                 let args = self.state.cli_args();
                                 ui.ctx()
@@ -409,8 +408,6 @@ impl App {
                             }
                         });
                     });
-
-                    ui.style_mut().spacing.slider_width = ui.available_width() - 16.;
 
                     if apply {
                         self.apply();
