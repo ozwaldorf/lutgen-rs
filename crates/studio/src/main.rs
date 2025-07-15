@@ -8,9 +8,10 @@ use egui_file_dialog::FileDialog;
 use log::LevelFilter;
 
 use crate::state::{LutAlgorithm, UiState};
-use crate::ui::left::PaletteFilterBox;
+use crate::ui::left::{PaletteEditor, PaletteFilterBox};
 use crate::worker::{LutAlgorithmArgs, WorkerHandle};
 
+mod color;
 mod palette;
 mod state;
 mod ui;
@@ -48,6 +49,7 @@ pub struct App {
     scene_rect: egui::Rect,
     /// Filter box for selecting palettes
     palette_box: PaletteFilterBox,
+    palette_edit: PaletteEditor,
     // File pickers
     pub open_picker: FileDialog,
     pub save_picker: FileDialog,
@@ -84,6 +86,7 @@ impl App {
         let mut this = Self {
             worker,
             palette_box: PaletteFilterBox::new(&state.palette_selection),
+            palette_edit: PaletteEditor::new(&state.palette_selection),
             scene_rect: egui::Rect::ZERO,
             open_picker: FileDialog::new()
                 .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())

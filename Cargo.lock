@@ -1934,6 +1934,7 @@ name = "lutgen-studio"
 version = "0.1.2"
 dependencies = [
  "bpaf",
+ "dirs",
  "eframe",
  "egui",
  "egui-file-dialog",

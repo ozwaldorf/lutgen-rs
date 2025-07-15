@@ -166,7 +166,7 @@ impl UiState {
         }
 
         // finally custom palette colors
-        if self.palette_selection == DynamicPalette::Custom {
+        if matches!(self.palette_selection, DynamicPalette::Custom(_)) {
             args.push("--".to_string());
             for [r, g, b] in &self.palette {
                 args.push(format!("{r:0x}{g:0x}{b:0x}"));

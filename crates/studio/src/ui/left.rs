@@ -15,13 +15,12 @@ pub struct PaletteFilterBox {
 
 impl PaletteFilterBox {
     pub fn new(current: &DynamicPalette) -> Self {
-        // TODO: Load custom palettes from disk and sort into list
-        let items: Vec<_> = lutgen_palettes::Palette::VARIANTS
-            .iter()
-            .cloned()
-            .map(DynamicPalette::Builtin)
+        let items: Vec<_> = DynamicPalette::get_all()
+            .unwrap()
+            .into_iter()
             .map(Rc::new)
             .collect();
+
         Self {
             filter: String::new(),
             filtered: items.clone(),
@@ -30,6 +29,33 @@ impl PaletteFilterBox {
                 .position(|v| **v == *current)
                 .unwrap_or_default(),
             items,
+        }
+    }
+
+    pub fn reindex(&mut self, current: &DynamicPalette) {
+        self.items = DynamicPalette::get_all()
+            .unwrap()
+            .into_iter()
+            .map(Rc::new)
+            .collect();
+        self.filter();
+        self.idx = self
+            .filtered
+            .iter()
+            .position(|v| **v == *current)
+            .unwrap_or_default();
+    }
+
+    fn filter(&mut self) {
+        if self.filter.is_empty() {
+            self.filtered = self.items.clone();
+        } else {
+            self.filtered = self
+                .items
+                .iter()
+                .filter(|palette| palette.as_str().contains(&self.filter.to_lowercase()))
+                .cloned()
+                .collect();
         }
     }
 
@@ -45,18 +71,7 @@ impl PaletteFilterBox {
                         .changed()
                     {
                         // update filtered items
-                        if self.filter.is_empty() {
-                            self.filtered = self.items.clone();
-                        } else {
-                            self.filtered = self
-                                .items
-                                .iter()
-                                .filter(|palette| {
-                                    palette.as_str().contains(&self.filter.to_lowercase())
-                                })
-                                .cloned()
-                                .collect();
-                        }
+                        self.filter();
                         if !self.filtered.is_empty() {
                             self.idx = 0;
                             *current = (*self.filtered[self.idx]).clone();
@@ -118,6 +133,87 @@ impl PaletteFilterBox {
     }
 }
 
+pub struct PaletteEditor {
+    name: String,
+}
+
+impl PaletteEditor {
+    pub fn new(current: &DynamicPalette) -> Self {
+        Self {
+            name: current.to_string(),
+        }
+    }
+
+    pub fn show(
+        &mut self,
+        ui: &mut egui::Ui,
+        palette: &mut Vec<[u8; 3]>,
+        current: &mut DynamicPalette,
+    ) -> [bool; 2] {
+        // color palette
+        let mut apply = false;
+        let mut saved = false;
+        ui.group(|ui| {
+            ui.horizontal(|ui| {
+                let enabled = matches!(current, DynamicPalette::Custom(_));
+                ui.add_enabled(
+                    enabled,
+                    egui::TextEdit::singleline(&mut self.name)
+                        .desired_width(ui.available_width() - 49.),
+                );
+
+                if ui.add_enabled(enabled, egui::Button::new("save")).clicked() {
+                    *current = DynamicPalette::Custom(self.name.clone());
+                    current.save(palette).unwrap();
+                    saved = true;
+                }
+            });
+            ui.separator();
+            ui.horizontal_wrapped(|ui| {
+                let mut res = Vec::new();
+                for color in palette.iter_mut() {
+                    res.push(egui::widgets::color_picker::color_edit_button_srgb(
+                        ui, color,
+                    ));
+                }
+                for (i, res) in res.iter().enumerate() {
+                    if res.changed() {
+                        if matches!(current, DynamicPalette::Builtin(_)) {
+                            let name = current.to_string() + "-custom";
+                            self.name = name.clone();
+                            *current = DynamicPalette::Custom(name);
+                        }
+                        apply = true;
+                    }
+                    if res.secondary_clicked() {
+                        if matches!(current, DynamicPalette::Builtin(_)) {
+                            let name = current.to_string() + "-custom";
+                            self.name = name.clone();
+                            *current = DynamicPalette::Custom(name);
+                        }
+                        palette.remove(i);
+                        apply = true;
+                    }
+                }
+
+                if ui
+                    .add(egui::Button::new("+").min_size(egui::vec2(40., 0.)))
+                    .clicked()
+                {
+                    if matches!(current, DynamicPalette::Builtin(_)) {
+                        let name = current.to_string() + "-custom";
+                        self.name = name.clone();
+                        *current = DynamicPalette::Custom(name);
+                    }
+                    palette.push([0u8; 3]);
+                    apply = true;
+                };
+            });
+        });
+        [apply, saved]
+    }
+}
+
 impl App {
     pub fn show_sidebar(&mut self, ctx: &egui::Context) {
         // side panel for lut args
@@ -136,39 +232,22 @@ impl App {
                         .changed()
                     {
                         self.state.palette = self.state.palette_selection.get().to_vec();
+                        self.palette_edit.name = self.state.palette_selection.to_string();
                         apply = true;
                     }
 
-                    // color palette
-                    ui.group(|ui| {
-                        ui.horizontal_wrapped(|ui| {
-                            let mut res = Vec::new();
-                            for color in self.state.palette.iter_mut() {
-                                res.push(egui::widgets::color_picker::color_edit_button_srgb(
-                                    ui, color,
-                                ));
-                            }
-                            for (i, res) in res.iter().enumerate() {
-                                if res.changed() {
-                                    self.state.palette_selection = DynamicPalette::Custom;
-                                    apply = true;
-                                }
-                                if res.secondary_clicked() {
-                                    self.state.palette.remove(i);
-                                    self.state.palette_selection = DynamicPalette::Custom;
-                                    apply = true;
-                                }
-                            }
+                    // palette editor
+                    let [changed, saved] = self.palette_edit.show(
+                        ui,
+                        &mut self.state.palette,
+                        &mut self.state.palette_selection,
+                    );
+                    apply |= changed;
+                    if saved {
+                        self.palette_box.reindex(&self.state.palette_selection);
+                    }
 
-                            if ui
-                                .add(egui::Button::new("+").min_size(egui::vec2(40., 0.)))
-                                .clicked()
-                            {
-                                self.state.palette.push([0u8; 3]);
-                            };
-                        });
-                    });
-
+                    // Algorithm dropdown
                     ui.horizontal_wrapped(|ui| {
                         let label_width = ui.label("Algorithm:").rect.width();
                         egui::ComboBox::from_id_salt("algorithm")
@@ -188,9 +267,10 @@ impl App {
                             });
                     });
 
+                    // Algorithm arguments
                     ui.group(|ui| {
+                        // common args
                         ui.heading("Common Arguments");
-
                         ui.add_space(10.);
 
                         ui.label("Hald-Clut Level");
