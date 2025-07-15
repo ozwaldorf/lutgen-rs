@@ -6,9 +6,9 @@ permalink: studio
 
 # Lutgen Studio
 
-For those looking for an interactive experience, the official GUI is available. 
+For those looking for an interactive experience, the official GUI is available.
 
-<img alt="Lutgen Studio" src="https://github.com/user-attachments/assets/e6283a6e-dfff-45c6-8a7e-04cfdb972e03" />
+<img alt="Lutgen Studio" src="https://github.com/user-attachments/assets/305484e4-ad16-4ab3-8145-e5986ce88543" />
 
 ## Help
 
@@ -28,3 +28,8 @@ At any point, left-clicking on the image preview will toggle between the edited 
 
 Palette colors can be edited by left-clicking on the color, and using the color picker or typing the values.
 New colors can be added with the `  +  ` button. Palette colors can be deleted by right-clicking on the color.
+
+### Saving custom palettes
+
+Custom palettes can be saved to disk using the `save` button.
+These can then be loaded in studio's palette selector, as well as full compatibility with the lutgen CLI.
