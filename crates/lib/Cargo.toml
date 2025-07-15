@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.13.1"
+version = "0.13.2"
 documentation = "https://docs.rs/lutgen"
 keywords = [
   "image-processing",
@@ -29,7 +29,7 @@ rayon.workspace = true
 
 rand = "0.9"
 rand_distr = "0.5"
-kiddo = "5.0"
+kiddo = "5.2"
 arrayref = "0.3"
 
 [[bench]]
