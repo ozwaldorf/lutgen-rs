@@ -63,65 +63,78 @@ impl PaletteFilterBox {
         let mut apply = false;
         let mut res = ui
             .group(|ui| {
-                ui.horizontal(|ui| {
-                    if egui::TextEdit::singleline(&mut self.filter)
-                        .hint_text("Search Palettes ...")
-                        .desired_width(ui.available_width() - 58.)
-                        .show(ui)
-                        .response
-                        .changed()
-                    {
-                        // update filtered items
-                        self.filter();
-                        if !self.filtered.is_empty() {
-                            self.idx = 0;
-                            *current = (*self.filtered[self.idx]).clone();
-                        }
-                    }
-
-                    if ui.button("<").clicked() && !self.filtered.is_empty() {
-                        if self.idx == 0 {
-                            self.idx = self.filtered.len() - 1;
-                        } else {
-                            self.idx -= 1;
-                        }
-                        *current = (*self.filtered[self.idx]).clone();
-                        apply = true;
-                    }
-                    if ui.button(">").clicked() && !self.filtered.is_empty() {
-                        if self.idx >= self.filtered.len() - 1 {
-                            self.idx = 0;
-                        } else {
-                            self.idx += 1;
-                        }
-                        *current = (*self.filtered[self.idx]).clone();
-                        apply = true;
-                    }
-                });
-
-                ui.separator();
-
-                egui::ScrollArea::new([false, true])
-                    .max_height(200.)
-                    .auto_shrink([false, true])
+                egui::Resize::default()
+                    .resizable([true, false])
+                    .min_width(ui.available_width())
+                    .max_width(ui.available_width())
+                    .with_stroke(false)
                     .show(ui, |ui| {
-                        for (i, palette) in self.filtered.iter().enumerate() {
-                            let res =
-                                ui.selectable_value(current, (**palette).clone(), palette.as_str());
-                            // scroll when item is focused
-                            res.gained_focus()
-                                .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
-                            // scroll when we applied above
-                            if apply && *current == **palette {
-                                res.request_focus();
-                                ui.scroll_to_cursor(Some(egui::Align::Center));
+                        ui.horizontal(|ui| {
+                            if egui::TextEdit::singleline(&mut self.filter)
+                                .hint_text("Search Palettes ...")
+                                .desired_width(ui.available_width() - 54.)
+                                .show(ui)
+                                .response
+                                .changed()
+                            {
+                                // update filtered items
+                                self.filter();
+                                if !self.filtered.is_empty() {
+                                    self.idx = 0;
+                                    *current = (*self.filtered[self.idx]).clone();
+                                }
                             }
-                            if res.clicked() {
-                                self.idx = i;
+
+                            if ui.button("<").clicked() && !self.filtered.is_empty() {
+                                if self.idx == 0 {
+                                    self.idx = self.filtered.len() - 1;
+                                } else {
+                                    self.idx -= 1;
+                                }
+                                *current = (*self.filtered[self.idx]).clone();
                                 apply = true;
                             }
-                        }
-                    });
+                            if ui.button(">").clicked() && !self.filtered.is_empty() {
+                                if self.idx >= self.filtered.len() - 1 {
+                                    self.idx = 0;
+                                } else {
+                                    self.idx += 1;
+                                }
+                                *current = (*self.filtered[self.idx]).clone();
+                                apply = true;
+                            }
+                        });
+
+                        ui.separator();
+
+                        egui::ScrollArea::new([true, true])
+                            .auto_shrink([false, false])
+                            .show(ui, |ui| {
+                                for (i, palette) in self.filtered.iter().enumerate() {
+                                    let selected = (**palette).clone();
+                                    let res = ui.add(
+                                        egui::Button::selectable(
+                                            *current == selected,
+                                            palette.as_str(),
+                                        )
+                                        .min_size(egui::Vec2::new(ui.available_width(), 16.)),
+                                    );
+                                    // scroll when item is focused
+                                    res.gained_focus()
+                                        .then(|| ui.scroll_to_cursor(Some(egui::Align::Center)));
+                                    // scroll when we applied above
+                                    if apply && *current == **palette {
+                                        res.request_focus();
+                                        ui.scroll_to_cursor(Some(egui::Align::Center));
+                                    }
+                                    if res.clicked() {
+                                        *current = selected;
+                                        self.idx = i;
+                                        apply = true;
+                                    }
+                                }
+                            });
+                    })
             })
             .response;
 
@@ -225,6 +238,7 @@ impl App {
                 let mut apply = false;
                 egui::ScrollArea::vertical().show(ui, |ui| {
                     ui.style_mut().spacing.slider_width = ui.available_width() - 62.;
+                    ui.add_space(4.);
 
                     // palette menu
                     if self
