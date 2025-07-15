@@ -11,6 +11,7 @@ use image::ColorType;
 use log::{debug, info};
 use lutgen::GenerateLut;
 
+use crate::color::Color;
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
 
 pub enum FrontendEvent {
@@ -236,7 +237,20 @@ impl Worker {
 
         // generate lut from arguments
         info!("Generating LUT with args:\n{common:?}\n{args:?}");
-        debug!("LUT input palette ({} colors):\n{palette:?}", palette.len());
+        debug!(
+            "LUT input palette ({} colors):\n{}",
+            palette.len(),
+            palette
+                .chunks(5)
+                .map(|v| v
+                    .iter()
+                    .cloned()
+                    .map(|v| Color(v).to_string())
+                    .collect::<Vec<_>>()
+                    .join(", "))
+                .collect::<Vec<_>>()
+                .join("\n")
+        );
 
         let lut = match args {
             LutAlgorithmArgs::GaussianRbf { rbf, args } => {

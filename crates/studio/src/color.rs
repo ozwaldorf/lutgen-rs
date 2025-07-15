@@ -11,8 +11,7 @@ impl Display for Color {
 }
 impl Debug for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let [r, g, b] = self.0;
-        f.write_str(&format!("rgb({r}, {g}, {b})"))
+        Display::fmt(self, f)
     }
 }
 impl FromStr for Color {
