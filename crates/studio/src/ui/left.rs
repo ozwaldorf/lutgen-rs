@@ -184,6 +184,9 @@ impl PaletteEditor {
             });
             ui.separator();
             ui.horizontal_wrapped(|ui| {
+                ui.spacing_mut().interact_size.x =
+                    calculate_width(ui.available_width() + 7., 40., ui.spacing().item_spacing.x);
+
                 let mut res = Vec::new();
                 for color in palette.iter_mut() {
                     res.push(egui::widgets::color_picker::color_edit_button_srgb(
@@ -211,7 +214,7 @@ impl PaletteEditor {
                 }
 
                 if ui
-                    .add(egui::Button::new("+").min_size(egui::vec2(40., 0.)))
+                    .add(egui::Button::new("+").min_size(ui.spacing().interact_size))
                     .clicked()
                 {
                     if matches!(current, DynamicPalette::Builtin(_)) {
@@ -226,6 +229,25 @@ impl PaletteEditor {
         });
         [apply, saved]
     }
+}
+
+/// Calculates optimal button width for a wrapped grid with padding.
+pub fn calculate_width(width: f32, target: f32, padding: f32) -> f32 {
+    if width <= 0.0 || target <= 0.0 {
+        return 0.0;
+    }
+
+    let target_with_padding = target + padding;
+    if width < target_with_padding {
+        return (width - padding).max(0.0);
+    }
+
+    let buttons_that_fit = (width / target_with_padding).round();
+    if buttons_that_fit <= 0.0 {
+        return (width - padding).max(0.0);
+    }
+
+    (width / buttons_that_fit) - padding
 }
 
 impl App {
