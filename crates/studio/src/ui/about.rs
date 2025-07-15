@@ -8,7 +8,7 @@ impl App {
                 .with_title("About Lutgen Studio")
                 .with_active(true)
                 .with_resizable(false)
-                .with_inner_size((200.0, 200.0));
+                .with_inner_size((400.0, 400.0));
 
             ctx.show_viewport_immediate(id, vp, |ctx, _| {
                 egui::CentralPanel::default().show(ctx, |ui| {
