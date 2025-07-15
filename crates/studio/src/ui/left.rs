@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use strum::VariantArray;
 
-use crate::palette::DynamicPalette;
+use crate::palette::{lutgen_dir, DynamicPalette};
 use crate::state::LutAlgorithm;
 use crate::App;
 
@@ -245,6 +245,10 @@ impl App {
                     apply |= changed;
                     if saved {
                         self.palette_box.reindex(&self.state.palette_selection);
+                        self.state.last_event = format!(
+                            "Saved custom palette to {}",
+                            lutgen_dir().join(&self.palette_edit.name).display()
+                        );
                     }
 
                     // Algorithm dropdown
