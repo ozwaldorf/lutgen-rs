@@ -80,7 +80,7 @@ Detailed documentation, examples, and more are available on [The Lutgen Wiki](ht
 
 ## Lutgen Studio
 
-<img width="66%" alt="Lutgen Studio" src="https://github.com/user-attachments/assets/305484e4-ad16-4ab3-8145-e5986ce88543" />
+<img width="66%" alt="Lutgen Studio" src="https://github.com/user-attachments/assets/436ece7a-b59f-404d-a6d6-6c0e754355f2" />
 
 ### Package Repositories
 
