@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-cli"
-version = "1.0.1"
+version = "1.1.0"
 keywords = [
   "image-processing",
   "color",
@@ -19,7 +19,7 @@ categories = ["multimedia::images"]
 default-run = "lutgen"
 
 [dependencies]
-lutgen = { version = "0.13", path = "../lib" }
+lutgen = { version = "0.14", path = "../lib" }
 
 bpaf.workspace = true
 dirs.workspace = true
