@@ -322,7 +322,7 @@ impl App {
 
                         // common args
                         ui.heading("Common Arguments");
-                        ui.add_space(10.);
+                        ui.add_space(5.);
 
                         ui.label("Hald-Clut Level");
                         let res = ui.add(egui::Slider::new(&mut self.state.common.level, 4..=16));
@@ -331,7 +331,7 @@ impl App {
                         ui.label("Luminosity Factor");
                         let res = ui.add(egui::Slider::new(
                             self.state.common.lum_factor.as_mut(),
-                            0.0001..=2.,
+                            0.001..=2.,
                         ));
                         apply |= res.drag_stopped() | res.lost_focus();
 
@@ -344,12 +344,12 @@ impl App {
                             LutAlgorithm::GaussianRbf => {
                                 ui.separator();
                                 ui.heading("Gaussian Arguments");
-                                ui.add_space(10.);
+                                ui.add_space(5.);
 
                                 ui.label("Shape");
                                 let res = ui.add(egui::Slider::new(
                                     self.state.guassian_rbf.shape.as_mut(),
-                                    0.0001..=512.,
+                                    0.001..=512.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
                             },
@@ -361,7 +361,7 @@ impl App {
                                 ui.label("Power");
                                 let res = ui.add(egui::Slider::new(
                                     self.state.shepards_method.power.as_mut(),
-                                    0.0001..=64.,
+                                    0.001..=64.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
                             },
@@ -373,7 +373,7 @@ impl App {
                                 ui.label("Mean");
                                 let res = ui.add(egui::Slider::new(
                                     self.state.guassian_sampling.mean.as_mut(),
-                                    -128.0..=128.,
+                                    -127.0..=127.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
 
