@@ -80,6 +80,9 @@ struct Common {
         guard(|v| (2..=16).contains(v), "hald level must between 2-16"))
     ]
     level: u8,
+    /// Preserve the original image's luminocity values after interpolation.
+    #[bpaf(short('P'), long, fallback(false), display_fallback)]
+    preserve: bool,
 }
 
 #[derive(Bpaf, Clone, Debug, Hash)]
@@ -87,9 +90,6 @@ struct CommonRbf {
     /// Number of nearest colors to consider when interpolating. 0 uses all available colors.
     #[bpaf(short, long, argument("NEAREST"), fallback(16), display_fallback)]
     nearest: usize,
-    /// Preserve the original image's luminocity values after interpolation.
-    #[bpaf(short('P'), long, fallback(false), display_fallback)]
-    preserve: bool,
 }
 
 #[derive(Bpaf, Clone, Debug, Hash)]
@@ -205,15 +205,25 @@ impl LutAlgorithm {
         let lut = match self {
             LutAlgorithm::GaussianRbf {
                 shape,
-                common_rbf: CommonRbf { nearest, preserve },
-                common: Common { level, lum_factor },
+                common_rbf: CommonRbf { nearest },
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
                 ..
             } => GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
                 .generate_lut(*level),
             LutAlgorithm::ShepardsMethod {
                 power,
-                common_rbf: CommonRbf { nearest, preserve },
-                common: Common { level, lum_factor },
+                common_rbf: CommonRbf { nearest },
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
                 ..
             } => ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
                 .generate_lut(*level),
@@ -222,7 +232,12 @@ impl LutAlgorithm {
                 std_dev,
                 iterations,
                 seed,
-                common: Common { level, lum_factor },
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
                 ..
             } => GaussianSamplingRemapper::new(
                 &colors,
@@ -231,12 +246,20 @@ impl LutAlgorithm {
                 *iterations,
                 lum_factor.0,
                 *seed,
+                *preserve,
             )
             .generate_lut(*level),
             LutAlgorithm::NearestNeighbor {
-                common: Common { level, lum_factor },
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
                 ..
-            } => NearestNeighborRemapper::new(&colors, lum_factor.0).generate_lut(*level),
+            } => {
+                NearestNeighborRemapper::new(&colors, lum_factor.0, *preserve).generate_lut(*level)
+            },
             _ => unreachable!(),
         };
         println!("✔ Generated \"{name}\" LUT in {:.2?}", time.elapsed());
