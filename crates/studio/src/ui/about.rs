@@ -15,10 +15,7 @@ impl App {
                     ui.horizontal_centered(|ui| {
                         ui.vertical_centered(|ui| {
                             ui.add_space(30.);
-                            ui.add(
-                                egui::Image::new(egui::include_image!("../../assets/lutgen.png"))
-                                    .max_width(100.),
-                            );
+                            ui.add(egui::Image::from_texture(&self.icon).max_width(100.));
                             ui.add_space(20.);
                             ui.heading("Lutgen Studio");
                             ui.add_space(5.);

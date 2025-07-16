@@ -3,10 +3,6 @@
 
 use std::path::PathBuf;
 
-use bpaf::Bpaf;
-use egui_file_dialog::FileDialog;
-use log::LevelFilter;
-
 use crate::state::{LutAlgorithm, UiState};
 use crate::ui::left::{PaletteEditor, PaletteFilterBox};
 use crate::worker::{LutAlgorithmArgs, WorkerHandle};
@@ -23,18 +19,18 @@ const IMAGE_EXTENSIONS: &[&str] = &[
     "tga", "tiff", "webp",
 ];
 
-#[derive(Bpaf)]
+#[derive(bpaf::Bpaf)]
 #[bpaf(options, version)]
 pub struct Cli {
     /// Verbosity level, repeat for more (ie, -vvv for maximum logging)
     #[bpaf(
         short, req_flag(()), count,
         map(|l| {
-            use LevelFilter::*;
+            use log::LevelFilter::*;
             [Warn, Info, Debug, Trace][l.clamp(0, 3)]
         })
     )]
-    verbosity: LevelFilter,
+    verbosity: log::LevelFilter,
     /// Image to open on startup
     #[bpaf(positional, guard(|p| p.exists(), "Image path not found"), optional)]
     input: Option<PathBuf>,
@@ -51,14 +47,14 @@ pub struct App {
     palette_box: PaletteFilterBox,
     palette_edit: PaletteEditor,
     // File pickers
-    pub open_picker: FileDialog,
-    pub save_picker: FileDialog,
+    pub open_picker: egui_file_dialog::FileDialog,
+    pub save_picker: egui_file_dialog::FileDialog,
+    /// Lutgen icon
+    icon: egui::TextureHandle,
 }
 
 impl App {
     pub fn new(cc: &eframe::CreationContext<'_>, input: Option<PathBuf>) -> Self {
-        egui_extras::install_image_loaders(&cc.egui_ctx);
-
         // Theming
         cc.egui_ctx.set_visuals(egui::Visuals {
             dark_mode: true,
@@ -81,6 +77,17 @@ impl App {
             .and_then(|storage| eframe::get_value::<UiState>(storage, eframe::APP_KEY))
             .unwrap_or_default();
 
+        let image_bytes = include_bytes!("../assets/lutgen.png");
+        let image_buf = image::load_from_memory(image_bytes)
+            .expect("failed to load lutgen icon")
+            .to_rgba8();
+        let dim = image_buf.dimensions();
+        let icon = cc.egui_ctx.load_texture(
+            "lutgen.png",
+            egui::ColorImage::from_rgba_unmultiplied([dim.0 as usize, dim.1 as usize], &image_buf),
+            egui::TextureOptions::default(),
+        );
+
         // Spawn background worker thread
         let worker = WorkerHandle::new(cc.egui_ctx.clone());
         let mut this = Self {
@@ -88,12 +95,13 @@ impl App {
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
             scene_rect: egui::Rect::ZERO,
-            open_picker: FileDialog::new()
+            open_picker: egui_file_dialog::FileDialog::new()
                 .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
                 .default_file_filter("Images")
                 .title("Open Image"),
-            save_picker: FileDialog::new().title("Save Image As"),
+            save_picker: egui_file_dialog::FileDialog::new().title("Save Image As"),
             state,
+            icon,
         };
 
         // setup save extensions
