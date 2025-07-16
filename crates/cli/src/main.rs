@@ -60,16 +60,6 @@ impl<T: Clone + Debug> Display for Hashed<T> {
 
 #[derive(Bpaf, Clone, Debug, Hash)]
 struct Common {
-    /// Factor to multiply luminocity values by. Effectively weights the interpolation to prefer
-    /// more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
-    #[bpaf(
-        short('L'),
-        long("lum"),
-        argument("FACTOR"),
-        fallback(Hashed(1.0)),
-        display_fallback
-    )]
-    lum_factor: Hashed<f64>,
     /// Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
     #[bpaf(
         short,
@@ -83,6 +73,16 @@ struct Common {
     /// Preserve the original image's luminocity values after interpolation.
     #[bpaf(short('P'), long, fallback(false), display_fallback)]
     preserve: bool,
+    /// Factor to multiply luminocity values by. Effectively weights the interpolation to prefer
+    /// more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+    #[bpaf(
+        short('L'),
+        long("lum"),
+        argument("FACTOR"),
+        fallback(Hashed(1.0)),
+        display_fallback
+    )]
+    lum_factor: Hashed<f64>,
 }
 
 #[derive(Bpaf, Clone, Debug, Hash)]
