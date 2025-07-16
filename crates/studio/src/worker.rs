@@ -262,7 +262,7 @@ impl Worker {
                     *args.shape,
                     rbf.nearest,
                     *common.lum_factor,
-                    rbf.preserve,
+                    common.preserve,
                 )
                 .generate_lut_with_interrupt(common.level, abort)
             },
@@ -272,7 +272,7 @@ impl Worker {
                     *args.power,
                     rbf.nearest,
                     *common.lum_factor,
-                    rbf.preserve,
+                    common.preserve,
                 )
                 .generate_lut_with_interrupt(common.level, abort)
             },
@@ -284,12 +284,17 @@ impl Worker {
                     args.iterations,
                     *common.lum_factor,
                     args.seed,
+                    common.preserve,
                 )
                 .generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::NearestNeighbor => {
-                lutgen::interpolation::NearestNeighborRemapper::new(&palette, *common.lum_factor)
-                    .generate_lut_with_interrupt(common.level, abort)
+                lutgen::interpolation::NearestNeighborRemapper::new(
+                    &palette,
+                    *common.lum_factor,
+                    common.preserve,
+                )
+                .generate_lut_with_interrupt(common.level, abort)
             },
         }
         .ok_or("aborted".to_string())?;

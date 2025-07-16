@@ -335,29 +335,9 @@ impl App {
                         ));
                         apply |= res.drag_stopped() | res.lost_focus();
 
-                        // shared rbf args
-                        match self.state.current_alg {
-                            LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
-                                ui.separator();
-                                ui.heading("Rbf Arguments");
-                                ui.add_space(10.);
-
-                                ui.label("Nearest Colors");
-                                let res = ui.add(
-                                    egui::Slider::new(&mut self.state.common_rbf.nearest, 0..=32)
-                                        .step_by(1.),
-                                );
-                                apply |= res.drag_stopped() | res.lost_focus();
-
-                                apply |= ui
-                                    .checkbox(
-                                        &mut self.state.common_rbf.preserve,
-                                        "Preserve Luminosity",
-                                    )
-                                    .changed();
-                            },
-                            _ => {},
-                        }
+                        apply |= ui
+                            .checkbox(&mut self.state.common.preserve, "Preserve Luminosity")
+                            .changed();
 
                         // unique algorithm args
                         match self.state.current_alg {
@@ -415,6 +395,19 @@ impl App {
                                 let res = ui.add(
                                     egui::DragValue::new(&mut self.state.guassian_sampling.seed)
                                         .speed(2i32.pow(20)),
+                                );
+                                apply |= res.drag_stopped() | res.lost_focus();
+                            },
+                            _ => {},
+                        }
+
+                        // shared rbf args
+                        match self.state.current_alg {
+                            LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
+                                ui.label("Nearest Colors");
+                                let res = ui.add(
+                                    egui::Slider::new(&mut self.state.common_rbf.nearest, 0..=32)
+                                        .step_by(1.),
                                 );
                                 apply |= res.drag_stopped() | res.lost_focus();
                             },

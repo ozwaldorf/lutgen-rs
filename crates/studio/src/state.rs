@@ -134,14 +134,14 @@ impl UiState {
         match self.current_alg {
             LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
                 arg!(args, "-n", self.common_rbf.nearest, 16);
-                arg!(args, "-P", bool self.common_rbf.preserve, false);
             },
             _ => {},
         }
 
         // common args
-        arg!(args, "-L", self.common.lum_factor.0, 0.7);
         arg!(args, "-l", self.common.level, 12);
+        arg!(args, "-L", self.common.lum_factor.0, 0.7);
+        arg!(args, "-P", bool self.common.preserve, false);
 
         // algorithm specific args
         match self.current_alg {
@@ -223,6 +223,8 @@ pub enum LutAlgorithm {
 
 #[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]
 pub struct Common {
+    /// Preserve the original image's luminocity values after interpolation.
+    pub preserve: bool,
     /// Factor to multiply luminocity values by. Effectively weights the interpolation to prefer
     /// more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
     pub lum_factor: Hashed<f64>,
@@ -233,6 +235,7 @@ pub struct Common {
 impl Default for Common {
     fn default() -> Self {
         Self {
+            preserve: true,
             lum_factor: Hashed(0.7),
             level: 12,
         }
@@ -243,16 +246,11 @@ impl Default for Common {
 pub struct CommonRbf {
     /// Number of nearest colors to consider when interpolating. 0 uses all available colors.
     pub nearest: usize,
-    /// Preserve the original image's luminocity values after interpolation.
-    pub preserve: bool,
 }
 
 impl Default for CommonRbf {
     fn default() -> Self {
-        Self {
-            nearest: 16,
-            preserve: true,
-        }
+        Self { nearest: 16 }
     }
 }
 
