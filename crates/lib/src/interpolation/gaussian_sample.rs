@@ -32,9 +32,10 @@ impl<'a> GaussianSamplingRemapper<'a> {
         iterations: usize,
         lum_factor: f64,
         seed: u64,
+        preserve: bool,
     ) -> Self {
         let normal = Normal::new(mean, std_dev).unwrap();
-        let nearest_neighbor = NearestNeighborRemapper::new(palette, lum_factor);
+        let nearest_neighbor = NearestNeighborRemapper::new(palette, lum_factor, preserve);
 
         Self {
             iterations,
