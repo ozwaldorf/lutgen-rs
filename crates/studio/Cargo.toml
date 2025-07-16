@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-studio"
-version = "0.2.0"
+version = "0.2.1"
 description = "Offical GUI for Lutgen, the best way to apply popular colorschemes to any image or wallpaper!"
 edition = "2024"
 license = "MIT"
