@@ -181,6 +181,9 @@ impl Worker {
     }
 
     fn save_as(&self, path: PathBuf) -> Result<(), String> {
+        if self.last_render.is_empty() {
+            return Err("Image must be applied at least once".into());
+        }
         if let Some(image) = &self.current_image {
             image::save_buffer(
                 path,
@@ -294,10 +297,11 @@ impl Worker {
         // remap image
         lutgen::identity::correct_image(&mut image, &lut);
 
+        self.last_render = image.to_vec().into();
         self.send_set_image(
             time.elapsed(),
             ImageSource::Edited(hash),
-            image.to_vec().into(),
+            self.last_render.clone(),
             (image.height(), image.width()),
         );
 
