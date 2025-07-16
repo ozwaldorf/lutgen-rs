@@ -95,7 +95,15 @@ fn shepards_method() -> ShepardRemapper {
 }
 
 fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
-    GaussianSamplingRemapper::new(Palette::Carburetor.get(), 0.0, 20.0, 512, 1.0, 42080085)
+    GaussianSamplingRemapper::new(
+        Palette::Carburetor.get(),
+        0.0,
+        20.0,
+        512,
+        1.0,
+        42080085,
+        false,
+    )
 }
 
 fn apply(lut: &RgbImage, mut img: RgbaImage) {

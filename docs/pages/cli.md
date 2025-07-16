@@ -54,7 +54,7 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
 
 Generate and save a Hald CLUT to disk.
 
-**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-n`**=_`NEAREST`_\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]) **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`COLORS`_ &mdash; 
@@ -82,19 +82,19 @@ Generate and save a Hald CLUT to disk.
   Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
    
   [default: 10]
-- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
-  Number of nearest colors to consider when interpolating. 0 uses all available colors.
-   
-  [default: 16]
 - **`-P`**, **`--preserve`** &mdash; 
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
+- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
+  Number of nearest colors to consider when interpolating. 0 uses all available colors.
+   
+  [default: 16]
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
   [default: 128.0]
-### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
@@ -103,7 +103,7 @@ Generate and save a Hald CLUT to disk.
   [default: 4.0]
 
 
-### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-G`**, **`--gaussian-sampling`** &mdash; 
   Enable using Gaussian sampling for interpolation (slow).
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
@@ -124,7 +124,7 @@ Generate and save a Hald CLUT to disk.
   [default: 42080085]
 
 
-### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-N`**, **`--nearest-neighbor`** &mdash; 
   Disable interpolation completely.
 
@@ -137,7 +137,7 @@ Generate and save a Hald CLUT to disk.
 
 Extract colors and generate a LUT from existing image(s). Can be used for replicating an images look directly (copying a colorscheme, film emulation).
 
-**Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_...
+**Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] (\[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-n`**=_`NEAREST`_\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]) _`IMAGES`_...
 
 **Available positional items:**
 - _`IMAGES`_ &mdash; 
@@ -160,19 +160,19 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
   Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
    
   [default: 10]
-- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
-  Number of nearest colors to consider when interpolating. 0 uses all available colors.
-   
-  [default: 16]
 - **`-P`**, **`--preserve`** &mdash; 
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
+- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
+  Number of nearest colors to consider when interpolating. 0 uses all available colors.
+   
+  [default: 16]
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
   [default: 128.0]
-### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
@@ -181,7 +181,7 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
   [default: 4.0]
 
 
-### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-G`**, **`--gaussian-sampling`** &mdash; 
   Enable using Gaussian sampling for interpolation (slow).
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
@@ -202,7 +202,7 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
   [default: 42080085]
 
 
-### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-N`**, **`--nearest-neighbor`** &mdash; 
   Disable interpolation completely.
 
@@ -215,7 +215,7 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
 
 Apply a generated or provided Hald CLUT to images.
 
-**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-n`**=_`NEAREST`_\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`IMAGES`_ &mdash; 
@@ -251,19 +251,19 @@ Apply a generated or provided Hald CLUT to images.
   Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
    
   [default: 10]
-- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
-  Number of nearest colors to consider when interpolating. 0 uses all available colors.
-   
-  [default: 16]
 - **`-P`**, **`--preserve`** &mdash; 
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
+- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
+  Number of nearest colors to consider when interpolating. 0 uses all available colors.
+   
+  [default: 16]
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
   [default: 128.0]
-### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
@@ -272,7 +272,7 @@ Apply a generated or provided Hald CLUT to images.
   [default: 4.0]
 
 
-### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-G`**, **`--gaussian-sampling`** &mdash; 
   Enable using Gaussian sampling for interpolation (slow).
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
@@ -293,7 +293,7 @@ Apply a generated or provided Hald CLUT to images.
   [default: 42080085]
 
 
-### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-N`**, **`--nearest-neighbor`** &mdash; 
   Disable interpolation completely.
 
@@ -306,7 +306,7 @@ Apply a generated or provided Hald CLUT to images.
 
 Generate a patch for colors inside text files.
 
-**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-n`**=_`NEAREST`_\] \[**`-s`**=_`SHAPE`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] &#124; **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
 
 **Available positional items:**
 - _`FILES`_ &mdash; 
@@ -340,19 +340,19 @@ Generate a patch for colors inside text files.
   Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
    
   [default: 10]
-- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
-  Number of nearest colors to consider when interpolating. 0 uses all available colors.
-   
-  [default: 16]
 - **`-P`**, **`--preserve`** &mdash; 
   Preserve the original image's luminocity values after interpolation.
    
   [default: false]
+- **`-n`**, **`--nearest`**=_`NEAREST`_ &mdash; 
+  Number of nearest colors to consider when interpolating. 0 uses all available colors.
+   
+  [default: 16]
 - **`-s`**, **`--shape`**=_`SHAPE`_ &mdash; 
   Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.
    
   [default: 128.0]
-### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-S`**, **`--shepards-method`** &mdash; 
   Enable using Shepard's method (Inverse Distance RBF) for interpolation.
 - **`-p`**, **`--power`**=_`POWER`_ &mdash; 
@@ -361,7 +361,7 @@ Generate a patch for colors inside text files.
   [default: 4.0]
 
 
-### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-G`**, **`--gaussian-sampling`** &mdash; 
   Enable using Gaussian sampling for interpolation (slow).
 - **`-m`**, **`--mean`**=_`MEAN`_ &mdash; 
@@ -382,7 +382,7 @@ Generate a patch for colors inside text files.
   [default: 42080085]
 
 
-### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\]
+### **`-N`** \[**`-L`**=_`FACTOR`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\]
 - **`-N`**, **`--nearest-neighbor`** &mdash; 
   Disable interpolation completely.
 

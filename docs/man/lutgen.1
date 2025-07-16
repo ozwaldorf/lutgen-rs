@@ -5,10 +5,10 @@
 .SH SYNOPSIS
 .nf
 \fBlutgen\fP\fR \fP\fICOMMAND ...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR[\fP\fB\-\-ansi\fP\fR] (\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP\fR
@@ -66,7 +66,7 @@
 .SH NAME
 \fRlutgen \- \fP\fRGenerate and save a Hald CLUT to disk.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -107,18 +107,18 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: 10]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
-.PP
-.TP
-\fR[default: 16]\fP
-.PP
-.TP
 \fB\-P\fP\fR, \fP\fB\-\-preserve\fP
 \fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
 .PP
 .TP
 \fR[default: false]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -129,7 +129,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 128.0]\fP
 .PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
 \fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
@@ -142,7 +142,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 4.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -176,7 +176,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 42080085]\fP
 .PP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
@@ -192,7 +192,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 Can be used for replicating an images look directly
 (copying a colorscheme, film emulation).\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR...\fP
+\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -228,18 +228,18 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: 10]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
-.PP
-.TP
-\fR[default: 16]\fP
-.PP
-.TP
 \fB\-P\fP\fR, \fP\fB\-\-preserve\fP
 \fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
 .PP
 .TP
 \fR[default: false]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -250,7 +250,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 128.0]\fP
 .PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
 \fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
@@ -263,7 +263,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 4.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -297,7 +297,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 42080085]\fP
 .PP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
@@ -311,7 +311,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .SH NAME
 \fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -369,18 +369,18 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: 10]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
-.PP
-.TP
-\fR[default: 16]\fP
-.PP
-.TP
 \fB\-P\fP\fR, \fP\fB\-\-preserve\fP
 \fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
 .PP
 .TP
 \fR[default: false]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -391,7 +391,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 128.0]\fP
 .PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
 \fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
@@ -404,7 +404,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 4.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -438,7 +438,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 42080085]\fP
 .PP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
@@ -452,7 +452,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .SH NAME
 \fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -505,18 +505,18 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: 10]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
-.PP
-.TP
-\fR[default: 16]\fP
-.PP
-.TP
 \fB\-P\fP\fR, \fP\fB\-\-preserve\fP
 \fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
 .PP
 .TP
 \fR[default: false]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
@@ -527,7 +527,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 128.0]\fP
 .PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-P]\ [-L=FACTOR]\ [-L=2-16]
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
 \fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
@@ -540,7 +540,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 4.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -574,7 +574,7 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 \fR[default: 42080085]\fP
 .PP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]
+.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP

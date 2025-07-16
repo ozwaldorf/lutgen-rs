@@ -33,8 +33,9 @@
 //! let palette = vec![[255, 0, 0], [0, 255, 0], [0, 0, 255]];
 //!
 //! // Setup the slower Gaussian Sampling algorithm
-//! let (mean, std_dev, iters, lum_factor, seed) = (0.0, 20.0, 512, 1.0, 420);
-//! let remapper = GaussianSamplingRemapper::new(&palette, mean, std_dev, iters, lum_factor, seed);
+//! let (mean, std_dev, iters, lum_factor, seed, preserve) = (0.0, 20.0, 512, 1.0, 420, true);
+//! let remapper =
+//!     GaussianSamplingRemapper::new(&palette, mean, std_dev, iters, lum_factor, seed, preserve);
 //!
 //! // Generate and remap a HALD:4 for the provided palette
 //! let hald_clut = remapper.generate_lut(4);
