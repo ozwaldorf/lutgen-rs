@@ -14,4 +14,4 @@ find_container_tool() {
 
 CONTAINER_TOOL=$(find_container_tool)
 
-$CONTAINER_TOOL build -t lutgen:latest https://github.com/ozwaldorf/lutgen-rs#main
+$CONTAINER_TOOL build -t lutgen:latest https://github.com/ozwaldorf/lutgen-rs.git#main
