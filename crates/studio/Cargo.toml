@@ -30,13 +30,15 @@ dirs.workspace = true
 
 env_logger = "0.11"
 log = "0.4"
-egui = "0.32"
+egui = "0.32.0"
 egui-file-dialog = "0.11.0"
-eframe = { version = "0.32", default-features = false, features = [
+eframe = { version = "0.32.0", default-features = false, features = [
     "default_fonts", # Embed the default egui fonts.
     "glow",          # Use the glow rendering backend. Alternative: "wgpu".
     "persistence",   # Enable restoring app state when restarting the app.
     "wayland",       # To support Linux (and CI)
     "x11",           # To support older Linux distributions (restores one of the default features)
-] }
+]}
+ureq = "3.0"
+serde_json = "1.0"
 

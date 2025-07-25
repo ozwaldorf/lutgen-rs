@@ -13,6 +13,7 @@ use lutgen::GenerateLut;
 
 use crate::color::Color;
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
+use crate::updates::{check_for_updates, UpdateInfo};
 
 pub enum FrontendEvent {
     LoadFile(PathBuf),
@@ -38,6 +39,7 @@ pub enum LutAlgorithmArgs {
 
 pub enum BackendEvent {
     Error(String),
+    Update(UpdateInfo),
     SetImage {
         time: Duration,
         source: ImageSource,
@@ -50,6 +52,7 @@ impl Display for BackendEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             BackendEvent::Error(e) => format!("Error: {e}").fmt(f),
+            BackendEvent::Update(_) => Ok(()),
             BackendEvent::SetImage {
                 time,
                 dim: (x, y),
@@ -134,6 +137,16 @@ impl Worker {
         let (tx, worker_rx) = channel();
         let (worker_tx, rx) = channel();
         let abort = Arc::new(AtomicBool::new(false));
+
+        // Spawn thread to fetch the latest version and send it to the frontend if newer
+        let worker_tx_clone = worker_tx.clone();
+        std::thread::spawn(move || {
+            if let Ok(Some(update)) = check_for_updates() {
+                worker_tx_clone
+                    .send(BackendEvent::Update(update))
+                    .expect("failed to send update info to frontend");
+            }
+        });
 
         std::thread::spawn(move || {
             let mut worker = Worker {

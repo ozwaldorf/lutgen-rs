@@ -6,12 +6,14 @@ use egui::TextureHandle;
 use log::{error, info};
 
 use crate::palette::DynamicPalette;
+use crate::updates::UpdateInfo;
 use crate::utils::Hashed;
 use crate::worker::{BackendEvent, ImageSource};
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
 pub struct UiState {
     // main window state
+    pub show_about: bool,
     pub current_image: Option<PathBuf>,
     #[serde(skip)]
     pub image_texture: Option<TextureHandle>,
@@ -19,6 +21,10 @@ pub struct UiState {
     pub edited_texture: Option<TextureHandle>,
     #[serde(skip)]
     pub show_original: bool,
+    #[serde(skip)]
+    pub update: Option<UpdateInfo>,
+    #[serde(skip)]
+    pub last_event: String,
 
     // side panel state
     pub palette_selection: DynamicPalette,
@@ -29,17 +35,15 @@ pub struct UiState {
     pub guassian_sampling: GaussianSamplingArgs,
     pub common_rbf: CommonRbf,
     pub common: Common,
-
-    // about dialog
-    pub show_about: bool,
-
-    #[serde(skip)]
-    pub last_event: String,
 }
 
 impl Default for UiState {
     fn default() -> Self {
         Self {
+            // default is true for first starts
+            show_about: true,
+            update: None,
+            last_event: "Started.".to_string(),
             current_image: None,
             image_texture: None,
             edited_texture: None,
@@ -53,11 +57,6 @@ impl Default for UiState {
             guassian_sampling: Default::default(),
             common_rbf: Default::default(),
             common: Default::default(),
-
-            // default is true for first starts
-            show_about: true,
-
-            last_event: "Started.".to_string(),
         }
     }
 }
@@ -103,6 +102,9 @@ impl UiState {
                         self.show_original = false;
                     },
                 }
+            },
+            BackendEvent::Update(update) => {
+                self.update = Some(update);
             },
         }
     }

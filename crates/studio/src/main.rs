@@ -11,6 +11,7 @@ mod color;
 mod palette;
 mod state;
 mod ui;
+mod updates;
 mod utils;
 mod worker;
 

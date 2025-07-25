@@ -43,6 +43,16 @@ impl App {
 
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     egui::widgets::global_theme_preference_buttons(ui);
+                    if let Some(update) = &self.state.update {
+                        let [maj, min, pat] = update.version;
+                        if ui
+                            .link(format!("Update v{maj}.{min}.{pat} available!"))
+                            .clicked()
+                        {
+                            ui.ctx()
+                                .open_url(egui::OpenUrl::new_tab(update.url.clone()));
+                        }
+                    }
                 });
             });
         });
