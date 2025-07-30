@@ -8,18 +8,26 @@ impl App {
                 .with_title("About Lutgen Studio")
                 .with_active(true)
                 .with_resizable(false)
-                .with_inner_size((400.0, 400.0));
+                .with_inner_size((400.0, 420.0));
 
             ctx.show_viewport_immediate(id, vp, |ctx, _| {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.horizontal_centered(|ui| {
                         ui.vertical_centered(|ui| {
-                            ui.add_space(30.);
+                            ui.add_space(20.);
                             ui.add(egui::Image::from_texture(&self.icon).max_width(100.));
                             ui.add_space(20.);
-                            ui.heading("Lutgen Studio");
+                            ui.heading(format!("Lutgen Studio v{}", env!("CARGO_PKG_VERSION")));
                             ui.add_space(5.);
-                            ui.label(format!("Version {}", env!("CARGO_PKG_VERSION")));
+                            ui.label(format!(
+                                "License {}, Copyright 2025",
+                                env!("CARGO_PKG_LICENSE")
+                            ));
+                            ui.label(env!("CARGO_PKG_AUTHORS"));
+                            if ui.link("Source Code (Github)").clicked() {
+                                ui.ctx()
+                                    .open_url(egui::OpenUrl::new_tab(env!("CARGO_PKG_REPOSITORY")));
+                            }
 
                             ui.add_space(20.);
                             ui.add(egui::Separator::default().shrink(50.));
