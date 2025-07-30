@@ -313,7 +313,7 @@ impl Worker {
         .ok_or("aborted".to_string())?;
 
         // remap image
-        lutgen::identity::correct_image(&mut image, &lut);
+        lutgen::identity::correct_image_with_level(&mut image, &lut, common.level);
 
         self.last_render = image.to_vec().into();
         self.send_set_image(
