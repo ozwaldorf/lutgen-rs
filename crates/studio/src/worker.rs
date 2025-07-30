@@ -277,7 +277,7 @@ impl Worker {
                     *common.lum_factor,
                     common.preserve,
                 )
-                .generate_lut_with_interrupt(common.level, abort)
+                .par_generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::ShepardsMethod { rbf, args } => {
                 lutgen::interpolation::ShepardRemapper::new(
@@ -287,7 +287,7 @@ impl Worker {
                     *common.lum_factor,
                     common.preserve,
                 )
-                .generate_lut_with_interrupt(common.level, abort)
+                .par_generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::GaussianSampling { args } => {
                 lutgen::interpolation::GaussianSamplingRemapper::new(
@@ -299,7 +299,7 @@ impl Worker {
                     args.seed,
                     common.preserve,
                 )
-                .generate_lut_with_interrupt(common.level, abort)
+                .par_generate_lut_with_interrupt(common.level, abort)
             },
             LutAlgorithmArgs::NearestNeighbor => {
                 lutgen::interpolation::NearestNeighborRemapper::new(
@@ -307,7 +307,7 @@ impl Worker {
                     *common.lum_factor,
                     common.preserve,
                 )
-                .generate_lut_with_interrupt(common.level, abort)
+                .par_generate_lut_with_interrupt(common.level, abort)
             },
         }
         .ok_or("aborted".to_string())?;

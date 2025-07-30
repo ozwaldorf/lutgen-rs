@@ -214,7 +214,7 @@ impl LutAlgorithm {
                     },
                 ..
             } => GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
-                .generate_lut(*level),
+                .par_generate_lut(*level),
             LutAlgorithm::ShepardsMethod {
                 power,
                 common_rbf: CommonRbf { nearest },
@@ -226,7 +226,7 @@ impl LutAlgorithm {
                     },
                 ..
             } => ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
-                .generate_lut(*level),
+                .par_generate_lut(*level),
             LutAlgorithm::GaussianSampling {
                 mean,
                 std_dev,
@@ -248,7 +248,7 @@ impl LutAlgorithm {
                 *seed,
                 *preserve,
             )
-            .generate_lut(*level),
+            .par_generate_lut(*level),
             LutAlgorithm::NearestNeighbor {
                 common:
                     Common {
@@ -257,9 +257,8 @@ impl LutAlgorithm {
                         preserve,
                     },
                 ..
-            } => {
-                NearestNeighborRemapper::new(&colors, lum_factor.0, *preserve).generate_lut(*level)
-            },
+            } => NearestNeighborRemapper::new(&colors, lum_factor.0, *preserve)
+                .par_generate_lut(*level),
             _ => unreachable!(),
         };
         println!("✔ Generated \"{name}\" LUT in {:.2?}", time.elapsed());
