@@ -189,9 +189,11 @@ fn hald_clut_or_algorithm() -> impl Parser<LutAlgorithm> {
 }
 
 impl LutAlgorithm {
-    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<RgbImage, String> {
+    fn generate(&self, name: &str, colors: Vec<[u8; 3]>) -> Result<(RgbImage, u8), String> {
         if let Self::HaldClut { file } = &self {
-            return load_image(file).map(|i| i.to_rgb8());
+            let image = load_image(file).map(|i| i.to_rgb8())?;
+            let level = detect_level(&image);
+            return Ok((image, level));
         }
 
         if colors.is_empty() {
@@ -201,8 +203,7 @@ impl LutAlgorithm {
         }
 
         let time = Instant::now();
-
-        let lut = match self {
+        let (lut, level) = match self {
             LutAlgorithm::GaussianRbf {
                 shape,
                 common_rbf: CommonRbf { nearest },
@@ -213,8 +214,11 @@ impl LutAlgorithm {
                         preserve,
                     },
                 ..
-            } => GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
-                .par_generate_lut(*level),
+            } => (
+                GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
+                    .par_generate_lut(*level),
+                *level,
+            ),
             LutAlgorithm::ShepardsMethod {
                 power,
                 common_rbf: CommonRbf { nearest },
@@ -225,8 +229,11 @@ impl LutAlgorithm {
                         preserve,
                     },
                 ..
-            } => ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
-                .par_generate_lut(*level),
+            } => (
+                ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
+                    .par_generate_lut(*level),
+                *level,
+            ),
             LutAlgorithm::GaussianSampling {
                 mean,
                 std_dev,
@@ -239,16 +246,19 @@ impl LutAlgorithm {
                         preserve,
                     },
                 ..
-            } => GaussianSamplingRemapper::new(
-                &colors,
-                mean.0,
-                std_dev.0,
-                *iterations,
-                lum_factor.0,
-                *seed,
-                *preserve,
-            )
-            .par_generate_lut(*level),
+            } => (
+                GaussianSamplingRemapper::new(
+                    &colors,
+                    mean.0,
+                    std_dev.0,
+                    *iterations,
+                    lum_factor.0,
+                    *seed,
+                    *preserve,
+                )
+                .par_generate_lut(*level),
+                *level,
+            ),
             LutAlgorithm::NearestNeighbor {
                 common:
                     Common {
@@ -257,13 +267,16 @@ impl LutAlgorithm {
                         preserve,
                     },
                 ..
-            } => NearestNeighborRemapper::new(&colors, lum_factor.0, *preserve)
-                .par_generate_lut(*level),
+            } => (
+                NearestNeighborRemapper::new(&colors, lum_factor.0, *preserve)
+                    .par_generate_lut(*level),
+                *level,
+            ),
             _ => unreachable!(),
         };
         println!("✔ Generated \"{name}\" LUT in {:.2?}", time.elapsed());
 
-        Ok(lut)
+        Ok((lut, level))
     }
 }
 
@@ -621,7 +634,7 @@ impl Lutgen {
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
         let (name, colors) = concat_colors(palette, extra_colors);
-        let lut = lut_algorithm.generate(&name, colors)?;
+        let (lut, _) = lut_algorithm.generate(&name, colors)?;
         let time = Instant::now();
         let path = output.unwrap_or(format!("{name}.png").into());
         lut.save(&path).map_err(|e| e.to_string())?;
@@ -662,7 +675,7 @@ impl Lutgen {
         }
 
         // generate lut for full palette set
-        let lut =
+        let (lut, _) =
             lut_algorithm.generate("extracted", palette_set.into_iter().collect::<Vec<_>>())?;
 
         // save lut
@@ -684,7 +697,7 @@ impl Lutgen {
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
         let (name, colors) = concat_colors(palette, extra_colors);
-        let lut = if let Some(hash) = hash {
+        let (lut, level) = if let Some(hash) = hash {
             let mut path = dirs::cache_dir()
                 .expect("failed to determine cache dir")
                 .join("lutgen");
@@ -694,14 +707,16 @@ impl Lutgen {
 
             path = path.join(format!("{name}-{hash}.png"));
             if !path.exists() {
-                let lut = hald_clut_or_algorithm.generate(&name, colors)?;
+                let (lut, level) = hald_clut_or_algorithm.generate(&name, colors)?;
                 let time = Instant::now();
                 lut.save(path)
                     .map_err(|e| format!("failed to write cached LUT: {e}"))?;
                 println!("✔ Cached \"{name}\" LUT in {:.02?}", time.elapsed());
-                lut
+                (lut, level)
             } else {
-                load_image(path)?.into_rgb8()
+                let image = load_image(path)?.into_rgb8();
+                let level = detect_level(&image);
+                (image, level)
             }
         } else {
             hald_clut_or_algorithm.generate(&name, colors)?
@@ -712,7 +727,7 @@ impl Lutgen {
             match res {
                 Either::Left(mut image) => {
                     let time = Instant::now();
-                    lutgen::identity::correct_image(&mut image, &lut);
+                    lutgen::identity::correct_image_with_level(&mut image, &lut, level);
                     println!("✔ Applied LUT to {file:?} in {:.2?}", time.elapsed());
 
                     let time = Instant::now();
@@ -871,8 +886,7 @@ impl Lutgen {
         const REGEX: &str = r"(#)([0-9a-fA-F]{3}){1,2}|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
 
         let (name, colors) = concat_colors(palette, extra_colors);
-        let lut = hald_clut_or_algorithm.generate(&name, colors)?;
-        let level = detect_level(&lut);
+        let (lut, level) = hald_clut_or_algorithm.generate(&name, colors)?;
 
         let len = input.len();
         let re = Regex::new(REGEX).expect("failed to build regex");

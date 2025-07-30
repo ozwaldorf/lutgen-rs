@@ -61,6 +61,14 @@ pub fn correct_pixel(input: &[u8; 3], hald_clut: &RgbImage, level: u8) -> [u8; 3
 /// Panics if the hald clut is invalid.
 pub fn correct_image(image: &mut RgbaImage, hald_clut: &RgbImage) {
     let level = detect_level(hald_clut);
+    correct_image_with_level(image, hald_clut, level);
+}
+
+/// Correct an image in place with a hald clut identity.
+///
+/// Simple implementation that doesn't do any interpolation,
+/// so higher LUT sizes will prove to be more accurate.
+pub fn correct_image_with_level(image: &mut RgbaImage, hald_clut: &RgbImage, level: u8) {
     for pixel in image.pixels_mut() {
         let [r, g, b] = correct_pixel(&[pixel[0], pixel[1], pixel[2]], hald_clut, level);
         pixel[0] = r;
