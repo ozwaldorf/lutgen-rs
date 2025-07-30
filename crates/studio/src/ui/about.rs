@@ -18,7 +18,7 @@ impl App {
                             ui.add(egui::Image::from_texture(&self.icon).max_width(100.));
                             ui.add_space(20.);
                             ui.heading(format!("Lutgen Studio v{}", env!("CARGO_PKG_VERSION")));
-                            ui.add_space(5.);
+                            self.show_update(ui);
                             ui.label(format!(
                                 "License {}, Copyright 2025",
                                 env!("CARGO_PKG_LICENSE")
