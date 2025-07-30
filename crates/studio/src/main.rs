@@ -73,11 +73,17 @@ impl App {
         });
 
         // Load previous app state (if any).
-        let state = cc
+        let mut state = cc
             .storage
             .and_then(|storage| eframe::get_value::<UiState>(storage, eframe::APP_KEY))
             .unwrap_or_default();
 
+        // Set current image if provided by cli
+        if let Some(path) = input {
+            state.current_image = Some(path);
+        }
+
+        // Manually load texture for lutgen icon
         let image_bytes = include_bytes!("../assets/lutgen.png");
         let image_buf = image::load_from_memory(image_bytes)
             .expect("failed to load lutgen icon")
@@ -89,34 +95,30 @@ impl App {
             egui::TextureOptions::default(),
         );
 
+        // Setup open/save file pickers with supported images
+        let open_picker = egui_file_dialog::FileDialog::new()
+            .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
+            .default_file_filter("Images")
+            .title("Open Image");
+        let mut save_picker = egui_file_dialog::FileDialog::new().title("Save Image As");
+        for &ext in IMAGE_EXTENSIONS {
+            save_picker = save_picker.add_save_extension(ext, ext);
+        }
+        save_picker = save_picker.default_save_extension("png");
+
         // Spawn background worker thread
-        let worker = WorkerHandle::new(cc.egui_ctx.clone());
         let mut this = Self {
-            worker,
+            worker: WorkerHandle::new(cc.egui_ctx.clone()),
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
             scene_rect: egui::Rect::ZERO,
-            open_picker: egui_file_dialog::FileDialog::new()
-                .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
-                .default_file_filter("Images")
-                .title("Open Image"),
-            save_picker: egui_file_dialog::FileDialog::new().title("Save Image As"),
+            open_picker,
+            save_picker,
             state,
             icon,
         };
 
-        // setup save extensions
-        for &ext in IMAGE_EXTENSIONS {
-            this.save_picker = this.save_picker.add_save_extension(ext, ext);
-        }
-        this.save_picker = this.save_picker.default_save_extension("png");
-
-        // Set current image if provided
-        if let Some(path) = input {
-            this.state.current_image = Some(path);
-        }
-
-        // Load last opened image and apply settings
+        // Optionally load current image and apply settings right away
         if let Some(path) = &this.state.current_image {
             this.worker.load_file(path);
             this.apply();
