@@ -251,7 +251,6 @@ impl Worker {
         args.hash(&mut hasher);
         let hash = hasher.finish();
 
-        // generate lut from arguments
         info!("Generating LUT with args:\n{common:?}\n{args:?}");
         debug!(
             "LUT input palette ({} colors):\n{}",
@@ -268,6 +267,7 @@ impl Worker {
                 .join("\n")
         );
 
+        // generate lut from arguments
         let lut = match args {
             LutAlgorithmArgs::GaussianRbf { rbf, args } => {
                 lutgen::interpolation::GaussianRemapper::new(
@@ -310,7 +310,7 @@ impl Worker {
                 .par_generate_lut_with_interrupt(common.level, abort)
             },
         }
-        .ok_or("aborted".to_string())?;
+        .ok_or("Cancelled generating hald clut".to_string())?;
 
         // remap image
         lutgen::identity::correct_image_with_level(&mut image, &lut, common.level);
