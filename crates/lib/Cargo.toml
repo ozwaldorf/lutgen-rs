@@ -23,14 +23,18 @@ criterion = { version = "0.6", features = ["html_reports"] }
 lutgen-palettes = { path = "../palettes" }
 
 [dependencies]
-image.workspace = true
+image = { version = "0.25", default-features = false, features = [] }
 oklab.workspace = true
-rayon.workspace = true
+rayon = { workspace = true, optional = true }
 
 rand = "0.9"
 rand_distr = "0.5"
 kiddo = "5.2"
 arrayref = "0.3"
+
+[features]
+rayon = ["dep:rayon", "image/rayon"]
+default = ["rayon"]
 
 [[bench]]
 name = "main"

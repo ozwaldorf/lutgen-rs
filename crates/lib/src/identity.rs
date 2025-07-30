@@ -63,9 +63,9 @@ pub fn correct_image(image: &mut RgbaImage, hald_clut: &RgbImage) {
     let level = detect_level(hald_clut);
     for pixel in image.pixels_mut() {
         let [r, g, b] = correct_pixel(&[pixel[0], pixel[1], pixel[2]], hald_clut, level);
-        pixel.0[0] = r;
-        pixel.0[1] = g;
-        pixel.0[2] = b;
+        pixel[0] = r;
+        pixel[1] = g;
+        pixel[2] = b;
     }
 }
 

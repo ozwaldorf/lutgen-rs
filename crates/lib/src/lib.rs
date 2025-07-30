@@ -25,7 +25,7 @@
 //! let remapper = GaussianRemapper::new(&palette, shape, nearest, lum_factor, preserve);
 //!
 //! // Generate and remap a HALD:8 for the provided palette
-//! let hald_clut = remapper.generate_lut(8);
+//! let hald_clut = remapper.par_generate_lut(8);
 //!
 //! // hald_clut.save("output.png").unwrap();
 //!
@@ -38,7 +38,7 @@
 //!     GaussianSamplingRemapper::new(&palette, mean, std_dev, iters, lum_factor, seed, preserve);
 //!
 //! // Generate and remap a HALD:4 for the provided palette
-//! let hald_clut = remapper.generate_lut(4);
+//! let hald_clut = remapper.par_generate_lut(4);
 //!
 //! // hald_clut.save("output.png").unwrap();
 //! ```
@@ -56,7 +56,7 @@
 //! // Generate a hald clut
 //! let palette = Palette::GruvboxDark.get();
 //! let remapper = GaussianRemapper::new(&palette, 96.0, 0, 1.0, false);
-//! let hald_clut = remapper.generate_lut(8);
+//! let hald_clut = remapper.par_generate_lut(8);
 //!
 //! // Save the LUT for later
 //! hald_clut
@@ -97,7 +97,7 @@
 //! let mut hald_clut = lutgen::identity::generate(8).convert();
 //!
 //! // Remap the image
-//! remapper.remap_image(&mut hald_clut);
+//! remapper.par_remap_image(&mut hald_clut);
 //!
 //! // hald_clut.save("output.png").unwrap();
 //! ```
@@ -123,11 +123,33 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
         identity.convert()
     }
 
+    /// Rayon version. Helper method to generate a lut using an [`InterpolatedRemapper`].
+    fn par_generate_lut(&self, level: u8) -> RgbImage {
+        let mut identity = identity::generate(level).convert();
+        self.par_remap_image(&mut identity);
+        identity.convert()
+    }
+
     /// Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the given boolean
     /// is true.
     fn generate_lut_with_interrupt(&self, level: u8, abort: Arc<AtomicBool>) -> Option<RgbImage> {
         let mut identity = identity::generate(level).convert();
         self.remap_image_with_interrupt(&mut identity, abort.clone());
+        abort
+            .load(std::sync::atomic::Ordering::Relaxed)
+            .not()
+            .then_some(identity.convert())
+    }
+
+    /// Rayon version. Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the
+    /// given boolean is true.
+    fn par_generate_lut_with_interrupt(
+        &self,
+        level: u8,
+        abort: Arc<AtomicBool>,
+    ) -> Option<RgbImage> {
+        let mut identity = identity::generate(level).convert();
+        self.par_remap_image_with_interrupt(&mut identity, abort.clone());
         abort
             .load(std::sync::atomic::Ordering::Relaxed)
             .not()
