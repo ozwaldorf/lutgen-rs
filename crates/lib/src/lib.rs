@@ -1,12 +1,6 @@
 //! # Lutgen (Library)
 //!
-//! > For documentation on the cli application, see the [repository](https://github.com/ozwaldorf/lutgen-rs#usage).
-//!
-//! ## Default Features
-//!
-//! By default, the `bin` feature and dependencies are enabled.
-//! When used as a library, it's recommended to use `default-features = false` to minimize the
-//! dependency tree and build times.
+//! > For documentation on the cli or gui applications, see the [repository](https://github.com/ozwaldorf/lutgen-rs).
 //!
 //! ## Examples
 //!
