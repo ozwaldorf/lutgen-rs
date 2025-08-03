@@ -2,26 +2,25 @@ use std::fmt::Display;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
-use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::mpsc::channel;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
 
-use egui::Context;
-use image::ColorType;
 use log::{debug, info};
 use lutgen::GenerateLut;
+use web_time::{Duration, Instant};
 
 use crate::color::Color;
 use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
-use crate::updates::{check_for_updates, UpdateInfo};
+use crate::updates::UpdateInfo;
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum FrontendEvent {
-    LoadFile(PathBuf),
+    LoadFile(PathBuf, #[cfg(target_arch = "wasm32")] Vec<u8>),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
     SaveAs(PathBuf),
 }
 
-#[derive(Hash, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Hash, Debug)]
 pub enum LutAlgorithmArgs {
     GaussianRbf {
         rbf: CommonRbf,
@@ -37,6 +36,7 @@ pub enum LutAlgorithmArgs {
     NearestNeighbor,
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum BackendEvent {
     Error(String),
     Update(UpdateInfo),
@@ -68,6 +68,7 @@ impl Display for BackendEvent {
     }
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub enum ImageSource {
     Image(PathBuf),
     Edited(u64),
@@ -83,66 +84,28 @@ impl Display for ImageSource {
 }
 
 pub struct WorkerHandle {
-    tx: Sender<FrontendEvent>,
-    rx: Receiver<BackendEvent>,
+    #[cfg(target_arch = "wasm32")]
+    bridge: gloo_worker::WorkerBridge<Worker>,
+
+    #[cfg(not(target_arch = "wasm32"))]
+    tx: std::sync::mpsc::Sender<FrontendEvent>,
+
+    rx: std::sync::mpsc::Receiver<BackendEvent>,
     abort: Arc<AtomicBool>,
 }
 
 impl WorkerHandle {
-    pub fn new(ctx: egui::Context) -> Self {
-        Worker::spawn(ctx)
-    }
-
-    pub fn save_as(&self, path: PathBuf) {
-        self.tx
-            .send(FrontendEvent::SaveAs(path))
-            .expect("failed to send save as request to worker");
-    }
-
-    pub fn load_file(&self, path: &Path) {
-        self.tx
-            .send(FrontendEvent::LoadFile(path.to_path_buf()))
-            .expect("failed to send load file to worker");
-    }
-
-    pub fn apply_palette(&mut self, palette: Vec<[u8; 3]>, common: Common, args: LutAlgorithmArgs) {
-        // cancel previous run and init a new abort signal
-        self.abort.store(true, std::sync::atomic::Ordering::Relaxed);
-        self.abort = Arc::new(AtomicBool::new(false));
-
-        self.tx
-            .send(FrontendEvent::Apply(
-                palette,
-                common,
-                args,
-                self.abort.clone(),
-            ))
-            .expect("failed to send apply request to worker");
-    }
-
-    pub fn poll_event(&self) -> Option<BackendEvent> {
-        self.rx.try_recv().ok()
-    }
-}
-
-pub struct Worker {
-    tx: Sender<BackendEvent>,
-    current_image: Option<lutgen::RgbaImage>,
-    hasher: DefaultHasher,
-    last_render: Arc<[u8]>,
-}
-
-impl Worker {
-    fn spawn(ctx: Context) -> WorkerHandle {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn spawn(ctx: egui::Context) -> Self {
         let (tx, worker_rx) = channel();
         let (worker_tx, rx) = channel();
         let abort = Arc::new(AtomicBool::new(false));
 
         // Spawn thread to fetch the latest version and send it to the frontend if newer
-        let worker_tx_clone = worker_tx.clone();
+        let worker_tx_cloned = worker_tx.clone();
         std::thread::spawn(move || {
-            if let Ok(Some(update)) = check_for_updates() {
-                worker_tx_clone
+            if let Ok(Some(update)) = crate::updates::check_for_updates() {
+                worker_tx_cloned
                     .send(BackendEvent::Update(update))
                     .expect("failed to send update info to frontend");
             }
@@ -150,24 +113,15 @@ impl Worker {
 
         std::thread::spawn(move || {
             let mut worker = Worker {
-                tx: worker_tx,
                 current_image: None,
                 hasher: DefaultHasher::new(),
                 last_render: Default::default(),
             };
             while let Ok(event) = worker_rx.recv() {
-                let res = match event {
-                    FrontendEvent::SaveAs(path) => worker.save_as(path),
-                    FrontendEvent::LoadFile(path) => worker.load_file(&path),
-                    FrontendEvent::Apply(palette, common, args, abort) => {
-                        worker.apply_palette(palette, common, args, abort)
-                    },
-                };
-                if let Err(e) = res {
-                    worker
-                        .tx
-                        .send(BackendEvent::Error(e))
-                        .expect("failed to send backend error to ui thread");
+                if let Some(event) = worker.handle_event(event) {
+                    worker_tx
+                        .send(event)
+                        .expect("failed to send backend event to ui thread");
                 }
                 ctx.request_repaint();
             }
@@ -176,24 +130,88 @@ impl Worker {
         WorkerHandle { tx, rx, abort }
     }
 
-    fn send_set_image(
-        &mut self,
-        time: Duration,
-        source: ImageSource,
-        image: Arc<[u8]>,
-        dim: (u32, u32),
-    ) {
-        self.tx
-            .send(BackendEvent::SetImage {
-                time,
-                source,
-                image,
-                dim,
+    #[cfg(target_arch = "wasm32")]
+    pub fn spawn(ctx: egui::Context) -> Self {
+        use gloo_worker::Spawnable;
+
+        let abort = Arc::new(AtomicBool::new(false));
+        let (tx, rx) = channel();
+        let bridge = Worker::spawner()
+            .callback(move |event| {
+                tx.send(event)
+                    .expect("failed to send backend event to worker handle");
+                ctx.request_repaint();
             })
-            .expect("failed to send image to ui thread")
+            .spawn("worker.js");
+
+        Self { rx, bridge, abort }
     }
 
-    fn save_as(&self, path: PathBuf) -> Result<(), String> {
+    fn send(&self, event: FrontendEvent) {
+        #[cfg(target_arch = "wasm32")]
+        self.bridge.send(event);
+
+        #[cfg(not(target_arch = "wasm32"))]
+        self.tx
+            .send(event)
+            .expect("failed to send save as request to worker");
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn save_as(&self, path: PathBuf) {
+        self.send(FrontendEvent::SaveAs(path))
+    }
+
+    pub fn load_file(&self, path: PathBuf, #[cfg(target_arch = "wasm32")] bytes: Vec<u8>) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.send(FrontendEvent::LoadFile(path));
+        #[cfg(target_arch = "wasm32")]
+        self.send(FrontendEvent::LoadFile(path, bytes));
+    }
+
+    pub fn apply_palette(&mut self, palette: Vec<[u8; 3]>, common: Common, args: LutAlgorithmArgs) {
+        // cancel previous run and init a new abort signal
+        self.abort.store(true, std::sync::atomic::Ordering::Relaxed);
+        self.abort = Arc::new(AtomicBool::new(false));
+
+        self.send(FrontendEvent::Apply(
+            palette,
+            common,
+            args,
+            self.abort.clone(),
+        ))
+    }
+
+    pub fn poll_event(&self) -> Option<BackendEvent> {
+        self.rx.try_recv().ok()
+    }
+}
+
+pub struct Worker {
+    current_image: Option<lutgen::RgbaImage>,
+    hasher: DefaultHasher,
+    last_render: Arc<[u8]>,
+}
+
+impl Worker {
+    fn handle_event(&mut self, event: FrontendEvent) -> Option<BackendEvent> {
+        let res = match event {
+            FrontendEvent::SaveAs(path) => self.save_as(path),
+            #[cfg(not(target_arch = "wasm32"))]
+            FrontendEvent::LoadFile(path) => self.load_file(&path),
+            #[cfg(target_arch = "wasm32")]
+            FrontendEvent::LoadFile(path, bytes) => self.load_file(&path, bytes),
+            FrontendEvent::Apply(palette, common, args, abort) => {
+                self.apply_palette(palette, common, args, abort)
+            },
+        };
+        match res {
+            Ok(event) => event,
+            Err(e) => Some(BackendEvent::Error(e)),
+        }
+    }
+
+    fn save_as(&self, path: PathBuf) -> Result<Option<BackendEvent>, String> {
         if self.last_render.is_empty() {
             return Err("Image must be applied at least once".into());
         }
@@ -203,30 +221,41 @@ impl Worker {
                 &self.last_render,
                 image.width(),
                 image.height(),
-                ColorType::Rgba8,
+                image::ColorType::Rgba8,
             )
             .map_err(|e| format!("failed to encode image: {e}"))?;
         }
 
-        Ok(())
+        Ok(None)
     }
 
-    fn load_file(&mut self, path: &Path) -> Result<(), String> {
+    fn load_file(
+        &mut self,
+        path: &Path,
+        #[cfg(target_arch = "wasm32")] bytes: Vec<u8>,
+    ) -> Result<Option<BackendEvent>, String> {
         let time = Instant::now();
-        let image = image::open(path).map_err(|e| e.to_string())?.to_rgba8();
+
+        #[cfg(not(target_arch = "wasm32"))]
+        let image = image::open(path);
+        #[cfg(target_arch = "wasm32")]
+        let image = image::load_from_memory(&bytes);
+        let image = image.map_err(|e| e.to_string())?.to_rgba8();
 
         // hash image
         self.hasher = DefaultHasher::new();
         image.hash(&mut self.hasher);
 
-        self.send_set_image(
-            time.elapsed(),
-            ImageSource::Image(path.to_path_buf()),
-            image.to_vec().into(),
-            (image.height(), image.width()),
-        );
+        let frame = image.to_vec().into();
+        let dim = (image.height(), image.width());
         self.current_image = Some(image);
-        Ok(())
+
+        Ok(Some(BackendEvent::SetImage {
+            time: time.elapsed(),
+            source: ImageSource::Image(path.to_path_buf()),
+            image: frame,
+            dim,
+        }))
     }
 
     /// Apply a palette to the currently loaded image
@@ -236,12 +265,12 @@ impl Worker {
         common: Common,
         args: LutAlgorithmArgs,
         abort: Arc<AtomicBool>,
-    ) -> Result<(), String> {
+    ) -> Result<Option<BackendEvent>, String> {
         let time = Instant::now();
 
         let Some(mut image) = self.current_image.clone() else {
             // do nothing if no image is loaded
-            return Ok(());
+            return Ok(None);
         };
 
         // hash arguments with existing image hash
@@ -314,15 +343,41 @@ impl Worker {
 
         // remap image
         lutgen::identity::correct_image_with_level(&mut image, &lut, common.level);
-
         self.last_render = image.to_vec().into();
-        self.send_set_image(
-            time.elapsed(),
-            ImageSource::Edited(hash),
-            self.last_render.clone(),
-            (image.height(), image.width()),
-        );
 
-        Ok(())
+        Ok(Some(BackendEvent::SetImage {
+            time: time.elapsed(),
+            source: ImageSource::Edited(hash),
+            image: self.last_render.clone(),
+            dim: (image.height(), image.width()),
+        }))
     }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl gloo_worker::Worker for Worker {
+    type Input = FrontendEvent;
+    type Output = BackendEvent;
+    type Message = ();
+
+    fn create(_scope: &gloo_worker::WorkerScope<Self>) -> Self {
+        Worker {
+            current_image: None,
+            hasher: DefaultHasher::new(),
+            last_render: Default::default(),
+        }
+    }
+
+    fn received(
+        &mut self,
+        scope: &gloo_worker::WorkerScope<Self>,
+        msg: FrontendEvent,
+        id: gloo_worker::HandlerId,
+    ) {
+        if let Some(event) = self.handle_event(msg) {
+            scope.respond(id, event);
+        }
+    }
+
+    fn update(&mut self, _scope: &gloo_worker::WorkerScope<Self>, _msg: Self::Message) {}
 }

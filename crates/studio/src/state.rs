@@ -14,11 +14,16 @@ use crate::worker::{BackendEvent, ImageSource};
 pub struct UiState {
     // main window state
     pub show_about: bool,
+    #[cfg_attr(target_arch = "wasm32", serde(skip))]
     pub current_image: Option<PathBuf>,
     #[serde(skip)]
     pub image_texture: Option<TextureHandle>,
     #[serde(skip)]
     pub edited_texture: Option<TextureHandle>,
+    #[cfg(target_arch = "wasm32")]
+    #[serde(skip)]
+    /// on web, we need to keep a copy of the edited buffer on main thread for download
+    pub edited_buffer: (std::sync::Arc<[u8]>, u32, u32),
     #[serde(skip)]
     pub show_original: bool,
     #[serde(skip)]
@@ -48,6 +53,9 @@ impl Default for UiState {
             image_texture: None,
             edited_texture: None,
             show_original: false,
+
+            #[cfg(target_arch = "wasm32")]
+            edited_buffer: Default::default(),
 
             palette_selection: DynamicPalette::Builtin(lutgen_palettes::Palette::Carburetor),
             palette: lutgen_palettes::Palette::Carburetor.get().to_vec(),
@@ -97,6 +105,11 @@ impl UiState {
                         self.show_original = true;
                     },
                     ImageSource::Edited(_) => {
+                        #[cfg(target_arch = "wasm32")]
+                        {
+                            self.edited_buffer = (image, width, height);
+                        }
+
                         // for edited output
                         self.edited_texture = Some(texture);
                         self.show_original = false;

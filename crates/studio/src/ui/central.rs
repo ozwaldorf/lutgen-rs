@@ -18,7 +18,7 @@ impl App {
                     egui::Color32::GRAY,
                 );
                 if res.clicked() {
-                    self.open_picker.pick_file();
+                    self.open_picker.trigger(None);
                 }
             } else {
                 egui::Scene::new()

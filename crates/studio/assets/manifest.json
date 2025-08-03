@@ -1,0 +1,17 @@
+{
+  "name": "Lutgen Studio",
+  "short_name": "lutgen-studio",
+  "icons": [
+    {
+      "src": "./assets/lutgen.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ],
+  "lang": "en-US",
+  "id": "/index.html",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "theme_color": "black"
+}

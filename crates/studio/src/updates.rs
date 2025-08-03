@@ -1,12 +1,10 @@
-use std::fmt::Display;
-
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Release {
     tag_name: String,
     html_url: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize)]
 pub struct UpdateInfo {
     pub version: [u8; 3],
     pub url: String,
@@ -37,8 +35,9 @@ impl TryFrom<Release> for UpdateInfo {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn check_for_updates_inner(current: [u8; 3]) -> Result<Option<UpdateInfo>, String> {
-    fn update_err(e: impl Display) -> String {
+    fn update_err(e: impl std::fmt::Display) -> String {
         format!("Failed to fetch latest github releases: {e}")
     }
 
@@ -64,6 +63,7 @@ fn check_for_updates_inner(current: [u8; 3]) -> Result<Option<UpdateInfo>, Strin
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 /// Check for latest updates from github releases api.
 ///
 /// In debug mode, should always return the latest version.

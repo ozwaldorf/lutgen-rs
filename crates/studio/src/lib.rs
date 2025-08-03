@@ -1,41 +1,21 @@
 #![warn(clippy::all)]
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use std::path::PathBuf;
 
+use crate::file_picker::FileDialog;
 use crate::state::{LutAlgorithm, UiState};
 use crate::ui::left::{PaletteEditor, PaletteFilterBox};
+pub use crate::worker::Worker;
 use crate::worker::{LutAlgorithmArgs, WorkerHandle};
 
 mod color;
+mod file_picker;
 mod palette;
 mod state;
 mod ui;
 mod updates;
 mod utils;
 mod worker;
-
-const IMAGE_EXTENSIONS: &[&str] = &[
-    "avif", "bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpg", "jpeg", "png", "pnm", "qoi",
-    "tga", "tiff", "webp",
-];
-
-#[derive(bpaf::Bpaf)]
-#[bpaf(options, version)]
-pub struct Cli {
-    /// Verbosity level, repeat for more (ie, -vvv for maximum logging)
-    #[bpaf(
-        short, req_flag(()), count,
-        map(|l| {
-            use log::LevelFilter::*;
-            [Warn, Info, Debug, Trace][l.clamp(0, 3)]
-        })
-    )]
-    verbosity: log::LevelFilter,
-    /// Image to open on startup
-    #[bpaf(positional, guard(|p| p.exists(), "Image path not found"), optional)]
-    input: Option<PathBuf>,
-}
 
 pub struct App {
     /// Main app state
@@ -48,8 +28,9 @@ pub struct App {
     palette_box: PaletteFilterBox,
     palette_edit: PaletteEditor,
     // File pickers
-    pub open_picker: egui_file_dialog::FileDialog,
-    pub save_picker: egui_file_dialog::FileDialog,
+    pub open_picker: FileDialog,
+    #[cfg(not(target_arch = "wasm32"))]
+    pub save_picker: FileDialog,
     /// Lutgen icon
     icon: egui::TextureHandle,
 }
@@ -95,31 +76,24 @@ impl App {
             egui::TextureOptions::default(),
         );
 
-        // Setup open/save file pickers with supported images
-        let open_picker = egui_file_dialog::FileDialog::new()
-            .add_file_filter_extensions("Images", IMAGE_EXTENSIONS.to_vec())
-            .default_file_filter("Images")
-            .title("Open Image");
-        let mut save_picker = egui_file_dialog::FileDialog::new().title("Save Image As");
-        for &ext in IMAGE_EXTENSIONS {
-            save_picker = save_picker.add_save_extension(ext, ext);
-        }
-        save_picker = save_picker.default_save_extension("png");
-
         // Spawn background worker thread
+        let worker = WorkerHandle::spawn(cc.egui_ctx.clone());
+
         let mut this = Self {
-            worker: WorkerHandle::new(cc.egui_ctx.clone()),
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
             scene_rect: egui::Rect::ZERO,
-            open_picker,
-            save_picker,
+            open_picker: FileDialog::pick(cc.egui_ctx.clone()),
+            #[cfg(not(target_arch = "wasm32"))]
+            save_picker: FileDialog::save(cc.egui_ctx.clone()),
             state,
             icon,
+            worker,
         };
 
         // Optionally load current image and apply settings right away
-        if let Some(path) = &this.state.current_image {
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(path) = this.state.current_image.clone() {
             this.worker.load_file(path);
             this.apply();
         }
@@ -159,43 +133,25 @@ impl eframe::App for App {
             self.state.handle_event(ctx, event);
         }
 
-        self.open_picker.update(ctx);
-        if let Some(path) = self.open_picker.take_picked() {
-            self.worker.load_file(&path);
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(path) = self.open_picker.poll() {
+            self.worker.load_file(path.clone());
             self.state.current_image = Some(path);
         }
 
-        self.save_picker.update(ctx);
-        if let Some(path) = self.save_picker.take_picked() {
-            self.worker.save_as(path);
+        #[cfg(not(target_arch = "wasm32"))]
+        if let Some(item) = self.save_picker.poll() {
+            self.worker.save_as(item);
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        if let Some((path, bytes)) = self.open_picker.poll() {
+            self.worker.load_file(path.clone(), bytes);
+            self.state.current_image = Some(path);
+            self.apply();
         }
 
         // Show UI
         self.show(ctx);
     }
-}
-
-fn main() -> eframe::Result {
-    let args = cli().run();
-
-    env_logger::builder()
-        .filter_level(args.verbosity)
-        .parse_env("RUST_LOG")
-        .init();
-
-    eframe::run_native(
-        "lutgen-studio",
-        eframe::NativeOptions {
-            viewport: egui::ViewportBuilder::default()
-                .with_title("Lutgen Studio")
-                .with_icon(
-                    eframe::icon_data::from_png_bytes(include_bytes!("../assets/lutgen.png"))
-                        .expect("Failed to load icon"),
-                ),
-            persist_window: true,
-            centered: true,
-            ..Default::default()
-        },
-        Box::new(|cc| Ok(Box::new(App::new(cc, args.input)))),
-    )
 }

@@ -29,7 +29,12 @@
 
         cLib = crane.mkLib pkgs;
         stableCraneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
-        craneLib = cLib.overrideToolchain fenix.packages.${system}.complete.toolchain;
+        craneLib = cLib.overrideToolchain (
+          fenix.packages.${system}.fromToolchainFile {
+            file = ./rust-toolchain.toml;
+            sha256 = "UAoZcxg3iWtS+2n8TFNfANFt/GmkuOMDf7QAE0fRxeA=";
+          }
+        );
 
         # source and package versions
         src = craneLib.path ./.;
@@ -139,6 +144,7 @@
           packages = with pkgs; [
             jekyll
             bundler
+            trunk
           ];
 
         };

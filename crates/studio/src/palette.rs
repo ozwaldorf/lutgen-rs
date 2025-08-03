@@ -37,7 +37,7 @@ impl DynamicPalette {
 
         let path = std::env::var("LUTGEN_DIR")
             .map(Into::into)
-            .unwrap_or(dirs::config_dir().unwrap().join("lutgen"));
+            .unwrap_or(dirs::config_dir().unwrap_or_default().join("lutgen"));
         if path.is_dir() {
             for entry in std::fs::read_dir(path)? {
                 let path = entry?.path();
