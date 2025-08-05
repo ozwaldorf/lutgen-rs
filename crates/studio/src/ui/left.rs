@@ -327,6 +327,10 @@ impl App {
                         ui.label("Hald-Clut Level");
                         let res = ui.add(egui::Slider::new(&mut self.state.common.level, 4..=16));
                         apply |= res.drag_stopped() | res.lost_focus();
+                        res.on_hover_text("\
+                            Hald clut level to generate. \
+                            A level of 16 stores a value for the entire sRGB color space.\n\n\
+                            Default: 10\nRange: 4-16");
 
                         ui.label("Luminosity Factor");
                         let res = ui.add(egui::Slider::new(
@@ -334,10 +338,22 @@ impl App {
                             0.001..=2.,
                         ));
                         apply |= res.drag_stopped() | res.lost_focus();
+                        res.on_hover_text("\
+                            Factor to multiply luminocity values by. \
+                            Effectively weights the interpolation to prefer more \
+                            colorful or more greyscale/unsaturated matches.\n\n\
+                            Tip: Use values below 1.0 for more colorful results, \
+                            above 1.0 for less colorful results. \
+                            Extreme values usually are paired with 'Preserve Luminosity'.\n\n\
+                            Default: 0.7");
 
-                        apply |= ui
-                            .checkbox(&mut self.state.common.preserve, "Preserve Luminosity")
-                            .changed();
+                        let res = ui
+                            .checkbox(&mut self.state.common.preserve, "Preserve Luminosity");
+                        apply |= res.changed();
+                        res.on_hover_text("\
+                            Preserve the original image's luminocity values after interpolation. \
+                            This effectively retains the image's contrast and generally improves gradients.\n\n\
+                            Default: true");
 
                         // unique algorithm args
                         match self.state.current_alg {
@@ -352,6 +368,12 @@ impl App {
                                     0.001..=512.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Shape parameter for the default Gaussian RBF interpolation. \
+                                    Effectively creates more or less blending between colors in the palette.\n\n\
+                                    Bigger numbers = less blending (closer to original colors)\n\
+                                    Smaller numbers = more blending (smoother results)\n\n\
+                                    Default: 128.0");
                             },
                             LutAlgorithm::ShepardsMethod => {
                                 ui.separator();
@@ -364,6 +386,10 @@ impl App {
                                     0.001..=64.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Power parameter for Shepard's method (Inverse Distance RBF).\n\
+                                    Higher values give more weight to closer palette colors.\n\n\
+                                    Default: 4.0");
                             },
                             LutAlgorithm::GaussianSampling => {
                                 ui.separator();
@@ -376,6 +402,11 @@ impl App {
                                     -127.0..=127.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Average amount of noise to apply in each iteration. \
+                                    Controls the bias of the random sampling process, and can lighten \
+                                    or darken the image overall.\n\n\
+                                    Default: 0.0\nRange: -127.0 to 127.0");
 
                                 ui.label("Standard Deviation");
                                 let res = ui.add(egui::Slider::new(
@@ -383,6 +414,10 @@ impl App {
                                     1.0..=128.,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Standard deviation parameter for the noise applied in each iteration. \
+                                    Controls how much variation is applied during sampling.\n\n\
+                                    Default: 20.0");
 
                                 ui.label("Iterations");
                                 let res = ui.add(egui::Slider::new(
@@ -390,6 +425,10 @@ impl App {
                                     1..=1024,
                                 ));
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Number of iterations of noise to apply to each pixel.\n\
+                                    More iterations = better blending but slower processing.\n\n\
+                                    Default: 512");
 
                                 ui.label("RNG Seed");
                                 let res = ui.add(
@@ -397,6 +436,9 @@ impl App {
                                         .speed(2i32.pow(20)),
                                 );
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Seed for the random number generator used in noise generation.\n\n\
+                                    Default: 42080085");
                             },
                             _ => {},
                         }
@@ -410,17 +452,24 @@ impl App {
                                         .step_by(1.),
                                 );
                                 apply |= res.drag_stopped() | res.lost_focus();
+                                res.on_hover_text("\
+                                    Number of nearest colors to consider when interpolating.\n\n\
+                                    0 = uses all available colors ( O(n) )\n\
+                                    Lower values = faster processing\n\
+                                    Higher values = more blending\n\n\
+                                    Default: 16");
                             },
                             _ => {},
                         }
                     });
 
                     ui.horizontal(|ui| {
-                        if ui
+                        let res = ui
                             .add(
                                 egui::Button::new("Copy CLI Arguments")
                                     .min_size(egui::Vec2::new(ui.available_width(), 16.)),
-                            )
+                            );
+                        if res
                             .clicked()
                         {
                             let args = self.state.cli_args();
