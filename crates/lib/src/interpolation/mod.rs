@@ -7,6 +7,7 @@ pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgba;
 use kiddo::float::kdtree::KdTree;
 pub use nearest_neighbor::NearestNeighborRemapper;
+#[cfg(feature = "rayon")]
 use rayon::prelude::*;
 pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
 
@@ -31,7 +32,7 @@ pub trait InterpolatedRemapper<'a>: Sync {
 
     /// Remap an image in place, aborting if the given atomic boolean is true.
     fn remap_image_with_interrupt(&self, image: &mut RgbaImage, abort: Arc<AtomicBool>) {
-        image.par_pixels_mut().for_each(|pixel| {
+        image.pixels_mut().for_each(|pixel| {
             if !abort.load(std::sync::atomic::Ordering::Relaxed) {
                 self.remap_pixel(pixel);
             }

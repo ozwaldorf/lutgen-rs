@@ -118,6 +118,7 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
     }
 
     /// Rayon version. Helper method to generate a lut using an [`InterpolatedRemapper`].
+    #[cfg(feature = "rayon")]
     fn par_generate_lut(&self, level: u8) -> RgbImage {
         let mut identity = identity::generate(level).convert();
         self.par_remap_image(&mut identity);
@@ -137,6 +138,7 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
 
     /// Rayon version. Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the
     /// given boolean is true.
+    #[cfg(feature = "rayon")]
     fn par_generate_lut_with_interrupt(
         &self,
         level: u8,
