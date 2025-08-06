@@ -1,5 +1,11 @@
 name: Release Builds
-on: [push, workflow_dispatch]
+on: 
+  push: 
+    paths: 
+      - '.github/workflows/release.yml'
+      - 'crates/**/*'
+      - 'Cargo.*'
+  workflow_dispatch:
 
 jobs:
   cleanup:
