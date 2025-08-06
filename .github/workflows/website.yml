@@ -1,4 +1,4 @@
-name: Wiki
+name: Website
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/wiki.yml'
       - 'docs/**'
+      - 'crates/studio/**'
   workflow_dispatch:
 
 permissions:
