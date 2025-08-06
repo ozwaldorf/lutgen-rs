@@ -77,6 +77,10 @@ impl App {
                     self.state.show_about = !self.state.show_about;
                 }
 
+                if ui.button("Docs").clicked() {
+                    ui.ctx().open_url(egui::OpenUrl::new_tab("https://lut.sh"));
+                }
+
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     egui::widgets::global_theme_preference_buttons(ui);
                     #[cfg(not(target_arch = "wasm32"))]
