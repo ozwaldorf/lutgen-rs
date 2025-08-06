@@ -72,7 +72,7 @@ impl PaletteFilterBox {
                         ui.horizontal(|ui| {
                             if egui::TextEdit::singleline(&mut self.filter)
                                 .hint_text("Search Palettes ...")
-                                .desired_width(ui.available_width() - 54.)
+                                .desired_width(ui.available_width() - 55.)
                                 .show(ui)
                                 .response
                                 .changed()
@@ -117,7 +117,7 @@ impl PaletteFilterBox {
                                             *current == selected,
                                             palette.as_str(),
                                         )
-                                        .min_size(egui::Vec2::new(ui.available_width(), 16.)),
+                                        .min_size(egui::Vec2::new(ui.available_width() - 1., 16.)),
                                     );
                                     // scroll when item is focused
                                     res.gained_focus()
