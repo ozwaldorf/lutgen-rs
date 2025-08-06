@@ -3,6 +3,7 @@ description: Documentation, tips, and lore for lutgen-rs
 theme: just-the-docs
 color_scheme: carburetor
 aux_links:
+  Studio Web: /app
   Github: https://github.com/ozwaldorf/lutgen-rs
 exclude:
   - man/
