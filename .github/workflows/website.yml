@@ -4,7 +4,7 @@ on:
   push:
     branches: ['main']
     paths:
-      - '.github/workflows/wiki.yml'
+      - '.github/workflows/website.yml'
       - 'docs/**'
       - 'crates/studio/**'
   workflow_dispatch:
