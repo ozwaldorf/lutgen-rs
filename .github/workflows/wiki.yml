@@ -3,7 +3,7 @@ name: Wiki
 on:
   push:
     branches: ['main']
-    paths: 
+    paths:
       - '.github/workflows/wiki.yml'
       - 'docs/**'
   workflow_dispatch:
@@ -22,26 +22,28 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./docs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-          bundler-cache: true
-          cache-version: 0
-          working-directory: docs/
-      - name: Setup Pages
+      - name: Install nix
+        uses: DeterminateSystems/nix-installer-action@main
+      - name: Use nix develop environment
+        uses: nicknovitski/nix-develop@v1
+      - name: Setup pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
-        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+        run: |
+          cd docs
+          bundle install
+          bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+      - name: Build with Trunk
+        run: |
+          cd crates/studio
+          trunk build --release
+          mv dist ../../docs/_site/app
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

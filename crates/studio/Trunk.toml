@@ -1,2 +1,4 @@
 [build]
+public_url = "/app"
+minify = "on_release"
 filehash = false
