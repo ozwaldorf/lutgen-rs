@@ -328,9 +328,10 @@ impl App {
                         let res = ui.add(egui::Slider::new(&mut self.state.common.level, 4..=16));
                         apply |= res.drag_stopped() | res.lost_focus();
                         res.on_hover_text("\
-                            Hald clut level to generate. \
-                            A level of 16 stores a value for the entire sRGB color space.\n\n\
-                            Default: 10\nRange: 4-16");
+                            Hald clut level to generate. Heavy impact on performance for high levels. \n\
+                            A level of 16 computes a value for the entire sRGB color space.\n\n\
+                            Range: 4-16",
+                        );
 
                         ui.label("Luminosity Factor");
                         let res = ui.add(egui::Slider::new(

@@ -252,21 +252,18 @@ impl Default for Common {
         Self {
             preserve: true,
             lum_factor: Hashed(0.7),
+            #[cfg(not(target_arch = "wasm32"))]
             level: 12,
+            #[cfg(target_arch = "wasm32")]
+            level: 8,
         }
     }
 }
 
-#[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Copy, Debug, Default, Hash, serde::Deserialize, serde::Serialize)]
 pub struct CommonRbf {
     /// Number of nearest colors to consider when interpolating. 0 uses all available colors.
     pub nearest: usize,
-}
-
-impl Default for CommonRbf {
-    fn default() -> Self {
-        Self { nearest: 16 }
-    }
 }
 
 #[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]
