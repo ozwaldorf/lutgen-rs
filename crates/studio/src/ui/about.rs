@@ -8,16 +8,10 @@ impl App {
                 ui.add(egui::Image::from_texture(&self.icon).max_width(100.));
                 ui.add_space(20.);
 
-                let version = env!("CARGO_PKG_VERSION");
-                #[cfg(not(target_arch = "wasm32"))]
-                ui.heading(format!("Lutgen Studio v{version}"));
-                #[cfg(target_arch = "wasm32")]
-                ui.heading(format!("Lutgen Studio (Web) v{version}"));
-
-                ui.add_space(5.);
+                ui.heading(format!("Lutgen Studio v{}", env!("CARGO_PKG_VERSION")));
+                ui.add_space(10.);
                 #[cfg(not(target_arch = "wasm32"))]
                 self.show_update(ui);
-
                 ui.label(format!(
                     "License {}, Copyright 2025",
                     env!("CARGO_PKG_LICENSE")
@@ -32,9 +26,23 @@ impl App {
                 ui.add(egui::Separator::default().shrink(50.));
                 ui.add_space(15.);
 
+                #[cfg(target_arch = "wasm32")]
+                {
+                    ui.heading("Web Version Note");
+                    ui.add_space(10.);
+                    ui.label("It is recommended to use the native applications.");
+                    ui.label(
+                        "The web version is much slower than the cli or native gui, and much \
+                        less responsive when tweaking settings or using high level luts",
+                    );
+                    ui.add_space(15.);
+                    ui.add(egui::Separator::default().shrink(50.));
+                    ui.add_space(15.);
+                }
+
                 ui.heading("Basic Help");
-                ui.add_space(15.);
-                ui.label("Images can be opened and saved in the `File` dialog");
+                ui.add_space(10.);
+                ui.label("Images can be opened and saved in the top bar");
                 ui.add_space(5.);
                 ui.label("Left-click the preview to toggle between original and edited");
                 ui.add_space(5.);
