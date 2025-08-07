@@ -6,9 +6,15 @@ permalink: studio
 
 # Lutgen Studio
 
-For those looking for an interactive experience, the official GUI is available.
+For those looking for an interactive experience, the official GUI is available. It can be installed natively or used on the web at [lut.sh/app](https://lut.sh/app).
 
 <img alt="Lutgen Studio" src="https://github.com/user-attachments/assets/436ece7a-b59f-404d-a6d6-6c0e754355f2" />
+
+## Installing Native App
+
+`lutgen-studio` is available on the following package repositories:
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg?exclude_unsupported=1)](https://repology.org/project/lutgen-studio/versions)
 
 ## Help
 
