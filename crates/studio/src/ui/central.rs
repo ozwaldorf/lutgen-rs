@@ -81,6 +81,7 @@ impl App {
                         } else {
                             unreachable!();
                         };
+
                         // paint border
                         ui.painter().rect_stroke(
                             rect,
@@ -88,6 +89,19 @@ impl App {
                             egui::Stroke::new(1.0, egui::Color32::GRAY),
                             egui::StrokeKind::Middle,
                         );
+
+                        // show spinner if processing
+                        if self.state.show_spinner {
+                            ui.painter().rect_filled(
+                                rect,
+                                4.0,
+                                egui::Color32::from_black_alpha(64),
+                            );
+                            egui::Spinner::new().paint_at(
+                                ui,
+                                egui::Rect::from_center_size(rect.center(), egui::Vec2::splat(30.)),
+                            );
+                        }
                     });
             }
             self.scene_rect = scene_rect;

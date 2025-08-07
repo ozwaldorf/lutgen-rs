@@ -14,6 +14,8 @@ use crate::worker::{BackendEvent, ImageSource};
 pub struct UiState {
     // main window state
     pub show_about: bool,
+    #[serde(skip)]
+    pub show_spinner: bool,
     #[cfg_attr(target_arch = "wasm32", serde(skip))]
     pub current_image: Option<PathBuf>,
     #[serde(skip)]
@@ -47,6 +49,7 @@ impl Default for UiState {
         Self {
             // default is true for first starts
             show_about: true,
+            show_spinner: false,
             update: None,
             last_event: "Started.".to_string(),
             current_image: None,
@@ -96,6 +99,7 @@ impl UiState {
                         .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
+                self.show_spinner = false;
                 match source {
                     ImageSource::Image(path) => {
                         // for newly opened images from file picker
@@ -105,14 +109,13 @@ impl UiState {
                         self.show_original = true;
                     },
                     ImageSource::Edited(_) => {
+                        // for edited output
+                        self.edited_texture = Some(texture);
+                        self.show_original = false;
                         #[cfg(target_arch = "wasm32")]
                         {
                             self.edited_buffer = (image, width, height);
                         }
-
-                        // for edited output
-                        self.edited_texture = Some(texture);
-                        self.show_original = false;
                     },
                 }
             },

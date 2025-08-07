@@ -103,6 +103,7 @@ impl App {
 
     /// Collect arguments and send apply request to the worker
     pub fn apply(&mut self) {
+        self.state.show_spinner = true;
         let args = match self.state.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
                 rbf: self.state.common_rbf,
