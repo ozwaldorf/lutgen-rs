@@ -484,15 +484,17 @@ impl App {
         }
     }
 
+    /// side panel for lut args
     pub fn show_sidebar(&mut self, ctx: &egui::Context) {
-        // side panel for lut args
-        egui::SidePanel::left("args")
-            .resizable(true)
-            .min_width(214.)
-            .show(ctx, |ui| {
-                egui::ScrollArea::vertical().show(ui, |ui| {
-                    self.show_sidebar_inner(ui);
+        if !self.inline_layout {
+            egui::SidePanel::left("args")
+                .resizable(true)
+                .min_width(214.)
+                .show(ctx, |ui| {
+                    egui::ScrollArea::vertical().show(ui, |ui| {
+                        self.show_sidebar_inner(ui);
+                    });
                 });
-            });
+        }
     }
 }

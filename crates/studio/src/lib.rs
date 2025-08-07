@@ -22,6 +22,7 @@ pub struct App {
     state: UiState,
     /// Handle to background worker
     worker: WorkerHandle,
+    inline_layout: bool,
     /// Rect for the image preview scene
     scene_rect: egui::Rect,
     /// Filter box for selecting palettes
@@ -82,6 +83,7 @@ impl App {
         let mut this = Self {
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
+            inline_layout: false,
             scene_rect: egui::Rect::ZERO,
             open_picker: FileDialog::pick(cc.egui_ctx.clone()),
             #[cfg(not(target_arch = "wasm32"))]
@@ -130,6 +132,8 @@ impl eframe::App for App {
     }
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.inline_layout = ctx.available_rect().width() < 600.;
+
         // Handle any incoming events from the backend
         if let Some(event) = self.worker.poll_event() {
             self.state.handle_event(ctx, event);
