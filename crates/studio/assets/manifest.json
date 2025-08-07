@@ -1,6 +1,6 @@
 {
-  "name": "Lutgen Studio Web",
-  "short_name": "Lutgen Studio",
+  "name": "Lutgen Studio",
+  "short_name": "Lutgen",
   "icons": [
     {
       "src": "./assets/lutgen.png",
