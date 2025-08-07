@@ -12,9 +12,15 @@ For those looking for an interactive experience, the official GUI is available. 
 
 ## Installing Native App
 
-`lutgen-studio` is available on the following package repositories:
+`lutgen-studio` is available on the following package repositories
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg?exclude_unsupported=1)](https://repology.org/project/lutgen-studio/versions)
+
+## Installing Web App
+
+On desktop and mobile devices, the webapp can be installed directly by browsers.
+
+For example, in google chrome on android, tap the triple dot menu, then "Add to homescreen", and finally "Install".
 
 ## Help
 
@@ -24,11 +30,17 @@ New images can be opened in the `File` -> `Open` menu dropdown.
 
 ### Saving edited output
 
-Edited image output can be saved in the `File` -> `Save As` menu dropdown
+#### Native
+
+Edited image output can be saved to a file in any supported format by clicking `Save As` in the `File` menu.
+
+#### Web
+
+Edited output can be exported by selecting an image format in the `File` -> `Export` menu.
 
 ### Viewing original image
 
-At any point, left-clicking on the image preview will toggle between the edited and original images.
+At any point, left-clicking or tapping on the image preview will toggle between the edited and original images.
 
 ### Editing the palette
 
