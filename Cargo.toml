@@ -24,3 +24,7 @@ panic = "abort"
 
 [profile.test]
 inherits = "release"
+
+[patch.crates-io]
+egui = { git = "https://github.com/ozwaldorf/egui.git", branch = "patch-2" }
+eframe = { git = "https://github.com/ozwaldorf/egui.git", branch = "patch-2" }

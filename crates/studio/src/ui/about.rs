@@ -43,9 +43,7 @@ impl App {
                 ui.heading("Basic Help");
                 ui.add_space(10.);
                 ui.label("Images can be opened and saved in the top bar");
-                ui.add_space(5.);
                 ui.label("Left-click the preview to toggle between original and edited");
-                ui.add_space(5.);
                 ui.label("Left-click the palette colors to edit, right-click to delete");
                 ui.add_space(20.);
             });

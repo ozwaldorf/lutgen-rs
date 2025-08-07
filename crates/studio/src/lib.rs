@@ -38,22 +38,6 @@ pub struct App {
 
 impl App {
     pub fn new(cc: &eframe::CreationContext<'_>, input: Option<PathBuf>) -> Self {
-        // Theming
-        cc.egui_ctx.set_visuals(egui::Visuals {
-            dark_mode: true,
-            // bg
-            window_fill: egui::Color32::from_rgb(0x16, 0x16, 0x16),
-            code_bg_color: egui::Color32::from_rgb(0x0b, 0x0b, 0x0b),
-            faint_bg_color: egui::Color32::from_rgb(0x26, 0x26, 0x26),
-            extreme_bg_color: egui::Color32::from_rgb(0x39, 0x39, 0x39),
-            // fg
-            override_text_color: Some(egui::Color32::from_rgb(0xf4, 0xf4, 0xf4)),
-            hyperlink_color: egui::Color32::from_rgb(0x45, 0x89, 0xff),
-            warn_fg_color: egui::Color32::from_rgb(0xfd, 0xdc, 0x69),
-            error_fg_color: egui::Color32::from_rgb(0xfa, 0x4d, 0x56),
-            ..Default::default()
-        });
-
         // Load previous app state (if any).
         let mut state = cc
             .storage
@@ -80,6 +64,7 @@ impl App {
         // Spawn background worker thread
         let worker = WorkerHandle::spawn(cc.egui_ctx.clone());
 
+        #[allow(unused_mut)]
         let mut this = Self {
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),

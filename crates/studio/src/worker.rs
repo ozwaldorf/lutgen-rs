@@ -17,7 +17,10 @@ use crate::updates::UpdateInfo;
 pub enum FrontendEvent {
     LoadFile(PathBuf, #[cfg(target_arch = "wasm32")] Vec<u8>),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
-    SaveAs(#[cfg(not(target_arch = "wasm32"))] PathBuf),
+    SaveAs(
+        #[cfg(not(target_arch = "wasm32"))] PathBuf,
+        #[cfg(target_arch = "wasm32")] image::ImageFormat,
+    ),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Hash, Debug)]
@@ -47,7 +50,7 @@ pub enum BackendEvent {
         dim: (u32, u32),
     },
     #[cfg(target_arch = "wasm32")]
-    SaveData(Duration, String),
+    SaveData(Duration, String, image::ImageFormat),
 }
 
 impl Display for BackendEvent {
@@ -67,8 +70,8 @@ impl Display for BackendEvent {
                 },
             },
             #[cfg(target_arch = "wasm32")]
-            BackendEvent::SaveData(time, _) => {
-                format!("Encoded png for download in {time:.2?}").fmt(f)
+            BackendEvent::SaveData(time, _, format) => {
+                format!("Encoded {format:?} for download in {time:.2?}").fmt(f)
             },
         }
     }
@@ -162,11 +165,12 @@ impl WorkerHandle {
         self.bridge.send(event);
     }
 
-    pub fn save_as(&self, #[cfg(not(target_arch = "wasm32"))] path: PathBuf) {
-        #[cfg(not(target_arch = "wasm32"))]
-        self.send(FrontendEvent::SaveAs(path));
-        #[cfg(target_arch = "wasm32")]
-        self.send(FrontendEvent::SaveAs());
+    pub fn save_as(
+        &self,
+        #[cfg(not(target_arch = "wasm32"))] item: PathBuf,
+        #[cfg(target_arch = "wasm32")] item: image::ImageFormat,
+    ) {
+        self.send(FrontendEvent::SaveAs(item));
     }
 
     pub fn load_file(&self, path: PathBuf, #[cfg(target_arch = "wasm32")] bytes: Vec<u8>) {
@@ -206,7 +210,7 @@ impl Worker {
             #[cfg(not(target_arch = "wasm32"))]
             FrontendEvent::SaveAs(path) => self.save_as(path),
             #[cfg(target_arch = "wasm32")]
-            FrontendEvent::SaveAs() => self.save_as(),
+            FrontendEvent::SaveAs(format) => self.save_as(format),
             #[cfg(not(target_arch = "wasm32"))]
             FrontendEvent::LoadFile(path) => self.load_file(&path),
             #[cfg(target_arch = "wasm32")]
@@ -224,6 +228,7 @@ impl Worker {
     fn save_as(
         &self,
         #[cfg(not(target_arch = "wasm32"))] path: PathBuf,
+        #[cfg(target_arch = "wasm32")] format: image::ImageFormat,
     ) -> Result<Option<BackendEvent>, String> {
         if self.last_render.is_empty() {
             return Err("Image must be applied at least once".into());
@@ -241,27 +246,49 @@ impl Worker {
 
             #[cfg(target_arch = "wasm32")]
             {
-                info!("encoding image");
                 use base64::Engine;
-                let time = Instant::now();
 
-                // encode image as png
+                let time = Instant::now();
+                let width = image.width();
+                let height = image.height();
+
+                info!("Encoding {width}x{height} image as {format:?}");
+
+                // encode image in the given format
                 let mut buf = std::io::Cursor::new(Vec::new());
-                image::write_buffer_with_format(
+                if let Err(_) = image::write_buffer_with_format(
                     &mut buf,
                     &self.last_render,
-                    image.width(),
-                    image.height(),
+                    width,
+                    height,
                     image::ColorType::Rgba8,
-                    image::ImageFormat::Png,
-                )
-                .unwrap();
+                    format,
+                ) {
+                    // image format likely doesn't support transparency
+                    let buffer: Vec<u8> = self
+                        .last_render
+                        .chunks_exact(4)
+                        .flat_map(|v| &v[0..3])
+                        .cloned()
+                        .collect();
+                    buf = std::io::Cursor::new(Vec::new());
+                    image::write_buffer_with_format(
+                        &mut buf,
+                        &buffer,
+                        width,
+                        height,
+                        image::ColorType::Rgb8,
+                        format,
+                    )
+                    .map_err(|e| format!("failed to encode image: {e}"))?;
+                }
 
-                // encode png as base64 and send to frontend
+                // encode image file as data url and send to frontend
                 let data = base64::engine::general_purpose::STANDARD.encode(&buf.into_inner());
                 return Ok(Some(BackendEvent::SaveData(
                     time.elapsed(),
-                    format!("data:image/png;base64,{data}"),
+                    format!("data:{};base64,{data}", format.to_mime_type()),
+                    format,
                 )));
             }
         }

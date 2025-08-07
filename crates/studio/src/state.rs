@@ -73,6 +73,7 @@ impl UiState {
 
         match event {
             BackendEvent::Error(e) => {
+                self.processing = false;
                 error!("{e}");
             },
             BackendEvent::SetImage {
@@ -114,15 +115,12 @@ impl UiState {
                 self.update = Some(update);
             },
             #[cfg(target_arch = "wasm32")]
-            BackendEvent::SaveData(_, data) => {
+            BackendEvent::SaveData(_, data, format) => {
                 use web_sys::wasm_bindgen::JsCast;
 
                 self.processing = false;
-                let filename = self
-                    .current_image
-                    .as_ref()
-                    .map(|path| path.display().to_string())
-                    .unwrap_or("lutgen.png".to_string());
+                let mut filename = self.current_image.clone().unwrap_or("lutgen.png".into());
+                filename.set_extension(format.extensions_str().first().unwrap());
 
                 // create a download link
                 let win = web_sys::window().expect("failed to get window");
@@ -130,13 +128,11 @@ impl UiState {
                 let link = doc.create_element("a").expect("failed to create link");
                 link.set_attribute("href", &data)
                     .expect("failed to set data");
-                link.set_attribute("download", &filename)
+                link.set_attribute("download", &filename.display().to_string())
                     .expect("failed to set download name");
 
                 // click it
-                let link: web_sys::HtmlAnchorElement =
-                    web_sys::HtmlAnchorElement::unchecked_from_js(link.into());
-                link.click();
+                web_sys::HtmlAnchorElement::unchecked_from_js(link.clone().into()).click();
 
                 // cleanup
                 link.remove();
