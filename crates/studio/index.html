@@ -8,15 +8,17 @@
 <head>
     <title>Lutgen Studio</title>
 
+    <base data-trunk-public-url />
+
     <link data-trunk rel="rust" data-wasm-opt="2" data-bin="lutgen-studio" />
     <link data-trunk rel="rust" data-wasm-opt="2" data-bin="worker" data-type="worker" />
 
-    <base data-trunk-public-url />
 
-    <link data-trunk rel="icon" href="assets/lutgen.png">
+
+    <link data-trunk rel="copy-file" href="assets/sw.js"/>
     <link data-trunk rel="copy-file" href="assets/manifest.json"/>
-    <link data-trunk rel="copy-file" href="assets/lutgen.png" data-target-path="assets"/>
     <link data-trunk rel="copy-file" href="assets/maskable.png" data-target-path="assets"/>
+    <link data-trunk rel="icon" href="assets/lutgen.png" data-target-path="assets"/>
 
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
@@ -112,9 +114,20 @@
 <body>
     <canvas id="the_canvas_id"></canvas>
     <div class="centered" id="loading_text">
-        <p style="font-size:16px">Loading…</p>
         <div class="lds-dual-ring"></div>
     </div>
+
+
+    <!--Register Service Worker. this will cache the wasm / js scripts for offline use (for PWA functionality). -->
+    <!-- Force refresh (Ctrl + F5) to load the latest files instead of cached files  -->
+    <script>
+        // We disable caching during development so that we always view the latest version.
+        if ('serviceWorker' in navigator && window.location.hash !== "#dev") {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
 </body>
 
 </html>
