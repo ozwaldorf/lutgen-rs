@@ -17,7 +17,7 @@ use crate::updates::UpdateInfo;
 pub enum FrontendEvent {
     LoadFile(PathBuf, #[cfg(target_arch = "wasm32")] Vec<u8>),
     Apply(Vec<[u8; 3]>, Common, LutAlgorithmArgs, Arc<AtomicBool>),
-    SaveAs(PathBuf),
+    SaveAs(#[cfg(not(target_arch = "wasm32"))] PathBuf),
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Hash, Debug)]
@@ -46,6 +46,8 @@ pub enum BackendEvent {
         image: Arc<[u8]>,
         dim: (u32, u32),
     },
+    #[cfg(target_arch = "wasm32")]
+    SaveData(Duration, String),
 }
 
 impl Display for BackendEvent {
@@ -63,6 +65,10 @@ impl Display for BackendEvent {
                 ImageSource::Edited(_) => {
                     format!("Generated and applied LUT to image in {time:.2?}").fmt(f)
                 },
+            },
+            #[cfg(target_arch = "wasm32")]
+            BackendEvent::SaveData(time, _) => {
+                format!("Encoded png for download in {time:.2?}").fmt(f)
             },
         }
     }
@@ -148,18 +154,19 @@ impl WorkerHandle {
     }
 
     fn send(&self, event: FrontendEvent) {
-        #[cfg(target_arch = "wasm32")]
-        self.bridge.send(event);
-
         #[cfg(not(target_arch = "wasm32"))]
         self.tx
             .send(event)
             .expect("failed to send save as request to worker");
+        #[cfg(target_arch = "wasm32")]
+        self.bridge.send(event);
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
-    pub fn save_as(&self, path: PathBuf) {
-        self.send(FrontendEvent::SaveAs(path))
+    pub fn save_as(&self, #[cfg(not(target_arch = "wasm32"))] path: PathBuf) {
+        #[cfg(not(target_arch = "wasm32"))]
+        self.send(FrontendEvent::SaveAs(path));
+        #[cfg(target_arch = "wasm32")]
+        self.send(FrontendEvent::SaveAs());
     }
 
     pub fn load_file(&self, path: PathBuf, #[cfg(target_arch = "wasm32")] bytes: Vec<u8>) {
@@ -196,7 +203,10 @@ pub struct Worker {
 impl Worker {
     fn handle_event(&mut self, event: FrontendEvent) -> Option<BackendEvent> {
         let res = match event {
+            #[cfg(not(target_arch = "wasm32"))]
             FrontendEvent::SaveAs(path) => self.save_as(path),
+            #[cfg(target_arch = "wasm32")]
+            FrontendEvent::SaveAs() => self.save_as(),
             #[cfg(not(target_arch = "wasm32"))]
             FrontendEvent::LoadFile(path) => self.load_file(&path),
             #[cfg(target_arch = "wasm32")]
@@ -211,11 +221,15 @@ impl Worker {
         }
     }
 
-    fn save_as(&self, path: PathBuf) -> Result<Option<BackendEvent>, String> {
+    fn save_as(
+        &self,
+        #[cfg(not(target_arch = "wasm32"))] path: PathBuf,
+    ) -> Result<Option<BackendEvent>, String> {
         if self.last_render.is_empty() {
             return Err("Image must be applied at least once".into());
         }
         if let Some(image) = &self.current_image {
+            #[cfg(not(target_arch = "wasm32"))]
             image::save_buffer(
                 path,
                 &self.last_render,
@@ -224,6 +238,32 @@ impl Worker {
                 image::ColorType::Rgba8,
             )
             .map_err(|e| format!("failed to encode image: {e}"))?;
+
+            #[cfg(target_arch = "wasm32")]
+            {
+                info!("encoding image");
+                use base64::Engine;
+                let time = Instant::now();
+
+                // encode image as png
+                let mut buf = std::io::Cursor::new(Vec::new());
+                image::write_buffer_with_format(
+                    &mut buf,
+                    &self.last_render,
+                    image.width(),
+                    image.height(),
+                    image::ColorType::Rgba8,
+                    image::ImageFormat::Png,
+                )
+                .unwrap();
+
+                // encode png as base64 and send to frontend
+                let data = base64::engine::general_purpose::STANDARD.encode(&buf.into_inner());
+                return Ok(Some(BackendEvent::SaveData(
+                    time.elapsed(),
+                    format!("data:image/png;base64,{data}"),
+                )));
+            }
         }
 
         Ok(None)

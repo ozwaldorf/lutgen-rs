@@ -22,10 +22,6 @@ pub struct UiState {
     pub image_texture: Option<TextureHandle>,
     #[serde(skip)]
     pub edited_texture: Option<TextureHandle>,
-    #[cfg(target_arch = "wasm32")]
-    #[serde(skip)]
-    /// on web, we need to keep a copy of the edited buffer on main thread for download
-    pub edited_buffer: (std::sync::Arc<[u8]>, u32, u32),
     #[serde(skip)]
     pub show_original: bool,
     #[serde(skip)]
@@ -56,9 +52,6 @@ impl Default for UiState {
             image_texture: None,
             edited_texture: None,
             show_original: false,
-
-            #[cfg(target_arch = "wasm32")]
-            edited_buffer: Default::default(),
 
             palette_selection: DynamicPalette::Builtin(lutgen_palettes::Palette::Carburetor),
             palette: lutgen_palettes::Palette::Carburetor.get().to_vec(),
@@ -114,15 +107,39 @@ impl UiState {
                         // for edited output
                         self.edited_texture = Some(texture);
                         self.show_original = false;
-                        #[cfg(target_arch = "wasm32")]
-                        {
-                            self.edited_buffer = (image, width, height);
-                        }
                     },
                 }
             },
             BackendEvent::Update(update) => {
                 self.update = Some(update);
+            },
+            #[cfg(target_arch = "wasm32")]
+            BackendEvent::SaveData(_, data) => {
+                use web_sys::wasm_bindgen::JsCast;
+
+                self.processing = false;
+                let filename = self
+                    .current_image
+                    .as_ref()
+                    .map(|path| path.display().to_string())
+                    .unwrap_or("lutgen.png".to_string());
+
+                // create a download link
+                let win = web_sys::window().expect("failed to get window");
+                let doc = win.document().expect("failed to get document");
+                let link = doc.create_element("a").expect("failed to create link");
+                link.set_attribute("href", &data)
+                    .expect("failed to set data");
+                link.set_attribute("download", &filename)
+                    .expect("failed to set download name");
+
+                // click it
+                let link: web_sys::HtmlAnchorElement =
+                    web_sys::HtmlAnchorElement::unchecked_from_js(link.into());
+                link.click();
+
+                // cleanup
+                link.remove();
             },
         }
     }

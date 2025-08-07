@@ -139,6 +139,7 @@ impl eframe::App for App {
         if let Some(path) = self.open_picker.poll() {
             self.worker.load_file(path.clone());
             self.state.current_image = Some(path);
+            self.state.processing = true;
         }
 
         #[cfg(not(target_arch = "wasm32"))]

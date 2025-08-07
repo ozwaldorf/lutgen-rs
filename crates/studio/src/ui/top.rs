@@ -32,44 +32,10 @@ impl App {
                 }
 
                 #[cfg(target_arch = "wasm32")]
-                if let Some(path) = self.state.current_image.clone() {
+                if self.state.edited_texture.is_some() {
                     if ui.button("Download").clicked() {
-                        use base64::Engine;
-                        use web_sys::wasm_bindgen::JsCast;
-
-                        // encode image as base64 png data
-                        let (image, width, height) = self.state.edited_buffer.clone();
-                        if width + height > 2 {
-                            let mut buf = std::io::Cursor::new(Vec::new());
-                            image::write_buffer_with_format(
-                                &mut buf,
-                                &image,
-                                height,
-                                width,
-                                image::ColorType::Rgba8,
-                                image::ImageFormat::Png,
-                            )
-                            .unwrap();
-
-                            let data =
-                                base64::engine::general_purpose::STANDARD.encode(&buf.into_inner());
-
-                            log::info!("encoded image");
-                            // create a download link, click it to trigger, and remove afterwards
-                            let win = web_sys::window().expect("failed to get window");
-                            let doc = win.document().expect("failed to get document");
-                            let body = doc.body().unwrap();
-                            let link = doc.create_element("a").expect("failed to create link");
-
-                            link.set_attribute("href", &format!("data:image/png;base64,{data}"))
-                                .expect("failed to set data");
-                            link.set_attribute("download", &path.display().to_string())
-                                .expect("failed to set download name");
-                            let link: web_sys::HtmlAnchorElement =
-                                web_sys::HtmlAnchorElement::unchecked_from_js(link.into());
-                            link.click();
-                            link.remove();
-                        }
+                        self.worker.save_as();
+                        self.state.processing = true;
                     }
                 }
 
