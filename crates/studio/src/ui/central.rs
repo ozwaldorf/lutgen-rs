@@ -91,7 +91,7 @@ impl App {
                         );
 
                         // show spinner if processing
-                        if self.state.show_spinner {
+                        if self.state.processing {
                             ui.painter().rect_filled(
                                 rect,
                                 4.0,

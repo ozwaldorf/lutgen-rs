@@ -15,7 +15,7 @@ pub struct UiState {
     // main window state
     pub show_about: bool,
     #[serde(skip)]
-    pub show_spinner: bool,
+    pub processing: bool,
     #[cfg_attr(target_arch = "wasm32", serde(skip))]
     pub current_image: Option<PathBuf>,
     #[serde(skip)]
@@ -49,7 +49,7 @@ impl Default for UiState {
         Self {
             // default is true for first starts
             show_about: true,
-            show_spinner: false,
+            processing: false,
             update: None,
             last_event: "Started.".to_string(),
             current_image: None,
@@ -99,7 +99,9 @@ impl UiState {
                         .with_mipmap_mode(Some(egui::TextureFilter::Nearest)),
                 );
 
-                self.show_spinner = false;
+                // hide spinner
+                self.processing = false;
+
                 match source {
                     ImageSource::Image(path) => {
                         // for newly opened images from file picker

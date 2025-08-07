@@ -103,7 +103,8 @@ impl App {
 
     /// Collect arguments and send apply request to the worker
     pub fn apply(&mut self) {
-        self.state.show_spinner = true;
+        // Show the spinner until we receive an edited image
+        self.state.processing = true;
         let args = match self.state.current_alg {
             LutAlgorithm::GaussianRbf => LutAlgorithmArgs::GaussianRbf {
                 rbf: self.state.common_rbf,
