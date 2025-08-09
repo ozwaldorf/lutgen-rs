@@ -1,12 +1,10 @@
-use egui::Vec2;
-
+use crate::ui::scene::ConstrainedScene;
 use crate::App;
 
 impl App {
-    fn show_image(&mut self, pad: f32, ui: &mut egui::Ui) {
+    fn show_image(&mut self, mut size: egui::Vec2, ui: &mut egui::Ui) {
         if self.state.edited_texture.is_none() && self.state.image_texture.is_none() {
             // no image loaded
-            let mut size = ui.available_size();
             if self.inline_layout {
                 size.y /= 4.;
             }
@@ -22,7 +20,6 @@ impl App {
                 self.open_picker.trigger(None);
             }
         } else {
-            let available_size = ui.available_size() - Vec2::splat(pad);
             let rect = if !self.state.show_original
                 && let Some(texture) = &self.state.edited_texture
             {
@@ -30,8 +27,7 @@ impl App {
                 let res = ui.add(
                     egui::Image::from_texture(texture)
                         .texture_options(egui::TextureOptions::NEAREST)
-                        .max_size(available_size)
-                        .fit_to_exact_size(available_size)
+                        .max_size(size)
                         .corner_radius(4.0)
                         .sense(egui::Sense::click()),
                 );
@@ -44,8 +40,7 @@ impl App {
                 let res = ui.add(
                     egui::Image::from_texture(texture)
                         .texture_options(egui::TextureOptions::NEAREST)
-                        .max_size(available_size)
-                        .fit_to_exact_size(available_size)
+                        .max_size(size)
                         .corner_radius(4.0)
                         .sense(egui::Sense::click()),
                 );
@@ -103,17 +98,16 @@ impl App {
     /// Main app panel
     pub fn show_central_panel(&mut self, ctx: &egui::Context) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            let size = ui.available_size();
             if !self.inline_layout {
-                let mut scene_rect = self.scene_rect;
-                egui::Scene::new()
-                    .zoom_range(1.0..=256.0)
-                    .show(ui, &mut scene_rect, |ui| {
-                        self.show_image(15., ui);
-                    });
-                self.scene_rect = scene_rect;
+                let mut transform = self.scene_transform;
+                ConstrainedScene::new(0.95..=f32::INFINITY).show(ui, &mut transform, |ui| {
+                    self.show_image(size, ui);
+                });
+                self.scene_transform = transform;
             } else {
                 egui::ScrollArea::new([false, true]).show(ui, |ui| {
-                    self.show_image(0., ui);
+                    self.show_image(size, ui);
                     self.show_sidebar_inner(ui);
                 });
             }

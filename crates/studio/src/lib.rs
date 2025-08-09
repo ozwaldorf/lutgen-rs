@@ -22,9 +22,10 @@ pub struct App {
     state: UiState,
     /// Handle to background worker
     worker: WorkerHandle,
+
     inline_layout: bool,
-    /// Rect for the image preview scene
-    scene_rect: egui::Rect,
+    scene_transform: egui::emath::TSTransform,
+
     /// Filter box for selecting palettes
     palette_box: PaletteFilterBox,
     palette_edit: PaletteEditor,
@@ -69,7 +70,7 @@ impl App {
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
             inline_layout: false,
-            scene_rect: egui::Rect::ZERO,
+            scene_transform: Default::default(),
             open_picker: FileDialog::pick(cc.egui_ctx.clone()),
             #[cfg(not(target_arch = "wasm32"))]
             save_picker: FileDialog::save(cc.egui_ctx.clone()),

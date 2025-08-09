@@ -5,6 +5,7 @@ use crate::App;
 mod about;
 mod central;
 pub mod left;
+pub mod scene;
 mod status;
 mod top;
 
