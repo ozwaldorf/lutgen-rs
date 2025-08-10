@@ -26,20 +26,20 @@ impl App {
                 ui.label("Lutgen Studio Web");
 
                 ui.menu_button("File", |ui| {
-                    if ui.button("Open").clicked() {
+                    if ui.button("🖻  Open").clicked() {
                         self.open_picker.trigger(self.state.current_image.clone());
                         ui.close();
                     }
 
                     #[cfg(not(target_arch = "wasm32"))]
-                    if ui.button("Save As").clicked() {
+                    if ui.button("💾  Save As").clicked() {
                         self.save_picker.trigger(self.state.current_image.clone());
                         ui.close();
                     }
 
                     #[cfg(target_arch = "wasm32")]
                     ui.add_enabled_ui(self.state.current_image.is_some(), |ui| {
-                        egui::containers::menu::SubMenuButton::new("Export").ui(ui, |ui| {
+                        egui::containers::menu::SubMenuButton::new("⤓  Export").ui(ui, |ui| {
                             for format in image::ImageFormat::all() {
                                 let ext = *format.extensions_str().first().unwrap();
                                 if ui.button(ext).clicked() {
@@ -51,17 +51,17 @@ impl App {
                         });
                     });
 
-                    ui.menu_button("Theme", |ui| {
+                    ui.menu_button("🎨  Theme", |ui| {
                         egui::widgets::global_theme_preference_buttons(ui);
                     });
                 });
 
                 ui.menu_button("Help", |ui| {
-                    if ui.button("About").clicked() {
+                    if ui.button("ℹ  About").clicked() {
                         self.state.show_about = !self.state.show_about;
                     }
 
-                    if ui.button("Docs").clicked() {
+                    if ui.button("🖹  Docs").clicked() {
                         ui.ctx().open_url(egui::OpenUrl::new_tab("https://lut.sh"));
                     }
                 });
