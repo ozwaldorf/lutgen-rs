@@ -24,7 +24,7 @@ pub struct App {
     worker: WorkerHandle,
 
     inline_layout: bool,
-    scene_transform: egui::emath::TSTransform,
+    scene_rect: egui::Rect,
 
     /// Filter box for selecting palettes
     palette_box: PaletteFilterBox,
@@ -70,7 +70,7 @@ impl App {
             palette_box: PaletteFilterBox::new(&state.palette_selection),
             palette_edit: PaletteEditor::new(&state.palette_selection),
             inline_layout: false,
-            scene_transform: Default::default(),
+            scene_rect: egui::Rect::NOTHING,
             open_picker: FileDialog::pick(cc.egui_ctx.clone()),
             #[cfg(not(target_arch = "wasm32"))]
             save_picker: FileDialog::save(cc.egui_ctx.clone()),

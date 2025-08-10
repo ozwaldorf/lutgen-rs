@@ -1,4 +1,4 @@
-use crate::ui::scene::ConstrainedScene;
+use crate::ui::scene::Scene;
 use crate::App;
 
 impl App {
@@ -100,11 +100,14 @@ impl App {
         egui::CentralPanel::default().show(ctx, |ui| {
             let size = ui.available_size();
             if !self.inline_layout {
-                let mut transform = self.scene_transform;
-                ConstrainedScene::new(0.95..=f32::INFINITY).show(ui, &mut transform, |ui| {
-                    self.show_image(size, ui);
-                });
-                self.scene_transform = transform;
+                let mut rect = self.scene_rect;
+                Scene::new()
+                    .zoom_range(0.95..=f32::INFINITY)
+                    .constrain_panning(true)
+                    .show(ui, &mut rect, |ui| {
+                        self.show_image(size, ui);
+                    });
+                self.scene_rect = rect;
             } else {
                 egui::ScrollArea::new([false, true]).show(ui, |ui| {
                     self.show_image(size, ui);

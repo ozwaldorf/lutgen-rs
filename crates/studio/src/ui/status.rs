@@ -24,8 +24,8 @@ impl App {
                 ui.horizontal(|ui| {
                     ui.label(&self.state.last_event);
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        let scale = self.scene_transform.scaling * 100.;
-                        ui.label(format!("{scale:.0} %"));
+                        // let scale = self.scene_rect.scaling * 100.;
+                        // ui.label(format!("{scale:.0} %"));
                         ui.separator();
 
                         if let Some(tex) = &self.state.image_texture {
