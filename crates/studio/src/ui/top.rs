@@ -39,7 +39,7 @@ impl App {
 
                     #[cfg(target_arch = "wasm32")]
                     ui.add_enabled_ui(self.state.current_image.is_some(), |ui| {
-                        egui::containers::menu::SubMenuButton::new("⤓  Export").ui(ui, |ui| {
+                        egui::containers::menu::SubMenuButton::new("💾  Export").ui(ui, |ui| {
                             for format in image::ImageFormat::all() {
                                 let ext = *format.extensions_str().first().unwrap();
                                 if ui.button(ext).clicked() {
