@@ -56,12 +56,15 @@ fn constrain_transform_to_content(
         return transform;
     }
 
+    let TSTransform {
+        scaling,
+        mut translation,
+    } = transform;
+
     // Transform content rect to global coordinates
     let content_in_global = transform * content_rect;
     let view_size = view_rect.size();
     let content_size = content_in_global.size();
-
-    let mut translation = transform.translation;
 
     // X axis constraint
     if content_size.x <= view_size.x {
@@ -91,7 +94,7 @@ fn constrain_transform_to_content(
 
     TSTransform {
         translation,
-        scaling: transform.scaling,
+        scaling,
     }
 }
 
@@ -125,6 +128,7 @@ impl Default for Scene {
     }
 }
 
+#[allow(unused)]
 impl Scene {
     #[inline]
     pub fn new() -> Self {
@@ -347,13 +351,15 @@ impl Scene {
                 to_global.scaling = self.zoom_range.clamp(to_global.scaling);
             }
 
-            // Pan:
-            *to_global = TSTransform::from_translation(pan_delta) * *to_global;
-
             // Apply panning constraints if enabled
             if self.constrain_panning {
-                *to_global =
-                    constrain_transform_to_content(*to_global, view_rect, self.content_rect);
+                *to_global = constrain_transform_to_content(
+                    TSTransform::from_translation(pan_delta) * *to_global,
+                    view_rect,
+                    self.content_rect,
+                );
+            } else {
+                *to_global = TSTransform::from_translation(pan_delta) * *to_global;
             }
 
             resp.mark_changed();
