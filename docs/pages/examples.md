@@ -11,13 +11,13 @@ permalink: /examples
 Edit `my-image` into the catppuccin colorscheme
 
 ```bash
-lutgen apply --palette catpuccin-mocha my-image.png
+lutgen apply --palette catppuccin-mocha my-image.png
 ```
 
 If results could be better, try tweaking some parameters. For example:
 
 ```bash
-lutgen apply --preserve catpuccin-mocha --lum 0.5 --preserve my-image.png
+lutgen apply --preserve catppuccin-mocha --lum 0.5 --preserve my-image.png
 # or for short
 lutgen a -p catppuccin-mocha -PL0.5 my-image.png
 ```
