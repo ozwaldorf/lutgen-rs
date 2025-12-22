@@ -65,7 +65,7 @@ struct Common {
         short,
         long,
         argument("2-16"),
-        fallback(10),
+        fallback(6),
         display_fallback,
         guard(|v| (2..=16).contains(v), "hald level must between 2-16"))
     ]
@@ -79,7 +79,7 @@ struct Common {
         short('L'),
         long("lum"),
         argument("FACTOR"),
-        fallback(Hashed(1.0)),
+        fallback(Hashed(0.8)),
         display_fallback
     )]
     lum_factor: Hashed<f64>,

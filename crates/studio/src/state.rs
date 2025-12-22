@@ -271,9 +271,9 @@ impl Default for Common {
             preserve: true,
             lum_factor: Hashed(0.7),
             #[cfg(not(target_arch = "wasm32"))]
-            level: 12,
-            #[cfg(target_arch = "wasm32")]
             level: 8,
+            #[cfg(target_arch = "wasm32")]
+            level: 4,
         }
     }
 }
