@@ -36,6 +36,7 @@ quantette = { version = "0.3", features = ["colorspaces", "kmeans"] }
 [[bin]]
 name = "lutgen"
 path = "src/main.rs"
+bench = false
 
 [package.metadata.aur]
 custom = [

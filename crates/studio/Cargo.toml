@@ -18,9 +18,18 @@ keywords = [
 categories = ["multimedia::images"]
 include = ["Cargo.toml", "**/*.rs", "assets"]
 
+[lib]
+bench = false
+
 [[bin]]
 name = "lutgen-studio"
 path = "src/bin/main.rs"
+bench = false
+
+[[bin]]
+name = "lutgen-studio-worker"
+path = "src/bin/worker.rs"
+bench = false
 
 [dependencies]
 lutgen = { path = "../lib", version = "0.15" }

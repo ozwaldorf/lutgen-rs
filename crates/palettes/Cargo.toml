@@ -12,6 +12,7 @@ categories = ["multimedia::images"]
 
 [lib]
 path = "./lib.rs"
+bench = false
 
 [dependencies]
 strum.workspace = true

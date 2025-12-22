@@ -19,7 +19,7 @@ homepage = "https://github.com/ozwaldorf/lutgen-rs"
 categories = ["multimedia::images"]
 
 [dev-dependencies]
-criterion = { version = "0.6", features = ["html_reports"] }
+criterion = { version = "0.8", features = ["html_reports"] }
 lutgen-palettes = { path = "../palettes" }
 image = { version = "0.25", default-features = false, features = ["jpeg"] }
 
@@ -36,6 +36,9 @@ arrayref = "0.3"
 [features]
 rayon = ["dep:rayon", "image/rayon"]
 default = ["rayon"]
+
+[lib]
+bench = false
 
 [[bench]]
 name = "main"
