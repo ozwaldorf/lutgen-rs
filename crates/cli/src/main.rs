@@ -14,7 +14,7 @@ use image::codecs::gif::{GifDecoder, GifEncoder};
 use image::codecs::png::PngDecoder;
 use image::codecs::webp::WebPDecoder;
 use image::{AnimationDecoder, DynamicImage, Frame};
-use lutgen::identity::{correct_pixel, detect_level};
+use lutgen::identity::{detect_level, HaldClutSampler};
 use lutgen::interpolation::{
     GaussianRemapper,
     GaussianSamplingRemapper,
@@ -724,10 +724,11 @@ impl Lutgen {
 
         for file in &input {
             let res = load_static_or_animated_image(file)?;
+            let sampler = HaldClutSampler::new_with_level(&lut, level);
             match res {
                 Either::Left(mut image) => {
                     let time = Instant::now();
-                    lutgen::identity::correct_image_with_level(&mut image, &lut, level);
+                    sampler.correct_image_tetrahedral(&mut image);
                     println!("✔ Applied LUT to {file:?} in {:.2?}", time.elapsed());
 
                     let time = Instant::now();
@@ -755,7 +756,7 @@ impl Lutgen {
                         print!("\r… Encoding frame {i}/{len}");
                         std::io::stdout().lock().flush().unwrap();
                         let img = frame.buffer_mut();
-                        lutgen::identity::correct_image(img, &lut);
+                        sampler.correct_image_tetrahedral(img);
                     });
                     println!("\r✔ Encoded {len} frames in {:.2?}", time.elapsed());
 
@@ -887,6 +888,7 @@ impl Lutgen {
 
         let (name, colors) = concat_colors(palette, extra_colors);
         let (lut, level) = hald_clut_or_algorithm.generate(&name, colors)?;
+        let sampler = HaldClutSampler::new_with_level(&lut, level);
 
         let len = input.len();
         let re = Regex::new(REGEX).expect("failed to build regex");
@@ -898,21 +900,21 @@ impl Lutgen {
                 *counter += 1;
                 if caps.get(1).is_some() {
                     let rgb = Color::from_str(&caps[2]).expect("valid hex");
-                    let [r, g, b] = correct_pixel(rgb.as_ref(), &lut, level);
+                    let [r, g, b] = sampler.sample_tetrahedral(rgb.0);
                     format!("#{r:02x}{g:02x}{b:02x}")
                 } else if caps.get(3).is_some() {
                     let inner: Vec<u8> = caps[4]
                         .split(',')
                         .map(|s| s.trim().parse().expect("invalid rgb code"))
                         .collect();
-                    let [r, g, b] = correct_pixel(&[inner[0], inner[1], inner[2]], &lut, level);
+                    let [r, g, b] = sampler.sample_tetrahedral([inner[0], inner[1], inner[2]]);
                     format!("rgb({r}, {g}, {b})")
                 } else if caps.get(5).is_some() {
                     let inner: Vec<u8> = caps[6]
                         .split(',')
                         .map(|s| s.trim().parse().expect("invalid rgb point"))
                         .collect();
-                    let [r, g, b] = correct_pixel(&[inner[0], inner[1], inner[2]], &lut, level);
+                    let [r, g, b] = sampler.sample_tetrahedral([inner[0], inner[1], inner[2]]);
                     format!("rgba({r}, {g}, {b}, {})", &caps[7].trim())
                 } else {
                     unreachable!()

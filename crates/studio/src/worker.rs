@@ -409,7 +409,8 @@ impl Worker {
         .ok_or("Cancelled generating hald clut".to_string())?;
 
         // remap image
-        lutgen::identity::correct_image_with_level(&mut image, &lut, common.level);
+        lutgen::identity::HaldClutSampler::new_with_level(&lut, common.level)
+            .correct_image_tetrahedral(&mut image);
         self.last_render = image.to_vec().into();
 
         Ok(Some(BackendEvent::SetImage {
