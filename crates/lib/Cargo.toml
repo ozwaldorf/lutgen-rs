@@ -1,6 +1,6 @@
 [package]
 name = "lutgen"
-version = "0.14.1"
+version = "0.15.0"
 documentation = "https://docs.rs/lutgen"
 keywords = [
   "image-processing",
@@ -21,6 +21,7 @@ categories = ["multimedia::images"]
 [dev-dependencies]
 criterion = { version = "0.6", features = ["html_reports"] }
 lutgen-palettes = { path = "../palettes" }
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
 
 [dependencies]
 image = { version = "0.25", default-features = false, features = [] }

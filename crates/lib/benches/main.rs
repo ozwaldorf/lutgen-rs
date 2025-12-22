@@ -1,14 +1,11 @@
 use std::hint::black_box;
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
-use lutgen::identity::correct_image;
+use lutgen::identity::HaldClutSampler;
 use lutgen::interpolation::{
-    GaussianRemapper,
-    GaussianSamplingRemapper,
-    InterpolatedRemapper,
-    ShepardRemapper,
+    GaussianRemapper, GaussianSamplingRemapper, InterpolatedRemapper, ShepardRemapper,
 };
-use lutgen::{GenerateLut, RgbImage, RgbaImage};
+use lutgen::GenerateLut;
 use lutgen_palettes::Palette;
 
 fn benchmark(c: &mut Criterion) {
@@ -61,18 +58,64 @@ fn benchmark(c: &mut Criterion) {
 
     drop(g);
 
-    let mut g = c.benchmark_group("apply");
-    g.sample_size(100);
-    for i in (1..=4).map(|i| i * 4) {
-        g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
-            let lut = gaussian_rbf().generate_lut(*i);
-            let image = image::open("../../docs/assets/example-image.jpg")
-                .expect("failed to load image")
-                .to_rgba8();
+    // Benchmark apply strategies
+    let image = image::open("../../docs/assets/example-image.jpg")
+        .expect("failed to load image")
+        .to_rgba8();
+    let lut = gaussian_rbf().generate_lut(8);
+    let sampler = HaldClutSampler::new(&lut);
 
-            b.iter(|| apply(&lut, image.clone()));
-        });
-    }
+    let mut g = c.benchmark_group("apply");
+    g.sample_size(50);
+
+    g.bench_function("seq/nearest", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.correct_image(&mut img);
+            black_box(img)
+        })
+    });
+
+    g.bench_function("seq/trilinear", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.correct_image_trilinear(&mut img);
+            black_box(img)
+        })
+    });
+
+    g.bench_function("seq/tetrahedral", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.correct_image_tetrahedral(&mut img);
+            black_box(img)
+        })
+    });
+
+    g.bench_function("par/nearest", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.par_correct_image(&mut img);
+            black_box(img)
+        })
+    });
+
+    g.bench_function("par/trilinear", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.par_correct_image_trilinear(&mut img);
+            black_box(img)
+        })
+    });
+
+    g.bench_function("par/tetrahedral", |b| {
+        b.iter(|| {
+            let mut img = image.clone();
+            sampler.par_correct_image_tetrahedral(&mut img);
+            black_box(img)
+        })
+    });
+
     drop(g);
 }
 
@@ -104,11 +147,6 @@ fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
         42080085,
         false,
     )
-}
-
-fn apply(lut: &RgbImage, mut img: RgbaImage) {
-    correct_image(&mut img, lut);
-    black_box(img);
 }
 
 criterion_group!(benches, benchmark);
