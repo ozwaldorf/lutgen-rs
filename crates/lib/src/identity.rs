@@ -12,9 +12,12 @@ const CHUNK_SIZE: usize = 256;
 /// Supports nearest-neighbor (fast), trilinear (smooth), and tetrahedral (balanced) interpolation.
 #[derive(Clone)]
 pub struct HaldClutSampler {
-    /// Flattened 3D LUT: index = r + g * cube_size + b * cube_size²
+    /// Flattened 3D LUT: index = r + g * cube_size + b * cube_squared
     lut: Vec<[u8; 3]>,
     cube_size: u32,
+    cube_squared: u32,
+    /// Pre-computed (cube_size - 1) / 255.0 for interpolation
+    scale: f32,
 }
 
 impl HaldClutSampler {
@@ -35,9 +38,10 @@ impl HaldClutSampler {
     pub fn new_with_level(hald_clut: &RgbImage, level: u8) -> Self {
         let level = level as u32;
         let cube_size = level * level;
-        let total = (cube_size * cube_size * cube_size) as usize;
+        let cube_squared = cube_size * cube_size;
+        let scale = (cube_size - 1) as f32 / 255.0;
 
-        let mut lut = vec![[0u8; 3]; total];
+        let mut lut = vec![[0u8; 3]; (cube_squared * cube_size) as usize];
 
         // Convert from 2D Hald layout to linear 3D array
         for b in 0..cube_size {
@@ -46,13 +50,13 @@ impl HaldClutSampler {
                     let x = (r % cube_size) + (g % level) * cube_size;
                     let y = (b * level) + (g / level);
                     let src = hald_clut.get_pixel(x, y).0;
-                    let idx = (r + g * cube_size + b * cube_size * cube_size) as usize;
+                    let idx = (r + g * cube_size + b * cube_squared) as usize;
                     lut[idx] = src;
                 }
             }
         }
 
-        Self { lut, cube_size }
+        Self { lut, cube_size, cube_squared, scale }
     }
 
     /// Get the cube size (level²).
@@ -62,10 +66,14 @@ impl HaldClutSampler {
     }
 
     /// Internal: sample at specific cube coordinates via direct indexing.
+    ///
+    /// # Safety
+    /// Caller must ensure r, g, b are all < cube_size.
     #[inline(always)]
     fn sample_at(&self, r: u32, g: u32, b: u32) -> [u8; 3] {
-        let idx = (r + g * self.cube_size + b * self.cube_size * self.cube_size) as usize;
-        self.lut[idx]
+        let idx = (r + g * self.cube_size + b * self.cube_squared) as usize;
+        // SAFETY: r, g, b are always < cube_size when called from sample_* methods
+        unsafe { *self.lut.get_unchecked(idx) }
     }
 
     /// Sample using nearest-neighbor lookups (fastest, quality depends on LUT size).
@@ -80,12 +88,10 @@ impl HaldClutSampler {
     /// Sample with trilinear interpolation (smoother, higher quality).
     #[inline]
     pub fn sample_trilinear(&self, rgb: [u8; 3]) -> [u8; 3] {
-        let scale = (self.cube_size - 1) as f32 / 255.0;
-
         // Compute floating-point coordinates in cube space
-        let rf = rgb[0] as f32 * scale;
-        let gf = rgb[1] as f32 * scale;
-        let bf = rgb[2] as f32 * scale;
+        let rf = rgb[0] as f32 * self.scale;
+        let gf = rgb[1] as f32 * self.scale;
+        let bf = rgb[2] as f32 * self.scale;
 
         // Get integer coordinates and fractions
         let r0 = rf as u32;
@@ -135,11 +141,9 @@ impl HaldClutSampler {
     /// Sample with tetrahedral interpolation (faster than trilinear, good quality).
     #[inline]
     pub fn sample_tetrahedral(&self, rgb: [u8; 3]) -> [u8; 3] {
-        let scale = (self.cube_size - 1) as f32 / 255.0;
-
-        let rf = rgb[0] as f32 * scale;
-        let gf = rgb[1] as f32 * scale;
-        let bf = rgb[2] as f32 * scale;
+        let rf = rgb[0] as f32 * self.scale;
+        let gf = rgb[1] as f32 * self.scale;
+        let bf = rgb[2] as f32 * self.scale;
 
         let r0 = rf as u32;
         let g0 = gf as u32;
