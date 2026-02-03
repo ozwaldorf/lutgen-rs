@@ -1,3 +1,4 @@
+use std::ops::RangeInclusive;
 use std::rc::Rc;
 
 use strum::VariantArray;
@@ -5,6 +6,30 @@ use strum::VariantArray;
 use crate::palette::{lutgen_dir, DynamicPalette};
 use crate::state::LutAlgorithm;
 use crate::App;
+
+/// Helper to add a labeled slider with dynamic DragValue sizing.
+/// The DragValue is measured first, then the slider fills remaining space.
+fn labeled_slider<Num: egui::emath::Numeric>(
+    ui: &mut egui::Ui,
+    label: &str,
+    value: &mut Num,
+    range: RangeInclusive<Num>,
+) -> egui::Response {
+    ui.label(label);
+    ui.horizontal(|ui| {
+        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+            let drag = ui.add(egui::DragValue::new(value).range(range.clone()));
+            ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                ui.style_mut().spacing.slider_width = ui.available_width();
+                let slider = ui.add(egui::Slider::new(value, range).show_value(false));
+                drag | slider
+            })
+            .inner
+        })
+        .inner
+    })
+    .inner
+}
 
 pub struct PaletteFilterBox {
     items: Vec<Rc<DynamicPalette>>,
@@ -288,10 +313,7 @@ impl App {
             ui.heading("Common Arguments");
             ui.add_space(5.);
 
-            ui.label("Hald-Clut Level");
-            let res = ui.add(
-                egui::Slider::new(&mut self.state.common.level, 4..=16)
-            );
+            let res = labeled_slider(ui, "Hald-Clut Level", &mut self.state.common.level, 4..=16);
             apply |= res.drag_stopped() | res.lost_focus();
             res.on_hover_text("\
                 Hald clut level to generate. Heavy impact on performance for high levels. \n\
@@ -299,11 +321,7 @@ impl App {
                 Range: 4-16",
             );
 
-            ui.label("Luminosity Factor");
-            let res = ui.add(egui::Slider::new(
-                self.state.common.lum_factor.as_mut(),
-                0.001..=2.,
-            ));
+            let res = labeled_slider(ui, "Luminosity Factor", self.state.common.lum_factor.as_mut(), 0.001..=2.);
             apply |= res.drag_stopped() | res.lost_focus();
             res.on_hover_text("\
                 Factor to multiply luminocity values by. \
@@ -329,11 +347,7 @@ impl App {
                     ui.heading("Gaussian Arguments");
                     ui.add_space(5.);
 
-                    ui.label("Shape");
-                    let res = ui.add(egui::Slider::new(
-                        self.state.guassian_rbf.shape.as_mut(),
-                        0.001..=512.,
-                    ));
+                    let res = labeled_slider(ui, "Shape", self.state.guassian_rbf.shape.as_mut(), 0.001..=512.);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Shape parameter for the default Gaussian RBF interpolation. \
@@ -347,11 +361,7 @@ impl App {
                     ui.heading("Shepard's Method Arguments");
                     ui.add_space(10.);
 
-                    ui.label("Power");
-                    let res = ui.add(egui::Slider::new(
-                        self.state.shepards_method.power.as_mut(),
-                        0.001..=64.,
-                    ));
+                    let res = labeled_slider(ui, "Power", self.state.shepards_method.power.as_mut(), 0.001..=64.);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Power parameter for Shepard's method (Inverse Distance RBF).\n\
@@ -363,11 +373,7 @@ impl App {
                     ui.heading("Guassian Sampling Arguments");
                     ui.add_space(10.);
 
-                    ui.label("Mean");
-                    let res = ui.add(egui::Slider::new(
-                        self.state.guassian_sampling.mean.as_mut(),
-                        -127.0..=127.,
-                    ));
+                    let res = labeled_slider(ui, "Mean", self.state.guassian_sampling.mean.as_mut(), -127.0..=127.);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Average amount of noise to apply in each iteration. \
@@ -375,22 +381,14 @@ impl App {
                         or darken the image overall.\n\n\
                         Default: 0.0\nRange: -127.0 to 127.0");
 
-                    ui.label("Standard Deviation");
-                    let res = ui.add(egui::Slider::new(
-                        self.state.guassian_sampling.std_dev.as_mut(),
-                        1.0..=128.,
-                    ));
+                    let res = labeled_slider(ui, "Standard Deviation", self.state.guassian_sampling.std_dev.as_mut(), 1.0..=128.);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Standard deviation parameter for the noise applied in each iteration. \
                         Controls how much variation is applied during sampling.\n\n\
                         Default: 20.0");
 
-                    ui.label("Iterations");
-                    let res = ui.add(egui::Slider::new(
-                        &mut self.state.guassian_sampling.iterations,
-                        1..=1024,
-                    ));
+                    let res = labeled_slider(ui, "Iterations", &mut self.state.guassian_sampling.iterations, 1..=1024);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Number of iterations of noise to apply to each pixel.\n\
@@ -413,11 +411,7 @@ impl App {
             // shared rbf args
             match self.state.current_alg {
                 LutAlgorithm::GaussianRbf | LutAlgorithm::ShepardsMethod => {
-                    ui.label("Nearest Colors");
-                    let res = ui.add(
-                        egui::Slider::new(&mut self.state.common_rbf.nearest, 0..=32)
-                            .step_by(1.),
-                    );
+                    let res = labeled_slider(ui, "Nearest Colors", &mut self.state.common_rbf.nearest, 0..=32);
                     apply |= res.drag_stopped() | res.lost_focus();
                     res.on_hover_text("\
                         Number of nearest colors to consider when interpolating.\n\n\
@@ -447,7 +441,6 @@ impl App {
 
     pub fn show_sidebar_inner(&mut self, ui: &mut egui::Ui) {
         let mut apply = false;
-        ui.style_mut().spacing.slider_width = ui.available_width() - 62.;
         ui.add_space(4.);
 
         // palette menu
@@ -491,6 +484,7 @@ impl App {
                 .resizable(true)
                 .min_width(214.)
                 .show(ctx, |ui| {
+                    ui.take_available_width();
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         self.show_sidebar_inner(ui);
                     });
