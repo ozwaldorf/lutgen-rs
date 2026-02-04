@@ -405,6 +405,19 @@ impl App {
                         Seed for the random number generator used in noise generation.\n\n\
                         Default: 42080085");
                 },
+                LutAlgorithm::GaussianBlur => {
+                    ui.separator();
+                    ui.heading("Gaussian Blur Arguments");
+                    ui.add_space(10.);
+
+                    let res = labeled_slider(ui, "Radius", self.state.gaussian_blur.radius.as_mut(), 1.0..=64.0);
+                    apply |= res.drag_stopped() | res.lost_focus();
+                    res.on_hover_text("\
+                        Gaussian blur radius (sigma) applied in OKLab color space.\n\n\
+                        Higher values = larger blur kernel = more color blending\n\
+                        Lower values = smaller kernel = sharper boundaries\n\n\
+                        Default: 8.0");
+                },
                 _ => {},
             }
 

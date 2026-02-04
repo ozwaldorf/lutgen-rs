@@ -10,7 +10,14 @@ use lutgen::GenerateLut;
 use web_time::{Duration, Instant};
 
 use crate::color::Color;
-use crate::state::{Common, CommonRbf, GaussianRbfArgs, GaussianSamplingArgs, ShepardsMethodArgs};
+use crate::state::{
+    BlurArgs,
+    Common,
+    CommonRbf,
+    GaussianRbfArgs,
+    GaussianSamplingArgs,
+    ShepardsMethodArgs,
+};
 use crate::updates::UpdateInfo;
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -35,6 +42,9 @@ pub enum LutAlgorithmArgs {
     },
     GaussianSampling {
         args: GaussianSamplingArgs,
+    },
+    GaussianBlur {
+        args: BlurArgs,
     },
     NearestNeighbor,
 }
@@ -410,6 +420,15 @@ impl Worker {
                     args.iterations,
                     *common.lum_factor,
                     args.seed,
+                    common.preserve,
+                )
+                .par_generate_lut_with_interrupt(common.level, abort)
+            },
+            LutAlgorithmArgs::GaussianBlur { args } => {
+                lutgen::interpolation::GaussianBlurRemapper::new(
+                    &palette,
+                    *args.radius,
+                    *common.lum_factor,
                     common.preserve,
                 )
                 .par_generate_lut_with_interrupt(common.level, abort)

@@ -5,7 +5,6 @@ use kiddo::traits::DistanceMetric;
 use kiddo::{NearestNeighbour, SquaredEuclidean};
 
 use super::{ColorTree, InterpolatedRemapper};
-use crate::GenerateLut;
 
 pub trait RadialBasisFn: Sync {
     fn radial_basis(&self, distance: f64) -> f64;
@@ -19,7 +18,6 @@ pub struct RBFRemapper<F: RadialBasisFn> {
     preserve_lum: bool,
 }
 
-impl<F: RadialBasisFn> GenerateLut<'_> for RBFRemapper<F> {}
 impl<F: RadialBasisFn> RBFRemapper<F> {
     pub fn with_function(
         palette: &[[u8; 3]],

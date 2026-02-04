@@ -36,6 +36,7 @@ pub struct UiState {
     pub guassian_rbf: GaussianRbfArgs,
     pub shepards_method: ShepardsMethodArgs,
     pub guassian_sampling: GaussianSamplingArgs,
+    pub gaussian_blur: BlurArgs,
     pub common_rbf: CommonRbf,
     pub common: Common,
 }
@@ -59,6 +60,7 @@ impl Default for UiState {
             guassian_rbf: Default::default(),
             shepards_method: Default::default(),
             guassian_sampling: Default::default(),
+            gaussian_blur: Default::default(),
             common_rbf: Default::default(),
             common: Default::default(),
         }
@@ -190,6 +192,9 @@ impl UiState {
                 arg!(args, "-i", self.guassian_sampling.iterations, 512);
                 arg!(args, "-S", self.guassian_sampling.seed, 42080085);
             },
+            LutAlgorithm::GaussianBlur => {
+                arg!(args, "-r", self.gaussian_blur.radius.0, 8.0);
+            },
             LutAlgorithm::NearestNeighbor => {},
         }
 
@@ -229,6 +234,9 @@ impl UiState {
             LutAlgorithm::GaussianSampling => {
                 self.guassian_sampling = default.guassian_sampling;
             },
+            LutAlgorithm::GaussianBlur => {
+                self.gaussian_blur = default.gaussian_blur;
+            },
             LutAlgorithm::NearestNeighbor => {},
         }
     }
@@ -248,9 +256,10 @@ impl UiState {
 )]
 pub enum LutAlgorithm {
     #[default]
+    GaussianBlur,
     GaussianRbf,
-    ShepardsMethod,
     GaussianSampling,
+    ShepardsMethod,
     NearestNeighbor,
 }
 
@@ -331,6 +340,20 @@ impl Default for GaussianSamplingArgs {
             std_dev: Hashed(20.),
             iterations: 128,
             seed: 42080085,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Hash, serde::Deserialize, serde::Serialize)]
+pub struct BlurArgs {
+    /// Gaussian blur radius (sigma). Larger = more blending.
+    pub radius: Hashed<f64>,
+}
+
+impl Default for BlurArgs {
+    fn default() -> Self {
+        Self {
+            radius: Hashed(8.0),
         }
     }
 }

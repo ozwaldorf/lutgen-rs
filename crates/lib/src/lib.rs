@@ -109,15 +109,36 @@ pub mod interpolation;
 /// Core image type (Rgba8)
 pub use image::{RgbImage, RgbaImage};
 
-pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
-    /// Helper method to generate a lut using an [`InterpolatedRemapper`].
+/// Trait for types that can generate a Hald CLUT LUT image.
+pub trait GenerateLut<'a>: Sync {
+    /// Generate a hald clut LUT image at the given level.
+    fn generate_lut(&self, level: u8) -> RgbImage;
+
+    /// Rayon version of [`GenerateLut::generate_lut`].
+    #[cfg(feature = "rayon")]
+    fn par_generate_lut(&self, level: u8) -> RgbImage;
+
+    /// Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the given boolean
+    /// is true.
+    fn generate_lut_with_interrupt(&self, level: u8, abort: Arc<AtomicBool>) -> Option<RgbImage>;
+
+    /// Rayon version of [`GenerateLut::generate_lut_with_interrupt`].
+    #[cfg(feature = "rayon")]
+    fn par_generate_lut_with_interrupt(
+        &self,
+        level: u8,
+        abort: Arc<AtomicBool>,
+    ) -> Option<RgbImage>;
+}
+
+/// Blanket impl: any [`InterpolatedRemapper`] can generate a LUT by remapping an identity image.
+impl<'a, T: InterpolatedRemapper<'a>> GenerateLut<'a> for T {
     fn generate_lut(&self, level: u8) -> RgbImage {
         let mut identity = identity::generate(level).convert();
         self.remap_image(&mut identity);
         identity.convert()
     }
 
-    /// Rayon version. Helper method to generate a lut using an [`InterpolatedRemapper`].
     #[cfg(feature = "rayon")]
     fn par_generate_lut(&self, level: u8) -> RgbImage {
         let mut identity = identity::generate(level).convert();
@@ -125,8 +146,6 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
         identity.convert()
     }
 
-    /// Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the given boolean
-    /// is true.
     fn generate_lut_with_interrupt(&self, level: u8, abort: Arc<AtomicBool>) -> Option<RgbImage> {
         let mut identity = identity::generate(level).convert();
         self.remap_image_with_interrupt(&mut identity, abort.clone());
@@ -136,8 +155,6 @@ pub trait GenerateLut<'a>: InterpolatedRemapper<'a> {
             .then_some(identity.convert())
     }
 
-    /// Rayon version. Same as [`GenerateLut::generate_lut`], but aborts and returns nothing if the
-    /// given boolean is true.
     #[cfg(feature = "rayon")]
     fn par_generate_lut_with_interrupt(
         &self,

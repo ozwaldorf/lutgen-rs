@@ -16,6 +16,7 @@ use image::codecs::webp::WebPDecoder;
 use image::{AnimationDecoder, DynamicImage, Frame};
 use lutgen::identity::{correct_pixel, detect_level};
 use lutgen::interpolation::{
+    GaussianBlurRemapper,
     GaussianRemapper,
     GaussianSamplingRemapper,
     NearestNeighborRemapper,
@@ -95,12 +96,25 @@ struct CommonRbf {
 #[derive(Bpaf, Clone, Debug, Hash)]
 enum LutAlgorithm {
     // Default algorithm, so adjacent isn't used.
-    GaussianRbf {
+    GaussianBlur {
         #[bpaf(external)]
         common: Common,
-        #[bpaf(external)]
-        common_rbf: CommonRbf,
-        /// Shape parameter for the default Gaussian RBF interpolation. Effectively creates more or
+        /// Gaussian blur radius (sigma). Larger = more blending.
+        #[bpaf(
+            short('r'),
+            long,
+            argument("RADIUS"),
+            fallback(Hashed(8.0)),
+            display_fallback
+        )]
+        radius: Hashed<f64>,
+    },
+    #[bpaf(adjacent)]
+    GaussianRbf {
+        /// Enable using Gaussian RBF for interpolation.
+        #[bpaf(short('R'), long("gaussian-rbf"), req_flag(()))]
+        _gaussian_rbf: (),
+        /// Shape parameter for Gaussian RBF interpolation. Effectively creates more or
         /// less blending between colors in the palette, where bigger numbers equal less blending.
         /// Effect is heavily dependant on the number of nearest colors used.
         #[bpaf(
@@ -111,21 +125,6 @@ enum LutAlgorithm {
             display_fallback
         )]
         shape: Hashed<f64>,
-    },
-    #[bpaf(adjacent)]
-    ShepardsMethod {
-        /// Enable using Shepard's method (Inverse Distance RBF) for interpolation.
-        #[bpaf(short('S'), long("shepards-method"), req_flag(()))]
-        _shepards_method: (),
-        /// Power parameter for shepard's method.
-        #[bpaf(
-            short,
-            long,
-            argument("POWER"),
-            fallback(Hashed(4.0)),
-            display_fallback
-        )]
-        power: Hashed<f64>,
         #[bpaf(external)]
         common_rbf: CommonRbf,
         #[bpaf(external)]
@@ -160,6 +159,25 @@ enum LutAlgorithm {
             display_fallback
         )]
         seed: u64,
+        #[bpaf(external)]
+        common: Common,
+    },
+    #[bpaf(adjacent)]
+    ShepardsMethod {
+        /// Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+        #[bpaf(short('S'), long("shepards-method"), req_flag(()))]
+        _shepards_method: (),
+        /// Power parameter for shepard's method.
+        #[bpaf(
+            short,
+            long,
+            argument("POWER"),
+            fallback(Hashed(4.0)),
+            display_fallback
+        )]
+        power: Hashed<f64>,
+        #[bpaf(external)]
+        common_rbf: CommonRbf,
         #[bpaf(external)]
         common: Common,
     },
@@ -204,6 +222,20 @@ impl LutAlgorithm {
 
         let time = Instant::now();
         let (lut, level) = match self {
+            LutAlgorithm::GaussianBlur {
+                radius,
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
+                ..
+            } => (
+                GaussianBlurRemapper::new(&colors, radius.0, lum_factor.0, *preserve)
+                    .par_generate_lut(*level),
+                *level,
+            ),
             LutAlgorithm::GaussianRbf {
                 shape,
                 common_rbf: CommonRbf { nearest },
@@ -216,21 +248,6 @@ impl LutAlgorithm {
                 ..
             } => (
                 GaussianRemapper::new(&colors, shape.0, *nearest, lum_factor.0, *preserve)
-                    .par_generate_lut(*level),
-                *level,
-            ),
-            LutAlgorithm::ShepardsMethod {
-                power,
-                common_rbf: CommonRbf { nearest },
-                common:
-                    Common {
-                        level,
-                        lum_factor,
-                        preserve,
-                    },
-                ..
-            } => (
-                ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
                     .par_generate_lut(*level),
                 *level,
             ),
@@ -257,6 +274,21 @@ impl LutAlgorithm {
                     *preserve,
                 )
                 .par_generate_lut(*level),
+                *level,
+            ),
+            LutAlgorithm::ShepardsMethod {
+                power,
+                common_rbf: CommonRbf { nearest },
+                common:
+                    Common {
+                        level,
+                        lum_factor,
+                        preserve,
+                    },
+                ..
+            } => (
+                ShepardRemapper::new(&colors, power.0, *nearest, lum_factor.0, *preserve)
+                    .par_generate_lut(*level),
                 *level,
             ),
             LutAlgorithm::NearestNeighbor {

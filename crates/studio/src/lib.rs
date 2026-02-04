@@ -105,6 +105,9 @@ impl App {
             LutAlgorithm::GaussianSampling => LutAlgorithmArgs::GaussianSampling {
                 args: self.state.guassian_sampling,
             },
+            LutAlgorithm::GaussianBlur => LutAlgorithmArgs::GaussianBlur {
+                args: self.state.gaussian_blur,
+            },
             LutAlgorithm::NearestNeighbor => LutAlgorithmArgs::NearestNeighbor,
         };
         self.worker

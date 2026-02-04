@@ -3,6 +3,7 @@
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
+pub use gaussian_blur::GaussianBlurRemapper;
 pub use gaussian_sample::GaussianSamplingRemapper;
 use image::Rgba;
 use kiddo::float::kdtree::KdTree;
@@ -13,6 +14,7 @@ pub use rbf::{GaussianRemapper, LinearRemapper, ShepardRemapper};
 
 use crate::RgbaImage;
 
+mod gaussian_blur;
 mod gaussian_sample;
 mod nearest_neighbor;
 mod rbf;

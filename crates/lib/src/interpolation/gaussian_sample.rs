@@ -8,7 +8,6 @@ use rand_distr::{Distribution, Normal};
 
 use super::nearest_neighbor::NearestNeighborRemapper;
 use super::InterpolatedRemapper;
-use crate::GenerateLut;
 
 /// Interpolated remapper using a gaussian distribution set to sample and mix colors.
 /// Slow, compared to the RBF algorithms.
@@ -46,7 +45,6 @@ impl<'a> GaussianSamplingRemapper<'a> {
     }
 }
 
-impl<'a> GenerateLut<'a> for GaussianSamplingRemapper<'a> {}
 impl<'a> InterpolatedRemapper<'a> for GaussianSamplingRemapper<'a> {
     fn remap_pixel(&self, pixel: &mut Rgba<u8>) {
         let mut mean = [0f64; 3];
