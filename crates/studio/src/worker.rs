@@ -235,14 +235,29 @@ impl Worker {
         }
         if let Some(image) = &self.current_image {
             #[cfg(not(target_arch = "wasm32"))]
-            image::save_buffer(
-                path,
+            if let Err(_) = image::save_buffer(
+                &path,
                 &self.last_render,
                 image.width(),
                 image.height(),
                 image::ColorType::Rgba8,
-            )
-            .map_err(|e| format!("failed to encode image: {e}"))?;
+            ) {
+                // image format likely doesn't support transparency, convert to RGB
+                let buffer: Vec<u8> = self
+                    .last_render
+                    .chunks_exact(4)
+                    .flat_map(|v| &v[0..3])
+                    .cloned()
+                    .collect();
+                image::save_buffer(
+                    path,
+                    &buffer,
+                    image.width(),
+                    image.height(),
+                    image::ColorType::Rgb8,
+                )
+                .map_err(|e| format!("failed to encode image: {e}"))?;
+            }
 
             #[cfg(target_arch = "wasm32")]
             {
