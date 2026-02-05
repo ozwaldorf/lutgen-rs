@@ -200,27 +200,43 @@ impl<'a> GaussianBlurRemapper<'a> {
         let channels = if self.preserve { 2 } else { 3 };
 
         // Build NN LUT with OKLab colors in parallel
-        let mut colors: Vec<f32> = (0..n_cells)
-            .into_par_iter()
-            .flat_map(|idx| {
-                let b = idx % size;
-                let g = (idx / size) % size;
-                let r = idx / (size * size);
+        let mut colors: Vec<f32> = if self.preserve {
+            (0..n_cells)
+                .into_par_iter()
+                .flat_map_iter(|idx| {
+                    let b = idx % size;
+                    let g = (idx / size) % size;
+                    let r = idx / (size * size);
 
-                let rf = (r as f32 * scale).round() as u8;
-                let gf = (g as f32 * scale).round() as u8;
-                let bf = (b as f32 * scale).round() as u8;
-                let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
-                let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
-                let target = &self.palette_oklab[nearest];
+                    let rf = (r as f32 * scale).round() as u8;
+                    let gf = (g as f32 * scale).round() as u8;
+                    let bf = (b as f32 * scale).round() as u8;
+                    let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
+                    let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
+                    let target = &self.palette_oklab[nearest];
 
-                if self.preserve {
-                    vec![target[1], target[2]]
-                } else {
-                    vec![target[0] / self.lum_factor, target[1], target[2]]
-                }
-            })
-            .collect();
+                    [target[1], target[2]]
+                })
+                .collect()
+        } else {
+            (0..n_cells)
+                .into_par_iter()
+                .flat_map_iter(|idx| {
+                    let b = idx % size;
+                    let g = (idx / size) % size;
+                    let r = idx / (size * size);
+
+                    let rf = (r as f32 * scale).round() as u8;
+                    let gf = (g as f32 * scale).round() as u8;
+                    let bf = (b as f32 * scale).round() as u8;
+                    let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
+                    let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
+                    let target = &self.palette_oklab[nearest];
+
+                    [target[0] / self.lum_factor, target[1], target[2]]
+                })
+                .collect()
+        };
 
         let mut colors_next = vec![0.0f32; n_cells * channels];
         let kernel = self.build_kernel();
