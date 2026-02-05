@@ -56,26 +56,6 @@ Generate and save a Hald CLUT to disk.
 
 **Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[_`ALGORITHM`_ ...\] **`--`** \[_`COLORS`_\]...
 
-**Gaussian blur (default):**
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
-- **`-P`**, **`--preserve`** &mdash; 
-  Preserve the original image's luminocity values after interpolation.
-   
-  [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
-   
-  [default: 1.0]
-- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
-  Gaussian blur radius (sigma). Larger = more blending.
-   
-  [default: 8.0]
-
-
-
 **Gaussian RBF:**
 ### **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]
 - **`-R`**, **`--gaussian-rbf`** &mdash; 
@@ -189,6 +169,26 @@ Generate and save a Hald CLUT to disk.
   [default: 1.0]
 
 
+
+
+
+**Gaussian blur (default):**
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
+- **`-P`**, **`--preserve`** &mdash; 
+  Preserve the original image's luminocity values after interpolation.
+   
+  [default: false]
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+   
+  [default: 1.0]
+- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
+  Gaussian blur radius (sigma). Larger = more blending.
+   
+  [default: 8.0]
 
 
 
@@ -210,6 +210,14 @@ Generate and save a Hald CLUT to disk.
   - Windows: `C:\Users\Alice\AppData\Roaming\lutgen`
 
   Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
+- **`-R`**, **`--gaussian-rbf`** &mdash; 
+  Enable using Gaussian RBF for interpolation.
+- **`-G`**, **`--gaussian-sampling`** &mdash; 
+  Enable using Gaussian sampling for interpolation (slow).
+- **`-S`**, **`--shepards-method`** &mdash; 
+  Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+- **`-N`**, **`--nearest-neighbor`** &mdash; 
+  Disable interpolation completely.
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -219,26 +227,6 @@ Generate and save a Hald CLUT to disk.
 Extract colors and generate a LUT from existing image(s). Can be used for replicating an images look directly (copying a colorscheme, film emulation).
 
 **Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] \[_`ALGORITHM`_ ...\] _`IMAGES`_...
-
-**Gaussian blur (default):**
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
-- **`-P`**, **`--preserve`** &mdash; 
-  Preserve the original image's luminocity values after interpolation.
-   
-  [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
-   
-  [default: 1.0]
-- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
-  Gaussian blur radius (sigma). Larger = more blending.
-   
-  [default: 8.0]
-
-
 
 **Gaussian RBF:**
 ### **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]
@@ -353,6 +341,26 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
   [default: 1.0]
 
 
+
+
+
+**Gaussian blur (default):**
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
+- **`-P`**, **`--preserve`** &mdash; 
+  Preserve the original image's luminocity values after interpolation.
+   
+  [default: false]
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+   
+  [default: 1.0]
+- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
+  Gaussian blur radius (sigma). Larger = more blending.
+   
+  [default: 8.0]
 
 
 
@@ -369,6 +377,14 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
   [default: 128]
 - **`-o`**, **`--output`**=_`PATH`_ &mdash; 
   Path to write output to
+- **`-R`**, **`--gaussian-rbf`** &mdash; 
+  Enable using Gaussian RBF for interpolation.
+- **`-G`**, **`--gaussian-sampling`** &mdash; 
+  Enable using Gaussian sampling for interpolation (slow).
+- **`-S`**, **`--shepards-method`** &mdash; 
+  Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+- **`-N`**, **`--nearest-neighbor`** &mdash; 
+  Disable interpolation completely.
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -378,26 +394,6 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
 Apply a generated or provided Hald CLUT to images.
 
 **Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ &#124; \[_`ALGORITHM`_ ...\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
-
-**Gaussian blur (default):**
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
-- **`-P`**, **`--preserve`** &mdash; 
-  Preserve the original image's luminocity values after interpolation.
-   
-  [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
-   
-  [default: 1.0]
-- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
-  Gaussian blur radius (sigma). Larger = more blending.
-   
-  [default: 8.0]
-
-
 
 **Gaussian RBF:**
 ### **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]
@@ -512,6 +508,26 @@ Apply a generated or provided Hald CLUT to images.
   [default: 1.0]
 
 
+
+
+
+**Gaussian blur (default):**
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
+- **`-P`**, **`--preserve`** &mdash; 
+  Preserve the original image's luminocity values after interpolation.
+   
+  [default: false]
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+   
+  [default: 1.0]
+- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
+  Gaussian blur radius (sigma). Larger = more blending.
+   
+  [default: 8.0]
 
 
 
@@ -541,6 +557,14 @@ Apply a generated or provided Hald CLUT to images.
   Cache generated LUT. No effect when using an external LUT.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating.
+- **`-R`**, **`--gaussian-rbf`** &mdash; 
+  Enable using Gaussian RBF for interpolation.
+- **`-G`**, **`--gaussian-sampling`** &mdash; 
+  Enable using Gaussian sampling for interpolation (slow).
+- **`-S`**, **`--shepards-method`** &mdash; 
+  Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+- **`-N`**, **`--nearest-neighbor`** &mdash; 
+  Disable interpolation completely.
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 
@@ -550,26 +574,6 @@ Apply a generated or provided Hald CLUT to images.
 Generate a patch for colors inside text files.
 
 **Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ &#124; \[_`ALGORITHM`_ ...\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
-
-**Gaussian blur (default):**
-- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
-  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
-   
-  [default: 10]
-- **`-P`**, **`--preserve`** &mdash; 
-  Preserve the original image's luminocity values after interpolation.
-   
-  [default: false]
-- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
-  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
-   
-  [default: 1.0]
-- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
-  Gaussian blur radius (sigma). Larger = more blending.
-   
-  [default: 8.0]
-
-
 
 **Gaussian RBF:**
 ### **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]
@@ -687,6 +691,26 @@ Generate a patch for colors inside text files.
 
 
 
+**Gaussian blur (default):**
+- **`-l`**, **`--level`**=_`2-16`_ &mdash; 
+  Hald clut level to generate. A level of 16 stores a value for the entire sRGB color space.
+   
+  [default: 10]
+- **`-P`**, **`--preserve`** &mdash; 
+  Preserve the original image's luminocity values after interpolation.
+   
+  [default: false]
+- **`-L`**, **`--lum`**=_`FACTOR`_ &mdash; 
+  Factor to multiply luminocity values by. Effectively weights the interpolation to prefer more colorful or more greyscale/unsaturated matches. Usually paired with `--preserve`.
+   
+  [default: 1.0]
+- **`-r`**, **`--radius`**=_`RADIUS`_ &mdash; 
+  Gaussian blur radius (sigma). Larger = more blending.
+   
+  [default: 8.0]
+
+
+
 **Available positional items:**
 - _`FILES`_ &mdash; 
   Text files to generate patches for.
@@ -711,6 +735,14 @@ Generate a patch for colors inside text files.
   Names are case-insensitive and parsed from the file stem, minus any file extensions. For example, `~/.config/lutgen/My-palette.txt` would be avalable to use as `my-palette`.
 - **`    --hald-clut`**=_`FILE`_ &mdash; 
   External Hald CLUT to use instead of generating.
+- **`-R`**, **`--gaussian-rbf`** &mdash; 
+  Enable using Gaussian RBF for interpolation.
+- **`-G`**, **`--gaussian-sampling`** &mdash; 
+  Enable using Gaussian sampling for interpolation (slow).
+- **`-S`**, **`--shepards-method`** &mdash; 
+  Enable using Shepard's method (Inverse Distance RBF) for interpolation.
+- **`-N`**, **`--nearest-neighbor`** &mdash; 
+  Disable interpolation completely.
 - **`-h`**, **`--help`** &mdash; 
   Prints help information
 

@@ -244,18 +244,48 @@ fn lut_algorithm() -> impl Parser<LutAlgorithm> {
         .group_help("Nearest neighbor:")
     };
 
-    construct!([
-        gaussian_blur,
+    // Completion hints for adjacent algorithm flags.
+    // Adjacent groups don't register their flags with the completion engine unless the
+    // leading flag is already present on the command line. These hidden switches always
+    // succeed (returning false when absent), which causes bpaf to register the flags
+    // as completion candidates without consuming anything. They must be AND-combined
+    // (not OR) so that all flags are always evaluated and registered for completions.
+    let comp_r = short('R')
+        .long("gaussian-rbf")
+        .help("Enable using Gaussian RBF for interpolation.")
+        .switch()
+        .hide_usage();
+    let comp_g = short('G')
+        .long("gaussian-sampling")
+        .help("Enable using Gaussian sampling for interpolation (slow).")
+        .switch()
+        .hide_usage();
+    let comp_s = short('S')
+        .long("shepards-method")
+        .help("Enable using Shepard's method (Inverse Distance RBF) for interpolation.")
+        .switch()
+        .hide_usage();
+    let comp_n = short('N')
+        .long("nearest-neighbor")
+        .help("Disable interpolation completely.")
+        .switch()
+        .hide_usage();
+
+    let algorithm = construct!([
         gaussian_rbf,
         gaussian_sampling,
         shepards_method,
-        nearest_neighbor
-    ])
-    .custom_usage(&[
-        ("[", Style::Text),
-        ("ALGORITHM", Style::Metavar),
-        (" ...]", Style::Text),
-    ])
+        nearest_neighbor,
+        gaussian_blur,
+    ]);
+
+    construct!(algorithm, comp_r, comp_g, comp_s, comp_n)
+        .map(|(a, _, _, _, _)| a)
+        .custom_usage(&[
+            ("[", Style::Text),
+            ("ALGORITHM", Style::Metavar),
+            (" ...]", Style::Text),
+        ])
 }
 
 /// Manually allow using an external hald clut, hack since we dont want to allow this for generate,

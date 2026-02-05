@@ -68,37 +68,6 @@
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] \fP\fR[\fP\fIALGORITHM\fP\fR ...]\fP\fR \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
 .PP
-.SS GAUSSIAN\ BLUR\ (DEFAULT):
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
-.PP
-.TP
-\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
-\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
-.PP
-.TP
-\fR[default: false]\fP
-.PP
-.TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
-.PP
-.TP
-\fR[default: 1.0]\fP
-.PP
-.TP
-\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
-\fRGaussian blur radius (sigma). Larger = more blending.\fP
-.PP
-.TP
-\fR[default: 8.0]\fP
-.PP
-.PP
 .SS GAUSSIAN\ RBF:
 .SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
@@ -273,6 +242,37 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .TP
 \fR[default: 1.0]\fP
 .PP
+.PP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
 .PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
@@ -299,6 +299,22 @@ Names are case\-insensitive and parsed from the file stem, minus any file extens
 For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP
 \fRPrints help information\fP
 .PP
@@ -309,37 +325,6 @@ Can be used for replicating an images look directly
 (copying a colorscheme, film emulation).\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] \fP\fR[\fP\fIALGORITHM\fP\fR ...]\fP\fR \fP\fIIMAGES\fP\fR...\fP
-.PP
-.SS GAUSSIAN\ BLUR\ (DEFAULT):
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
-.PP
-.TP
-\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
-\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
-.PP
-.TP
-\fR[default: false]\fP
-.PP
-.TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
-.PP
-.TP
-\fR[default: 1.0]\fP
-.PP
-.TP
-\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
-\fRGaussian blur radius (sigma). Larger = more blending.\fP
-.PP
-.TP
-\fR[default: 8.0]\fP
-.PP
 .PP
 .SS GAUSSIAN\ RBF:
 .SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
@@ -515,6 +500,37 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .TP
 \fR[default: 1.0]\fP
 .PP
+.PP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
 .PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
@@ -536,6 +552,22 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRPath to write output to\fP
 .PP
 .TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP
 \fRPrints help information\fP
 .PP
@@ -544,37 +576,6 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | \fP\fR[\fP\fIALGORITHM\fP\fR ...]\fP\fR) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
-.PP
-.SS GAUSSIAN\ BLUR\ (DEFAULT):
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
-.PP
-.TP
-\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
-\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
-.PP
-.TP
-\fR[default: false]\fP
-.PP
-.TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
-.PP
-.TP
-\fR[default: 1.0]\fP
-.PP
-.TP
-\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
-\fRGaussian blur radius (sigma). Larger = more blending.\fP
-.PP
-.TP
-\fR[default: 8.0]\fP
-.PP
 .PP
 .SS GAUSSIAN\ RBF:
 .SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
@@ -750,6 +751,37 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .TP
 \fR[default: 1.0]\fP
 .PP
+.PP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
 .PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
@@ -793,6 +825,22 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 \fRExternal Hald CLUT to use instead of generating.\fP
 .PP
 .TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP
 \fRPrints help information\fP
 .PP
@@ -801,37 +849,6 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 \fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
 .SH SYNOPSIS
 \fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | \fP\fR[\fP\fIALGORITHM\fP\fR ...]\fP\fR) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
-.PP
-.SS GAUSSIAN\ BLUR\ (DEFAULT):
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
-.PP
-.TP
-\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
-\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
-.PP
-.TP
-\fR[default: false]\fP
-.PP
-.TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
-.PP
-.TP
-\fR[default: 1.0]\fP
-.PP
-.TP
-\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
-\fRGaussian blur radius (sigma). Larger = more blending.\fP
-.PP
-.TP
-\fR[default: 8.0]\fP
-.PP
 .PP
 .SS GAUSSIAN\ RBF:
 .SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
@@ -1009,6 +1026,37 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 .PP
 .PP
 .PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
+.PP
+.PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
 \fIFILES\fP
@@ -1043,6 +1091,22 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
 \fRExternal Hald CLUT to use instead of generating.\fP
+.PP
+.TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
 .PP
 .TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP
