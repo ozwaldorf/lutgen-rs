@@ -315,7 +315,46 @@ impl<'a> GaussianBlurRemapper<'a> {
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        self.colors_to_lut(&colors, size, channels, level)
+        self.par_colors_to_lut(&colors, size, channels, level)
+    }
+
+    /// Convert a pixel index (HALD CLUT order: b outer, g, r inner) to (r, g, b) cell coords.
+    #[inline(always)]
+    fn pixel_to_rgb(pixel_idx: usize, size: usize) -> (usize, usize, usize) {
+        let r_idx = pixel_idx % size;
+        let g_idx = (pixel_idx / size) % size;
+        let b_idx = pixel_idx / (size * size);
+        (r_idx, g_idx, b_idx)
+    }
+
+    /// Convert an OKLab color at the given cell to an sRGB pixel.
+    #[inline(always)]
+    fn cell_to_rgb(
+        colors: &[f32],
+        idx: usize,
+        preserve: bool,
+        scale: f32,
+        r_idx: usize,
+        g_idx: usize,
+        b_idx: usize,
+    ) -> oklab::Rgb<u8> {
+        if preserve {
+            let rf = (r_idx as f32 * scale).round() as u8;
+            let gf = (g_idx as f32 * scale).round() as u8;
+            let bf = (b_idx as f32 * scale).round() as u8;
+            let Oklab { l, .. } = srgb_to_oklab([rf, gf, bf].into());
+            oklab_to_srgb(Oklab {
+                l,
+                a: colors[idx],
+                b: colors[idx + 1],
+            })
+        } else {
+            oklab_to_srgb(Oklab {
+                l: colors[idx],
+                a: colors[idx + 1],
+                b: colors[idx + 2],
+            })
+        }
     }
 
     fn colors_to_lut(
@@ -333,40 +372,44 @@ impl<'a> GaussianBlurRemapper<'a> {
         let mut buf = vec![0u8; (width * height * 3) as usize];
 
         // HALD CLUT order: blue (outer) -> green -> red (inner)
-        let mut pixel_idx = 0usize;
-        for b_idx in 0..size {
-            for g_idx in 0..size {
-                for r_idx in 0..size {
-                    let idx = Self::cell_idx(r_idx, g_idx, b_idx, size) * channels;
-                    let out_idx = pixel_idx * 3;
-
-                    let rgb = if self.preserve {
-                        // Reconstruct L from input, use blurred a, b
-                        let rf = (r_idx as f32 * scale).round() as u8;
-                        let gf = (g_idx as f32 * scale).round() as u8;
-                        let bf = (b_idx as f32 * scale).round() as u8;
-                        let Oklab { l, .. } = srgb_to_oklab([rf, gf, bf].into());
-
-                        oklab_to_srgb(Oklab {
-                            l,
-                            a: colors[idx],
-                            b: colors[idx + 1],
-                        })
-                    } else {
-                        oklab_to_srgb(Oklab {
-                            l: colors[idx],
-                            a: colors[idx + 1],
-                            b: colors[idx + 2],
-                        })
-                    };
-
-                    buf[out_idx] = rgb.r;
-                    buf[out_idx + 1] = rgb.g;
-                    buf[out_idx + 2] = rgb.b;
-                    pixel_idx += 1;
-                }
-            }
+        for (pixel_idx, pixel) in buf.chunks_exact_mut(3).enumerate() {
+            let (r_idx, g_idx, b_idx) = Self::pixel_to_rgb(pixel_idx, size);
+            let idx = Self::cell_idx(r_idx, g_idx, b_idx, size) * channels;
+            let rgb = Self::cell_to_rgb(colors, idx, self.preserve, scale, r_idx, g_idx, b_idx);
+            pixel[0] = rgb.r;
+            pixel[1] = rgb.g;
+            pixel[2] = rgb.b;
         }
+
+        RgbImage::from_raw(width, height, buf)
+    }
+
+    #[cfg(feature = "rayon")]
+    fn par_colors_to_lut(
+        &self,
+        colors: &[f32],
+        size: usize,
+        channels: usize,
+        level: u8,
+    ) -> Option<RgbImage> {
+        let level = level as u32;
+        let width = level * level * level;
+        let height = level * level * level;
+        let scale = 255.0 / (size - 1) as f32;
+        let preserve = self.preserve;
+
+        let mut buf = vec![0u8; (width * height * 3) as usize];
+
+        buf.par_chunks_exact_mut(3)
+            .enumerate()
+            .for_each(|(pixel_idx, pixel)| {
+                let (r_idx, g_idx, b_idx) = Self::pixel_to_rgb(pixel_idx, size);
+                let idx = Self::cell_idx(r_idx, g_idx, b_idx, size) * channels;
+                let rgb = Self::cell_to_rgb(colors, idx, preserve, scale, r_idx, g_idx, b_idx);
+                pixel[0] = rgb.r;
+                pixel[1] = rgb.g;
+                pixel[2] = rgb.b;
+            });
 
         RgbImage::from_raw(width, height, buf)
     }
