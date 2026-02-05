@@ -235,13 +235,15 @@ impl Worker {
         }
         if let Some(image) = &self.current_image {
             #[cfg(not(target_arch = "wasm32"))]
-            if let Err(_) = image::save_buffer(
+            if image::save_buffer(
                 &path,
                 &self.last_render,
                 image.width(),
                 image.height(),
                 image::ColorType::Rgba8,
-            ) {
+            )
+            .is_err()
+            {
                 // image format likely doesn't support transparency, convert to RGB
                 let buffer: Vec<u8> = self
                     .last_render
