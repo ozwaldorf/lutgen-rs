@@ -54,7 +54,7 @@ A blazingly fast interpolated LUT utility for arbitrary and popular color palett
 
 Generate and save a Hald CLUT to disk.
 
-**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] (\[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-r`**=_`RADIUS`_\] &#124; **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-N`** \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]) **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`generate`** \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[_`ALGORITHM`_ ...\] **`--`** \[_`COLORS`_\]...
 
 **Gaussian blur (default):**
 - **`-l`**, **`--level`**=_`2-16`_ &mdash; 
@@ -218,7 +218,7 @@ Generate and save a Hald CLUT to disk.
 
 Extract colors and generate a LUT from existing image(s). Can be used for replicating an images look directly (copying a colorscheme, film emulation).
 
-**Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] (\[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-r`**=_`RADIUS`_\] &#124; **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-N`** \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]) _`IMAGES`_...
+**Usage**: **`lutgen`** **`extract`** \[**`--color-count`**=_`ARG`_\] \[**`-o`**=_`PATH`_\] \[_`ALGORITHM`_ ...\] _`IMAGES`_...
 
 **Gaussian blur (default):**
 - **`-l`**, **`--level`**=_`2-16`_ &mdash; 
@@ -377,7 +377,7 @@ Extract colors and generate a LUT from existing image(s). Can be used for replic
 
 Apply a generated or provided Hald CLUT to images.
 
-**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-r`**=_`RADIUS`_\] &#124; **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-N`** \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`apply`** \[**`-d`**\] \[**`-o`**=_`PATH`_\] \[**`-p`**=_`PALETTE`_\] \[**`-c`**\] (**`--hald-clut`**=_`FILE`_ &#124; \[_`ALGORITHM`_ ...\]) _`IMAGES`_... **`--`** \[_`COLORS`_\]...
 
 **Gaussian blur (default):**
 - **`-l`**, **`--level`**=_`2-16`_ &mdash; 
@@ -549,7 +549,7 @@ Apply a generated or provided Hald CLUT to images.
 
 Generate a patch for colors inside text files.
 
-**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ &#124; \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] \[**`-r`**=_`RADIUS`_\] &#124; **`-R`** \[**`-s`**=_`SHAPE`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-G`** \[**`-m`**=_`MEAN`_\] \[**`-s`**=_`STD_DEV`_\] \[**`-i`**=_`ITERS`_\] \[**`-S`**=_`SEED`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-S`** \[**`-p`**=_`POWER`_\] \[**`-n`**=_`NEAREST`_\] \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\] &#124; **`-N`** \[**`-l`**=_`2-16`_\] \[**`-P`**\] \[**`-L`**=_`FACTOR`_\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
+**Usage**: **`lutgen`** **`patch`** \[**`-w`**\] \[**`-n`**\] \[**`-p`**=_`PALETTE`_\] (**`--hald-clut`**=_`FILE`_ &#124; \[_`ALGORITHM`_ ...\]) _`FILES`_... **`--`** \[_`COLORS`_\]...
 
 **Gaussian blur (default):**
 - **`-l`**, **`--level`**=_`2-16`_ &mdash; 

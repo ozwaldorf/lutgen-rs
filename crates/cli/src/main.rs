@@ -9,6 +9,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
+use bpaf::doc::Style;
 use bpaf::{construct, long, short, Bpaf, Doc, Parser, ShellComp};
 use image::codecs::gif::{GifDecoder, GifEncoder};
 use image::codecs::png::PngDecoder;
@@ -249,6 +250,11 @@ fn lut_algorithm() -> impl Parser<LutAlgorithm> {
         gaussian_sampling,
         shepards_method,
         nearest_neighbor
+    ])
+    .custom_usage(&[
+        ("[", Style::Text),
+        ("ALGORITHM", Style::Metavar),
+        (" ...]", Style::Text),
     ])
 }
 
