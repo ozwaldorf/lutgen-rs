@@ -19,18 +19,16 @@ use crate::GenerateLut;
 /// 1. Build nearest-neighbor LUT storing OKLab colors
 /// 2. Apply separable Gaussian blur directly on L, a, b channels
 /// 3. Convert back to RGB
-pub struct GaussianBlurRemapper<'a> {
-    #[allow(dead_code)]
-    palette: &'a [[u8; 3]],
+pub struct GaussianBlurRemapper {
     palette_oklab: Vec<[f32; 3]>,
     radius: f32,
     lum_factor: f32,
     preserve: bool,
 }
 
-impl<'a> GaussianBlurRemapper<'a> {
+impl GaussianBlurRemapper {
     #[inline]
-    pub fn new(palette: &'a [[u8; 3]], radius: f64, lum_factor: f64, preserve: bool) -> Self {
+    pub fn new(palette: &[[u8; 3]], radius: f64, lum_factor: f64, preserve: bool) -> Self {
         let lum_factor = lum_factor as f32;
 
         let palette_oklab: Vec<[f32; 3]> = palette
@@ -42,7 +40,6 @@ impl<'a> GaussianBlurRemapper<'a> {
             .collect();
 
         Self {
-            palette,
             palette_oklab,
             radius: radius as f32,
             lum_factor,
@@ -364,12 +361,10 @@ impl<'a> GaussianBlurRemapper<'a> {
         channels: usize,
         level: u8,
     ) -> Option<RgbImage> {
-        let level = level as u32;
-        let width = level * level * level;
-        let height = level * level * level;
+        let dim = (level as u32).pow(3);
         let scale = 255.0 / (size - 1) as f32;
 
-        let mut buf = vec![0u8; (width * height * 3) as usize];
+        let mut buf = vec![0u8; (dim * dim * 3) as usize];
 
         // HALD CLUT order: blue (outer) -> green -> red (inner)
         for (pixel_idx, pixel) in buf.chunks_exact_mut(3).enumerate() {
@@ -381,7 +376,7 @@ impl<'a> GaussianBlurRemapper<'a> {
             pixel[2] = rgb.b;
         }
 
-        RgbImage::from_raw(width, height, buf)
+        RgbImage::from_raw(dim, dim, buf)
     }
 
     #[cfg(feature = "rayon")]
@@ -392,13 +387,11 @@ impl<'a> GaussianBlurRemapper<'a> {
         channels: usize,
         level: u8,
     ) -> Option<RgbImage> {
-        let level = level as u32;
-        let width = level * level * level;
-        let height = level * level * level;
+        let dim = (level as u32).pow(3);
         let scale = 255.0 / (size - 1) as f32;
         let preserve = self.preserve;
 
-        let mut buf = vec![0u8; (width * height * 3) as usize];
+        let mut buf = vec![0u8; (dim * dim * 3) as usize];
 
         buf.par_chunks_exact_mut(3)
             .enumerate()
@@ -411,7 +404,7 @@ impl<'a> GaussianBlurRemapper<'a> {
                 pixel[2] = rgb.b;
             });
 
-        RgbImage::from_raw(width, height, buf)
+        RgbImage::from_raw(dim, dim, buf)
     }
 }
 
@@ -423,7 +416,7 @@ fn sq_dist(a: [f32; 3], b: [f32; 3]) -> f32 {
     dl * dl + da * da + db * db
 }
 
-impl<'a> GenerateLut<'a> for GaussianBlurRemapper<'a> {
+impl GenerateLut<'static> for GaussianBlurRemapper {
     fn generate_lut(&self, level: u8) -> RgbImage {
         self.generate_lut_inner(level, None)
             .expect("should not abort without signal")
