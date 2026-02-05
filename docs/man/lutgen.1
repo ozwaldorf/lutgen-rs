@@ -5,10 +5,10 @@
 .SH SYNOPSIS
 .nf
 \fBlutgen\fP\fR \fP\fICOMMAND ...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
-\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIIMAGES\fP\fR...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
+\fP\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fR[\fP\fB\-\-ansi\fP\fR] (\fP\fICOMMAND ...\fP\fR | \fP\fIPALETTE\fP\fR...)\fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBnames\fP\fR \fP\fR
 \fP\fBlutgen\fP\fR \fP\fBpalette\fP\fR \fP\fBall\fP\fR \fP\fR
@@ -66,7 +66,214 @@
 .SH NAME
 \fRlutgen \- \fP\fRGenerate and save a Hald CLUT to disk.\fP
 .SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+\fBlutgen\fP\fR \fP\fBgenerate\fP\fR \fP\fR[\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] ([\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
+.PP
+.PP
+.SS GAUSSIAN\ RBF:
+.SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS GAUSSIAN\ SAMPLING:
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
+\fREnable using Gaussian sampling for interpolation (slow).\fP
+.PP
+.TP
+\fB\-m\fP\fR, \fP\fB\-\-mean\fP\fR=\fP\fIMEAN\fP
+\fRAverage amount of noise to apply in each iteration.\fP
+.PP
+.TP
+\fR[default: 0.0]\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
+\fRStandard deviation parameter for the noise applied in each iteration.\fP
+.PP
+.TP
+\fR[default: 20.0]\fP
+.PP
+.TP
+\fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
+\fRNumber of iterations of noise to apply to each pixel.\fP
+.PP
+.TP
+\fR[default: 512]\fP
+.PP
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-seed\fP\fR=\fP\fISEED\fP
+\fRSeed for noise rng.\fP
+.PP
+.TP
+\fR[default: 42080085]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS SHEPARD'S\ METHOD:
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS NEAREST\ NEIGHBOR:
+.SS -N\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
+\fRDisable interpolation completely.\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -92,12 +299,67 @@ Names are case\-insensitive and parsed from the file stem, minus any file extens
 For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\-palette`.\fP
 .PP
 .TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ EXTRACT\ 
+.SH NAME
+\fRlutgen \- \fP\fRExtract colors and generate a LUT from existing image(s).
+Can be used for replicating an images look directly
+(copying a colorscheme, film emulation).\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIIMAGES\fP\fR...\fP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
 \fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
 \fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
 more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
 \fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
+.PP
+.PP
+.SS GAUSSIAN\ RBF:
+.SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
@@ -114,35 +376,17 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 16]\fP
-.PP
-.TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
-.PP
-.TP
-\fR[default: 128.0]\fP
-.PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
-\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
-.PP
-.TP
-\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
-\fRPower parameter for shepard\*(Aqs method.\fP
-.PP
-.TP
-\fR[default: 4.0]\fP
+\fR[default: 1.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.PP
+.SS GAUSSIAN\ SAMPLING:
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -175,24 +419,103 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 42080085]\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS SHEPARD'S\ METHOD:
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS NEAREST\ NEIGHBOR:
+.SS -N\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
 .TP
-\fB\-h\fP\fR, \fP\fB\-\-help\fP
-\fRPrints help information\fP
+\fR[default: 10]\fP
 .PP
-.SH LUTGEN\ EXTRACT\ 
-.SH NAME
-\fRlutgen \- \fP\fRExtract colors and generate a LUT from existing image(s).
-Can be used for replicating an images look directly
-(copying a colorscheme, film emulation).\fP
-.SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBextract\fP\fR \fP\fR[\fP\fB\-\-color\-count\fP\fR=\fP\fIARG\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] ([\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR...\fP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -213,12 +536,65 @@ Can be used for replicating an images look directly
 \fRPath to write output to\fP
 .PP
 .TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ APPLY\ 
+.SH NAME
+\fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
 \fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
 \fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
 more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
 \fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
+.PP
+.PP
+.SS GAUSSIAN\ RBF:
+.SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
@@ -235,35 +611,17 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 16]\fP
-.PP
-.TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
-.PP
-.TP
-\fR[default: 128.0]\fP
-.PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
-\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
-.PP
-.TP
-\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
-\fRPower parameter for shepard\*(Aqs method.\fP
-.PP
-.TP
-\fR[default: 4.0]\fP
+\fR[default: 1.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.PP
+.SS GAUSSIAN\ SAMPLING:
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -296,22 +654,103 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 42080085]\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS SHEPARD'S\ METHOD:
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS NEAREST\ NEIGHBOR:
+.SS -N\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
 .TP
-\fB\-h\fP\fR, \fP\fB\-\-help\fP
-\fRPrints help information\fP
+\fR[default: 10]\fP
 .PP
-.SH LUTGEN\ APPLY\ 
-.SH NAME
-\fRlutgen \- \fP\fRApply a generated or provided Hald CLUT to images.\fP
-.SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBapply\fP\fR \fP\fR[\fP\fB\-d\fP\fR] [\fP\fB\-o\fP\fR=\fP\fIPATH\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] [\fP\fB\-c\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIIMAGES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -354,12 +793,65 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 \fRExternal Hald CLUT to use instead of generating.\fP
 .PP
 .TP
+\fB\-h\fP\fR, \fP\fB\-\-help\fP
+\fRPrints help information\fP
+.PP
+.SH LUTGEN\ PATCH\ 
+.SH NAME
+\fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
+.SH SYNOPSIS
+\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-r\fP\fR=\fP\fIRADIUS\fP\fR] | \fP\fB\-R\fP\fR [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.PP
+.SS GAUSSIAN\ BLUR\ (DEFAULT):
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
 \fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
 \fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
 more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
 \fR[default: 1.0]\fP
+.PP
+.TP
+\fB\-r\fP\fR, \fP\fB\-\-radius\fP\fR=\fP\fIRADIUS\fP
+\fRGaussian blur radius (sigma). Larger = more blending.\fP
+.PP
+.TP
+\fR[default: 8.0]\fP
+.PP
+.PP
+.SS GAUSSIAN\ RBF:
+.SS -R\ [-S=SHAPE]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-R\fP\fR, \fP\fB\-\-gaussian\-rbf\fP
+\fREnable using Gaussian RBF for interpolation.\fP
+.PP
+.TP
+\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
+\fRShape parameter for Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.\fP
+.PP
+.TP
+\fR[default: 128.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
 .PP
 .TP
 \fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
@@ -376,35 +868,17 @@ more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-pr
 \fR[default: false]\fP
 .PP
 .TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
 .PP
 .TP
-\fR[default: 16]\fP
-.PP
-.TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
-.PP
-.TP
-\fR[default: 128.0]\fP
-.PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
-\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
-.PP
-.TP
-\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
-\fRPower parameter for shepard\*(Aqs method.\fP
-.PP
-.TP
-\fR[default: 4.0]\fP
+\fR[default: 1.0]\fP
 .PP
 .PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.PP
+.SS GAUSSIAN\ SAMPLING:
+.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
 \fREnable using Gaussian sampling for interpolation (slow).\fP
@@ -437,22 +911,103 @@ Effect is heavily dependant on the number of nearest colors used.\fP
 .TP
 \fR[default: 42080085]\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS SHEPARD'S\ METHOD:
+.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=2-16]\ [-P]\ [-L=FACTOR]
+.TP
+\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
+\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
+.PP
+.TP
+\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
+\fRPower parameter for shepard\*(Aqs method.\fP
+.PP
+.TP
+\fR[default: 4.0]\fP
+.PP
+.TP
+\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
+\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
+.PP
+.TP
+\fR[default: 16]\fP
+.PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
+.PP
+.TP
+\fR[default: 10]\fP
+.PP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
+.PP
+.SS NEAREST\ NEIGHBOR:
+.SS -N\ [-L=2-16]\ [-P]\ [-L=FACTOR]
 .TP
 \fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
 \fRDisable interpolation completely.\fP
 .PP
+.TP
+\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
+\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
 .PP
 .TP
-\fB\-h\fP\fR, \fP\fB\-\-help\fP
-\fRPrints help information\fP
+\fR[default: 10]\fP
 .PP
-.SH LUTGEN\ PATCH\ 
-.SH NAME
-\fRlutgen \- \fP\fRGenerate a patch for colors inside text files.\fP
-.SH SYNOPSIS
-\fBlutgen\fP\fR \fP\fBpatch\fP\fR \fP\fR[\fP\fB\-w\fP\fR] [\fP\fB\-n\fP\fR] [\fP\fB\-p\fP\fR=\fP\fIPALETTE\fP\fR] (\fP\fB\-\-hald\-clut\fP\fR=\fP\fIFILE\fP\fR | [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISHAPE\fP\fR] | \fP\fB\-S\fP\fR [\fP\fB\-p\fP\fR=\fP\fIPOWER\fP\fR] [\fP\fB\-n\fP\fR=\fP\fINEAREST\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-G\fP\fR [\fP\fB\-m\fP\fR=\fP\fIMEAN\fP\fR] [\fP\fB\-s\fP\fR=\fP\fISTD_DEV\fP\fR] [\fP\fB\-i\fP\fR=\fP\fIITERS\fP\fR] [\fP\fB\-S\fP\fR=\fP\fISEED\fP\fR] [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR] | \fP\fB\-N\fP\fR [\fP\fB\-L\fP\fR=\fP\fIFACTOR\fP\fR] [\fP\fB\-l\fP\fR=\fP\fI2\-16\fP\fR] [\fP\fB\-P\fP\fR]) \fP\fIFILES\fP\fR... \fP\fB\-\-\fP\fR [\fP\fICOLORS\fP\fR]...\fP
+.TP
+\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
+\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
+.PP
+.TP
+\fR[default: false]\fP
+.PP
+.TP
+\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
+\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
+more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
+.PP
+.TP
+\fR[default: 1.0]\fP
+.PP
+.PP
 .PP
 .SS AVAILABLE\ POSITIONAL\ ITEMS:
 .TP
@@ -488,97 +1043,6 @@ For example, `~/.config/lutgen/My\-palette.txt` would be avalable to use as `my\
 .TP
 \fB    \-\-hald\-clut\fP\fR=\fP\fIFILE\fP
 \fRExternal Hald CLUT to use instead of generating.\fP
-.PP
-.TP
-\fB\-L\fP\fR, \fP\fB\-\-lum\fP\fR=\fP\fIFACTOR\fP
-\fRFactor to multiply luminocity values by. Effectively weights the interpolation to prefer
-more colorful or more greyscale/unsaturated matches. Usually paired with `\-\-preserve`.\fP
-.PP
-.TP
-\fR[default: 1.0]\fP
-.PP
-.TP
-\fB\-l\fP\fR, \fP\fB\-\-level\fP\fR=\fP\fI2\-16\fP
-\fRHald clut level to generate. A level of 16 stores a value for the entire sRGB color space.\fP
-.PP
-.TP
-\fR[default: 10]\fP
-.PP
-.TP
-\fB\-P\fP\fR, \fP\fB\-\-preserve\fP
-\fRPreserve the original image\*(Aqs luminocity values after interpolation.\fP
-.PP
-.TP
-\fR[default: false]\fP
-.PP
-.TP
-\fB\-n\fP\fR, \fP\fB\-\-nearest\fP\fR=\fP\fINEAREST\fP
-\fRNumber of nearest colors to consider when interpolating. 0 uses all available colors.\fP
-.PP
-.TP
-\fR[default: 16]\fP
-.PP
-.TP
-\fB\-s\fP\fR, \fP\fB\-\-shape\fP\fR=\fP\fISHAPE\fP
-\fRShape parameter for the default Gaussian RBF interpolation. Effectively creates more or
-less blending between colors in the palette, where bigger numbers equal less blending.
-Effect is heavily dependant on the number of nearest colors used.\fP
-.PP
-.TP
-\fR[default: 128.0]\fP
-.PP
-.SS -S\ [-P=POWER]\ [-N=NEAREST]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-S\fP\fR, \fP\fB\-\-shepards\-method\fP
-\fREnable using Shepard\*(Aqs method (Inverse Distance RBF) for interpolation.\fP
-.PP
-.TP
-\fB\-p\fP\fR, \fP\fB\-\-power\fP\fR=\fP\fIPOWER\fP
-\fRPower parameter for shepard\*(Aqs method.\fP
-.PP
-.TP
-\fR[default: 4.0]\fP
-.PP
-.PP
-.SS -G\ [-M=MEAN]\ [-S=STD_DEV]\ [-I=ITERS]\ [-S=SEED]\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-G\fP\fR, \fP\fB\-\-gaussian\-sampling\fP
-\fREnable using Gaussian sampling for interpolation (slow).\fP
-.PP
-.TP
-\fB\-m\fP\fR, \fP\fB\-\-mean\fP\fR=\fP\fIMEAN\fP
-\fRAverage amount of noise to apply in each iteration.\fP
-.PP
-.TP
-\fR[default: 0.0]\fP
-.PP
-.TP
-\fB\-s\fP\fR, \fP\fB\-\-std\-dev\fP\fR=\fP\fISTD_DEV\fP
-\fRStandard deviation parameter for the noise applied in each iteration.\fP
-.PP
-.TP
-\fR[default: 20.0]\fP
-.PP
-.TP
-\fB\-i\fP\fR, \fP\fB\-\-iterations\fP\fR=\fP\fIITERS\fP
-\fRNumber of iterations of noise to apply to each pixel.\fP
-.PP
-.TP
-\fR[default: 512]\fP
-.PP
-.TP
-\fB\-S\fP\fR, \fP\fB\-\-seed\fP\fR=\fP\fISEED\fP
-\fRSeed for noise rng.\fP
-.PP
-.TP
-\fR[default: 42080085]\fP
-.PP
-.PP
-.SS -N\ [-L=FACTOR]\ [-L=2-16]\ [-P]
-.TP
-\fB\-N\fP\fR, \fP\fB\-\-nearest\-neighbor\fP
-\fRDisable interpolation completely.\fP
-.PP
 .PP
 .TP
 \fB\-h\fP\fR, \fP\fB\-\-help\fP

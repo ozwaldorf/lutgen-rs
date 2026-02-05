@@ -9,7 +9,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::time::Instant;
 
-use bpaf::{construct, long, Bpaf, Doc, Parser, ShellComp};
+use bpaf::{construct, long, short, Bpaf, Doc, Parser, ShellComp};
 use image::codecs::gif::{GifDecoder, GifEncoder};
 use image::codecs::png::PngDecoder;
 use image::codecs::webp::WebPDecoder;
@@ -93,104 +93,163 @@ struct CommonRbf {
     nearest: usize,
 }
 
-#[derive(Bpaf, Clone, Debug, Hash)]
+#[derive(Clone, Debug, Hash)]
 enum LutAlgorithm {
-    // Default algorithm, so adjacent isn't used.
     GaussianBlur {
-        #[bpaf(external)]
         common: Common,
-        /// Gaussian blur radius (sigma). Larger = more blending.
-        #[bpaf(
-            short('r'),
-            long,
-            argument("RADIUS"),
-            fallback(Hashed(8.0)),
-            display_fallback
-        )]
         radius: Hashed<f64>,
     },
-    #[bpaf(adjacent)]
     GaussianRbf {
-        /// Enable using Gaussian RBF for interpolation.
-        #[bpaf(short('R'), long("gaussian-rbf"), req_flag(()))]
         _gaussian_rbf: (),
-        /// Shape parameter for Gaussian RBF interpolation. Effectively creates more or
-        /// less blending between colors in the palette, where bigger numbers equal less blending.
-        /// Effect is heavily dependant on the number of nearest colors used.
-        #[bpaf(
-            short,
-            long,
-            argument("SHAPE"),
-            fallback(Hashed(128.0)),
-            display_fallback
-        )]
         shape: Hashed<f64>,
-        #[bpaf(external)]
         common_rbf: CommonRbf,
-        #[bpaf(external)]
         common: Common,
     },
-    #[bpaf(adjacent)]
     GaussianSampling {
-        /// Enable using Gaussian sampling for interpolation (slow).
-        #[bpaf(short('G'), long("gaussian-sampling"), req_flag(()))]
         _gaussian_sampling: (),
-        /// Average amount of noise to apply in each iteration.
-        #[bpaf(short, long, argument("MEAN"), fallback(Hashed(0.0)), display_fallback)]
         mean: Hashed<f64>,
-        /// Standard deviation parameter for the noise applied in each iteration.
-        #[bpaf(
-            short,
-            long,
-            argument("STD_DEV"),
-            fallback(Hashed(20.0)),
-            display_fallback
-        )]
         std_dev: Hashed<f64>,
-        /// Number of iterations of noise to apply to each pixel.
-        #[bpaf(short, long, argument("ITERS"), fallback(512), display_fallback)]
         iterations: usize,
-        /// Seed for noise rng.
-        #[bpaf(
-            short('S'),
-            long,
-            argument("SEED"),
-            fallback(42080085),
-            display_fallback
-        )]
         seed: u64,
-        #[bpaf(external)]
         common: Common,
     },
-    #[bpaf(adjacent)]
     ShepardsMethod {
-        /// Enable using Shepard's method (Inverse Distance RBF) for interpolation.
-        #[bpaf(short('S'), long("shepards-method"), req_flag(()))]
         _shepards_method: (),
-        /// Power parameter for shepard's method.
-        #[bpaf(
-            short,
-            long,
-            argument("POWER"),
-            fallback(Hashed(4.0)),
-            display_fallback
-        )]
         power: Hashed<f64>,
-        #[bpaf(external)]
         common_rbf: CommonRbf,
-        #[bpaf(external)]
         common: Common,
     },
-    #[bpaf(adjacent)]
     NearestNeighbor {
-        /// Disable interpolation completely.
-        #[bpaf(short('N'), long("nearest-neighbor"), req_flag(()))]
         _nearest_neighbor: (),
-        #[bpaf(external)]
         common: Common,
     },
-    #[bpaf(skip)]
-    HaldClut { file: PathBuf },
+    HaldClut {
+        file: PathBuf,
+    },
+}
+
+fn lut_algorithm() -> impl Parser<LutAlgorithm> {
+    let gaussian_blur = {
+        let common = common();
+        let radius = short('r')
+            .long("radius")
+            .help("Gaussian blur radius (sigma). Larger = more blending.")
+            .argument::<Hashed<f64>>("RADIUS")
+            .fallback(Hashed(8.0))
+            .display_fallback();
+        construct!(LutAlgorithm::GaussianBlur { common, radius })
+            .group_help("Gaussian blur (default):")
+    };
+
+    let gaussian_rbf = {
+        let _gaussian_rbf = short('R')
+            .long("gaussian-rbf")
+            .help("Enable using Gaussian RBF for interpolation.")
+            .req_flag(());
+        let shape = short('s')
+            .long("shape")
+            .help("Shape parameter for Gaussian RBF interpolation. Effectively creates more or less blending between colors in the palette, where bigger numbers equal less blending. Effect is heavily dependant on the number of nearest colors used.")
+            .argument::<Hashed<f64>>("SHAPE")
+            .fallback(Hashed(128.0))
+            .display_fallback();
+        let common_rbf = common_rbf();
+        let common = common();
+        construct!(LutAlgorithm::GaussianRbf {
+            _gaussian_rbf,
+            shape,
+            common_rbf,
+            common,
+        })
+        .adjacent()
+        .group_help("Gaussian RBF:")
+    };
+
+    let gaussian_sampling = {
+        let _gaussian_sampling = short('G')
+            .long("gaussian-sampling")
+            .help("Enable using Gaussian sampling for interpolation (slow).")
+            .req_flag(());
+        let mean = short('m')
+            .long("mean")
+            .help("Average amount of noise to apply in each iteration.")
+            .argument::<Hashed<f64>>("MEAN")
+            .fallback(Hashed(0.0))
+            .display_fallback();
+        let std_dev = short('s')
+            .long("std-dev")
+            .help("Standard deviation parameter for the noise applied in each iteration.")
+            .argument::<Hashed<f64>>("STD_DEV")
+            .fallback(Hashed(20.0))
+            .display_fallback();
+        let iterations = short('i')
+            .long("iterations")
+            .help("Number of iterations of noise to apply to each pixel.")
+            .argument::<usize>("ITERS")
+            .fallback(512)
+            .display_fallback();
+        let seed = short('S')
+            .long("seed")
+            .help("Seed for noise rng.")
+            .argument::<u64>("SEED")
+            .fallback(42080085)
+            .display_fallback();
+        let common = common();
+        construct!(LutAlgorithm::GaussianSampling {
+            _gaussian_sampling,
+            mean,
+            std_dev,
+            iterations,
+            seed,
+            common,
+        })
+        .adjacent()
+        .group_help("Gaussian sampling:")
+    };
+
+    let shepards_method = {
+        let _shepards_method = short('S')
+            .long("shepards-method")
+            .help("Enable using Shepard's method (Inverse Distance RBF) for interpolation.")
+            .req_flag(());
+        let power = short('p')
+            .long("power")
+            .help("Power parameter for shepard's method.")
+            .argument::<Hashed<f64>>("POWER")
+            .fallback(Hashed(4.0))
+            .display_fallback();
+        let common_rbf = common_rbf();
+        let common = common();
+        construct!(LutAlgorithm::ShepardsMethod {
+            _shepards_method,
+            power,
+            common_rbf,
+            common,
+        })
+        .adjacent()
+        .group_help("Shepard's method:")
+    };
+
+    let nearest_neighbor = {
+        let _nearest_neighbor = short('N')
+            .long("nearest-neighbor")
+            .help("Disable interpolation completely.")
+            .req_flag(());
+        let common = common();
+        construct!(LutAlgorithm::NearestNeighbor {
+            _nearest_neighbor,
+            common,
+        })
+        .adjacent()
+        .group_help("Nearest neighbor:")
+    };
+
+    construct!([
+        gaussian_blur,
+        gaussian_rbf,
+        gaussian_sampling,
+        shepards_method,
+        nearest_neighbor
+    ])
 }
 
 /// Manually allow using an external hald clut, hack since we dont want to allow this for generate,
