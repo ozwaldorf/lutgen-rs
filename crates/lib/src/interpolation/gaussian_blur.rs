@@ -2,6 +2,10 @@
 //!
 //! Creates a nearest-neighbor LUT with OKLab colors,
 //! then applies separable Gaussian blur directly on the color values.
+//!
+//! Uses a transpose-based approach for optimal cache locality:
+//! each blur pass operates on contiguous memory (stride=1), then
+//! the dimensions are rotated so the next axis becomes contiguous.
 
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
@@ -19,6 +23,9 @@ use crate::GenerateLut;
 /// 1. Build nearest-neighbor LUT storing OKLab colors
 /// 2. Apply separable Gaussian blur directly on L, a, b channels
 /// 3. Convert back to RGB
+///
+/// Uses transpose-based cache optimization: each blur pass operates on
+/// contiguous memory, with dimension rotations between passes.
 pub struct GaussianBlurRemapper {
     palette_oklab: Vec<[f32; 3]>,
     radius: f32,
@@ -77,30 +84,33 @@ impl GaussianBlurRemapper {
         kernel
     }
 
-    /// Apply a 1D Gaussian blur along a single axis of the 3D LUT.
-    ///
-    /// `axis_idx` maps `(r, g, b, kernel_offset)` to the source cell index,
-    /// where `kernel_offset` is a signed offset along the axis being blurred.
-    fn blur_axis(
-        colors: &[f32],
-        colors_next: &mut [f32],
+    /// Apply 1D Gaussian blur along the innermost (contiguous) axis.
+    /// This has optimal cache locality with stride=1 access pattern.
+    fn blur_inner(
+        src: &[f32],
+        dst: &mut [f32],
         size: usize,
         channels: usize,
         kernel: &[f32],
-        axis_idx: impl Fn(usize, usize, usize, i32) -> usize,
+        half: i32,
+        max: i32,
     ) {
-        let half = (kernel.len() / 2) as i32;
-        for r in 0..size {
-            for g in 0..size {
-                for b in 0..size {
-                    let idx_out = Self::cell_idx(r, g, b, size) * channels;
+        let row_len = size * channels;
+
+        for outer in 0..size {
+            for mid in 0..size {
+                let row_base = (outer * size + mid) * row_len;
+                for inner in 0..size {
+                    let out_base = row_base + inner * channels;
                     for c in 0..channels {
                         let mut sum = 0.0f32;
                         for (ki, &kw) in kernel.iter().enumerate() {
-                            let idx_in = axis_idx(r, g, b, ki as i32 - half) * channels + c;
-                            sum += kw * colors[idx_in];
+                            let inner_src =
+                                (inner as i32 + ki as i32 - half).clamp(0, max) as usize;
+                            let idx_in = row_base + inner_src * channels + c;
+                            sum += kw * src[idx_in];
                         }
-                        colors_next[idx_out + c] = sum;
+                        dst[out_base + c] = sum;
                     }
                 }
             }
@@ -108,30 +118,70 @@ impl GaussianBlurRemapper {
     }
 
     #[cfg(feature = "rayon")]
-    fn par_blur_axis(
-        colors: &[f32],
-        colors_next: &mut [f32],
+    fn par_blur_inner(
+        src: &[f32],
+        dst: &mut [f32],
         size: usize,
         channels: usize,
         kernel: &[f32],
-        axis_idx: impl Fn(usize, usize, usize, i32) -> usize + Sync,
+        half: i32,
+        max: i32,
     ) {
-        let half = (kernel.len() / 2) as i32;
-        colors_next
-            .par_chunks_mut(channels)
-            .enumerate()
-            .for_each(|(idx, out)| {
-                let b = idx % size;
-                let g = (idx / size) % size;
-                let r = idx / (size * size);
+        let row_len = size * channels;
 
-                for (c, out_c) in out.iter_mut().enumerate().take(channels) {
-                    let mut sum = 0.0f32;
-                    for (ki, &kw) in kernel.iter().enumerate() {
-                        let idx_in = axis_idx(r, g, b, ki as i32 - half) * channels + c;
-                        sum += kw * colors[idx_in];
+        // Parallelize over rows (outer * size + mid)
+        dst.par_chunks_mut(row_len)
+            .enumerate()
+            .for_each(|(row_idx, row_out)| {
+                let row_base = row_idx * row_len;
+                for inner in 0..size {
+                    let out_base = inner * channels;
+                    for c in 0..channels {
+                        let mut sum = 0.0f32;
+                        for (ki, &kw) in kernel.iter().enumerate() {
+                            let inner_src =
+                                (inner as i32 + ki as i32 - half).clamp(0, max) as usize;
+                            let idx_in = row_base + inner_src * channels + c;
+                            sum += kw * src[idx_in];
+                        }
+                        row_out[out_base + c] = sum;
                     }
-                    *out_c = sum;
+                }
+            });
+    }
+
+    /// Rotate dimensions: [a][b][c] -> [b][c][a]
+    /// After rotation, the previously outermost dimension becomes innermost.
+    fn rotate_dims(src: &[f32], dst: &mut [f32], size: usize, channels: usize) {
+        for a in 0..size {
+            for b in 0..size {
+                for c in 0..size {
+                    let src_idx = ((a * size + b) * size + c) * channels;
+                    let dst_idx = ((b * size + c) * size + a) * channels;
+                    for ch in 0..channels {
+                        dst[dst_idx + ch] = src[src_idx + ch];
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(feature = "rayon")]
+    fn par_rotate_dims(src: &[f32], dst: &mut [f32], size: usize, channels: usize) {
+        let row_len = size * channels;
+
+        // Parallelize over destination rows
+        dst.par_chunks_mut(row_len)
+            .enumerate()
+            .for_each(|(dst_row, row_out)| {
+                let b = dst_row / size;
+                let c = dst_row % size;
+                for a in 0..size {
+                    let src_idx = ((a * size + b) * size + c) * channels;
+                    let dst_local = a * channels;
+                    for ch in 0..channels {
+                        row_out[dst_local + ch] = src[src_idx + ch];
+                    }
                 }
             });
     }
@@ -156,11 +206,10 @@ impl GaussianBlurRemapper {
                     let target = &self.palette_oklab[nearest];
 
                     if self.preserve {
-                        // Only store a, b from target (L comes from input at output time)
                         colors.push(target[1]); // a
                         colors.push(target[2]); // b
                     } else {
-                        colors.push(target[0] / self.lum_factor); // restore original L
+                        colors.push(target[0] / self.lum_factor);
                         colors.push(target[1]);
                         colors.push(target[2]);
                     }
@@ -170,52 +219,66 @@ impl GaussianBlurRemapper {
 
         let mut colors_next = vec![0.0f32; n_cells * channels];
         let kernel = self.build_kernel();
+        let half = (kernel.len() / 2) as i32;
         let max = size as i32 - 1;
-        let clamp = |v: usize, off: i32| (v as i32 + off).clamp(0, max) as usize;
 
-        // Blur along R axis
+        // Pass 1: Blur along B axis (innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::blur_axis(
+        Self::blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(clamp(r, off), g, b, size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        // Blur along G axis
+        // Rotate [R][G][B] -> [G][B][R], now R is innermost
+        Self::rotate_dims(&colors, &mut colors_next, size, channels);
+        std::mem::swap(&mut colors, &mut colors_next);
+
+        // Pass 2: Blur along R axis (now innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::blur_axis(
+        Self::blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(r, clamp(g, off), b, size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        // Blur along B axis
+        // Rotate [G][B][R] -> [B][R][G], now G is innermost
+        Self::rotate_dims(&colors, &mut colors_next, size, channels);
+        std::mem::swap(&mut colors, &mut colors_next);
+
+        // Pass 3: Blur along G axis (now innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::blur_axis(
+        Self::blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(r, g, clamp(b, off), size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        self.colors_to_lut(&colors, size, channels, level)
+        // Rotate [B][R][G] -> [R][G][B], back to original layout
+        Self::rotate_dims(&colors, &mut colors_next, size, channels);
+
+        self.colors_to_lut(&colors_next, size, channels, level)
     }
 
     #[cfg(feature = "rayon")]
@@ -267,52 +330,66 @@ impl GaussianBlurRemapper {
 
         let mut colors_next = vec![0.0f32; n_cells * channels];
         let kernel = self.build_kernel();
+        let half = (kernel.len() / 2) as i32;
         let max = size as i32 - 1;
-        let clamp = |v: usize, off: i32| (v as i32 + off).clamp(0, max) as usize;
 
-        // Blur along R axis
+        // Pass 1: Blur along B axis (innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::par_blur_axis(
+        Self::par_blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(clamp(r, off), g, b, size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        // Blur along G axis
+        // Rotate [R][G][B] -> [G][B][R], now R is innermost
+        Self::par_rotate_dims(&colors, &mut colors_next, size, channels);
+        std::mem::swap(&mut colors, &mut colors_next);
+
+        // Pass 2: Blur along R axis (now innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::par_blur_axis(
+        Self::par_blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(r, clamp(g, off), b, size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        // Blur along B axis
+        // Rotate [G][B][R] -> [B][R][G], now G is innermost
+        Self::par_rotate_dims(&colors, &mut colors_next, size, channels);
+        std::mem::swap(&mut colors, &mut colors_next);
+
+        // Pass 3: Blur along G axis (now innermost, stride=1)
         if abort.is_some_and(|a| a.load(std::sync::atomic::Ordering::Relaxed)) {
             return None;
         }
-        Self::par_blur_axis(
+        Self::par_blur_inner(
             &colors,
             &mut colors_next,
             size,
             channels,
             &kernel,
-            |r, g, b, off| Self::cell_idx(r, g, clamp(b, off), size),
+            half,
+            max,
         );
         std::mem::swap(&mut colors, &mut colors_next);
 
-        self.par_colors_to_lut(&colors, size, channels, level)
+        // Rotate [B][R][G] -> [R][G][B], back to original layout
+        Self::par_rotate_dims(&colors, &mut colors_next, size, channels);
+
+        self.par_colors_to_lut(&colors_next, size, channels, level)
     }
 
     /// Convert a pixel index (HALD CLUT order: b outer, g, r inner) to (r, g, b) cell coords.
