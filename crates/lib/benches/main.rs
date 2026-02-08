@@ -3,6 +3,7 @@ use std::hint::black_box;
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use lutgen::identity::correct_image;
 use lutgen::interpolation::{
+    GaussianBlurRemapper,
     GaussianRemapper,
     GaussianSamplingRemapper,
     InterpolatedRemapper,
@@ -74,6 +75,32 @@ fn benchmark(c: &mut Criterion) {
         });
     }
     drop(g);
+
+    let mut g = c.benchmark_group("remap_gaussian_blur_sequential");
+    g.sample_size(25);
+    for i in (1..=4).map(|i| i * 4) {
+        g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
+            let remapper = gaussian_blur();
+            b.iter(|| {
+                let lut = remapper.generate_lut(*i);
+                black_box(lut);
+            });
+        });
+    }
+    drop(g);
+
+    let mut g = c.benchmark_group("remap_gaussian_blur_parallel");
+    g.sample_size(25);
+    for i in (1..=4).map(|i| i * 4) {
+        g.bench_with_input(BenchmarkId::new("hald", i), &i, |b, i| {
+            let remapper = gaussian_blur();
+            b.iter(|| {
+                let lut = remapper.par_generate_lut(*i);
+                black_box(lut);
+            });
+        });
+    }
+    drop(g);
 }
 
 fn generate(level: u8) {
@@ -104,6 +131,10 @@ fn gaussian_sampling() -> GaussianSamplingRemapper<'static> {
         42080085,
         false,
     )
+}
+
+fn gaussian_blur() -> GaussianBlurRemapper {
+    GaussianBlurRemapper::new(Palette::Carburetor.get(), 8.0, 1.0, false)
 }
 
 fn apply(lut: &RgbImage, mut img: RgbaImage) {

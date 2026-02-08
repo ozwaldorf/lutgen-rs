@@ -54,11 +54,25 @@ impl GaussianBlurRemapper {
         }
     }
 
+    /// Find nearest palette color, using a hint from spatial coherence.
+    /// Checks hint first; if distance is below threshold, skips full scan.
     #[inline(always)]
-    fn find_nearest(&self, color: [f32; 3]) -> usize {
-        let mut best_idx = 0;
-        let mut best_dist = f32::MAX;
+    fn find_nearest_with_hint(&self, color: [f32; 3], hint: usize, threshold_sq: f32) -> usize {
+        let hint_dist = sq_dist(color, self.palette_oklab[hint]);
+
+        // If hint is very close, it's almost certainly still the best
+        if hint_dist < threshold_sq {
+            return hint;
+        }
+
+        // Full scan starting from hint as best candidate
+        let mut best_idx = hint;
+        let mut best_dist = hint_dist;
+
         for (i, target) in self.palette_oklab.iter().enumerate() {
+            if i == hint {
+                continue;
+            }
             let d = sq_dist(color, *target);
             if d < best_dist {
                 best_dist = d;
@@ -195,6 +209,13 @@ impl GaussianBlurRemapper {
         let channels = if self.preserve { 2 } else { 3 };
         let mut colors: Vec<f32> = Vec::with_capacity(n_cells * channels);
 
+        // Threshold for early-exit: squared distance in OKLab space
+        // Adjacent LUT cells differ by ~1/size in each RGB channel
+        // In OKLab, this is roughly 0.01-0.02 per step, so threshold ~0.001 sq dist
+        let step = 1.0 / size as f32;
+        let threshold_sq = step * step * 0.5;
+
+        let mut hint = 0usize;
         for r in 0..size {
             let rf = (r as f32 * scale).round() as u8;
             for g in 0..size {
@@ -202,7 +223,12 @@ impl GaussianBlurRemapper {
                 for b in 0..size {
                     let bf = (b as f32 * scale).round() as u8;
                     let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
-                    let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
+                    let nearest = self.find_nearest_with_hint(
+                        [l * self.lum_factor, a, ob],
+                        hint,
+                        threshold_sq,
+                    );
+                    hint = nearest;
                     let target = &self.palette_oklab[nearest];
 
                     if self.preserve {
@@ -290,43 +316,44 @@ impl GaussianBlurRemapper {
         let channels = if self.preserve { 2 } else { 3 };
 
         // Build NN LUT with OKLab colors in parallel
-        let mut colors: Vec<f32> = if self.preserve {
-            (0..n_cells)
-                .into_par_iter()
-                .flat_map_iter(|idx| {
-                    let b = idx % size;
-                    let g = (idx / size) % size;
-                    let r = idx / (size * size);
+        // Parallelize over rows (r, g) to maintain spatial coherence along b axis
+        let step = 1.0 / size as f32;
+        let threshold_sq = step * step * 0.5;
+        let row_len = size * channels;
 
-                    let rf = (r as f32 * scale).round() as u8;
-                    let gf = (g as f32 * scale).round() as u8;
+        let mut colors: Vec<f32> = vec![0.0; n_cells * channels];
+        colors
+            .par_chunks_mut(row_len)
+            .enumerate()
+            .for_each(|(row_idx, row)| {
+                let g = row_idx % size;
+                let r = row_idx / size;
+                let rf = (r as f32 * scale).round() as u8;
+                let gf = (g as f32 * scale).round() as u8;
+
+                let mut hint = 0usize;
+                for b in 0..size {
                     let bf = (b as f32 * scale).round() as u8;
                     let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
-                    let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
+                    let nearest = self.find_nearest_with_hint(
+                        [l * self.lum_factor, a, ob],
+                        hint,
+                        threshold_sq,
+                    );
+                    hint = nearest;
                     let target = &self.palette_oklab[nearest];
 
-                    [target[1], target[2]]
-                })
-                .collect()
-        } else {
-            (0..n_cells)
-                .into_par_iter()
-                .flat_map_iter(|idx| {
-                    let b = idx % size;
-                    let g = (idx / size) % size;
-                    let r = idx / (size * size);
-
-                    let rf = (r as f32 * scale).round() as u8;
-                    let gf = (g as f32 * scale).round() as u8;
-                    let bf = (b as f32 * scale).round() as u8;
-                    let Oklab { l, a, b: ob } = srgb_to_oklab([rf, gf, bf].into());
-                    let nearest = self.find_nearest([l * self.lum_factor, a, ob]);
-                    let target = &self.palette_oklab[nearest];
-
-                    [target[0] / self.lum_factor, target[1], target[2]]
-                })
-                .collect()
-        };
+                    let out_base = b * channels;
+                    if self.preserve {
+                        row[out_base] = target[1];
+                        row[out_base + 1] = target[2];
+                    } else {
+                        row[out_base] = target[0] / self.lum_factor;
+                        row[out_base + 1] = target[1];
+                        row[out_base + 2] = target[2];
+                    }
+                }
+            });
 
         let mut colors_next = vec![0.0f32; n_cells * channels];
         let kernel = self.build_kernel();
