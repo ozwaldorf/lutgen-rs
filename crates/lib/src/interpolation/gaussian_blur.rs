@@ -23,9 +23,6 @@ use crate::GenerateLut;
 /// 1. Build nearest-neighbor LUT storing OKLab colors
 /// 2. Apply separable Gaussian blur directly on L, a, b channels
 /// 3. Convert back to RGB
-///
-/// Uses transpose-based cache optimization: each blur pass operates on
-/// contiguous memory, with dimension rotations between passes.
 pub struct GaussianBlurRemapper {
     palette_oklab: Vec<[f32; 3]>,
     radius: f32,
@@ -172,9 +169,8 @@ impl GaussianBlurRemapper {
                 for c in 0..size {
                     let src_idx = ((a * size + b) * size + c) * channels;
                     let dst_idx = ((b * size + c) * size + a) * channels;
-                    for ch in 0..channels {
-                        dst[dst_idx + ch] = src[src_idx + ch];
-                    }
+                    dst[dst_idx..(channels + dst_idx)]
+                        .copy_from_slice(&src[src_idx..(channels + src_idx)]);
                 }
             }
         }
@@ -193,9 +189,8 @@ impl GaussianBlurRemapper {
                 for a in 0..size {
                     let src_idx = ((a * size + b) * size + c) * channels;
                     let dst_local = a * channels;
-                    for ch in 0..channels {
-                        row_out[dst_local + ch] = src[src_idx + ch];
-                    }
+                    row_out[dst_local..(channels + dst_local)]
+                        .copy_from_slice(&src[src_idx..(channels + src_idx)]);
                 }
             });
     }
