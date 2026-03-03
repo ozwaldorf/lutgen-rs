@@ -6,18 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Lutgen Studio
-
-Lutgen Studio now runs in the browser as a Progressive Web App (PWA), available at [lut.sh/app](https://lut.sh/app). The web version includes a service worker for offline support, image processing in a background worker thread, and a responsive layout that adapts to mobile and narrow windows.
-
-Other improvements:
-- Export submenu with format selection on web
-- Icons in menus and docs button in top bar
-- Tooltips for remapper settings
-- Zoom percentage display in statusline
-- Visual feedback with dimmed image and spinner during processing
-- Fallback to re-encode without transparency if encoding fails
-
 ### Lutgen CLI
 
 New default algorithm: Gaussian Blur (`--gaussian-blur` / `-B`) replaces Gaussian RBF as the default. This algorithm builds a nearest-neighbor LUT then applies separable Gaussian blur on OKLab color values, producing results mathematically equivalent to gaussian sampling but significantly faster.
@@ -36,6 +24,20 @@ Help text improvements:
 ### lutgen-palettes
 
 - Added Evergarden palettes (fall, spring, summer, winter) (#41)
+
+### Lutgen Studio
+
+#### Web app
+
+Lutgen Studio now runs in the browser as a Progressive Web App (PWA), available at [lut.sh/app](https://lut.sh/app). The web version includes a service worker for offline support, image processing in a background worker thread, and a responsive layout that adapts to mobile and narrow windows.
+
+Other improvements:
+- Export submenu with format selection on web
+- Icons in menus and docs button in top bar
+- Tooltips for remapper settings
+- Zoom percentage display in statusline
+- Visual feedback with dimmed image and spinner during processing
+- Fallback to re-encode without transparency if encoding fails
 
 ---
 

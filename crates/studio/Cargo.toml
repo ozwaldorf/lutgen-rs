@@ -1,6 +1,6 @@
 [package]
 name = "lutgen-studio"
-version = "0.3.0"
+version = "0.4.0"
 description = "Offical GUI for Lutgen, the best way to apply popular colorschemes to any image or wallpaper!"
 edition = "2024"
 license = "MIT"
@@ -23,7 +23,7 @@ name = "lutgen-studio"
 path = "src/bin/main.rs"
 
 [dependencies]
-lutgen = { path = "../lib", version = "0.14" }
+lutgen = { path = "../lib", version = "0.15" }
 lutgen-palettes = { path = "../palettes", version = "0.4" }
 
 bpaf.workspace = true
@@ -55,7 +55,7 @@ ureq = "3.0.12"
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 image = { workspace = true, features = ["serde"] }
 poll-promise = { version = "0.3", features = ["web"] }
-getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom = { version = "0.4", features = ["wasm_js"] }
 wasm-bindgen-futures = "0.4"
 web-sys = "0.3" # to access the DOM
 gloo-worker = "0.5"
