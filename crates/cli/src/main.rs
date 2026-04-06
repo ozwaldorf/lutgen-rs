@@ -1010,7 +1010,7 @@ impl Lutgen {
         input: Vec<(PathBuf, String)>,
         extra_colors: Vec<Color>,
     ) -> Result<String, String> {
-        const REGEX: &str = r"(#)([0-9a-fA-F]{3}){1,2}|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
+        const REGEX: &str = r"(#)([0-9a-fA-F]{6}|[0-9a-fA-F]{3})|(rgb)\(((?:[0-9\s]+,?){3})\)|(rgba)\(((?:[0-9\s]+,?){3}),([\s0-9.]*)\)";
 
         let (name, colors) = concat_colors(palette, extra_colors);
         let (lut, level) = hald_clut_or_algorithm.generate(&name, colors)?;
@@ -1152,18 +1152,92 @@ fn main() {
 }
 
 #[cfg(test)]
-#[test]
-fn generate_docs() {
-    let options = lutgen();
+mod tests {
+    use super::*;
 
-    let roff = options.render_manpage("lutgen", bpaf::doc::Section::General, None, None, None);
-    std::fs::write("../../docs/man/lutgen.1", roff).expect("failed to write manpage");
+    #[test]
+    fn patch_nearest_neighbor() {
+        let palette_colors = vec![
+            Color([0xff, 0x00, 0x00]), // red
+            Color([0x00, 0xff, 0x00]), // green
+            Color([0x00, 0x00, 0xff]), // blue
+        ];
+        let algorithm = LutAlgorithm::NearestNeighbor {
+            _nearest_neighbor: (),
+            common: Common {
+                level: 2,
+                preserve: false,
+                lum_factor: Hashed(1.0),
+            },
+        };
+        let input = vec![(
+            PathBuf::from("test.conf"),
+            [
+                "fg = #ff0000",
+                "bg = #00ff00",
+                "border = #0000ff",
+                "short = #f00",
+                "mid = #808080",
+                "func = rgb(255, 0, 0)",
+                "func_a = rgba(0, 255, 0, 0.5)",
+            ]
+            .join("\n"),
+        )];
 
-    let md = options
-        .header("")
-        .render_markdown("lutgen")
-        .replace('|', "&#124;");
-    let header = "---\nlayout: page\ntitle: Command summary\npermalink: cli\n---";
-    std::fs::write("../../docs/pages/cli.md", format!("{header}{md}"))
-        .expect("failed to write markdown docs");
+        let result = Lutgen::patch(false, true, None, algorithm, input, palette_colors);
+        let msg = result.expect("patch should succeed");
+        assert!(msg.contains("patching 1 file"));
+    }
+
+    #[test]
+    fn patch_hex_preserves_full_color() {
+        // Regression: the old regex `([0-9a-fA-F]{3}){1,2}` only captured the
+        // last 3 chars of 6-digit hex codes, silently mangling colors.
+        let palette_colors = vec![
+            Color([0xff, 0x00, 0x00]),
+            Color([0x00, 0xff, 0x00]),
+            Color([0x00, 0x00, 0xff]),
+        ];
+        let algorithm = LutAlgorithm::NearestNeighbor {
+            _nearest_neighbor: (),
+            common: Common {
+                level: 2,
+                preserve: false,
+                lum_factor: Hashed(1.0),
+            },
+        };
+
+        // Use --write to a temp file so we can read back the actual result.
+        let tmp = std::env::temp_dir().join("lutgen-test-patch-hex.txt");
+        std::fs::write(&tmp, "color = #ff8000\n").unwrap();
+        let input = vec![(tmp.clone(), std::fs::read_to_string(&tmp).unwrap())];
+
+        Lutgen::patch(true, true, None, algorithm, input, palette_colors).unwrap();
+
+        let patched = std::fs::read_to_string(&tmp).unwrap();
+        std::fs::remove_file(&tmp).ok();
+
+        // #ff8000 is closest to red. With the old bug, the regex captured only
+        // "000" (last 3 hex chars) → mapped to blue. Assert it maps to red.
+        assert!(
+            patched.contains("#ff0000"),
+            "expected #ff8000 to map to red (#ff0000), got: {patched}"
+        );
+    }
+
+    #[test]
+    fn generate_docs() {
+        let options = lutgen();
+
+        let roff = options.render_manpage("lutgen", bpaf::doc::Section::General, None, None, None);
+        std::fs::write("../../docs/man/lutgen.1", roff).expect("failed to write manpage");
+
+        let md = options
+            .header("")
+            .render_markdown("lutgen")
+            .replace('|', "&#124;");
+        let header = "---\nlayout: page\ntitle: Command summary\npermalink: cli\n---";
+        std::fs::write("../../docs/pages/cli.md", format!("{header}{md}"))
+            .expect("failed to write markdown docs");
+    }
 }
