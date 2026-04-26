@@ -4183,11 +4183,11 @@ evergarden_fall = [
   "#b2caed",
   "#d2bdf3",
   "#f3c0e5",
-  "#f6cee5"
+  "#fae6ef"
 ]
 evergarden_spring = [
-  "#171c1f",
   "#1c2225",
+  "#232a2e",
   "#2b3438",
   "#343e43",
   "#3e4a4f",
@@ -4209,7 +4209,7 @@ evergarden_spring = [
   "#b2caed",
   "#d2bdf3",
   "#f3c0e5",
-  "#f6cee5"
+  "#fae6ef"
 ]
 evergarden_summer = [
   "#2b3034",
@@ -4261,7 +4261,7 @@ evergarden_winter = [
   "#b2caed",
   "#d2bdf3",
   "#f3c0e5",
-  "#f6cee5"
+  "#fae6ef"
 ]
 fahrenheit = [
   "#000000",
