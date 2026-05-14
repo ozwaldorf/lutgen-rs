@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2026-05-14]
 
-### Lutgen CLI v1.1.0
+### Lutgen CLI v1.1.1
 
 New default algorithm: Gaussian Blur (`--gaussian-blur` / `-B`) replaces Gaussian RBF as the default. This algorithm builds a nearest-neighbor LUT then applies separable Gaussian blur on OKLab color values, producing results mathematically equivalent to gaussian sampling but significantly faster.
 
