@@ -20,7 +20,8 @@ fn labeled_slider<Num: egui::emath::Numeric>(
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             let drag = ui.add(egui::DragValue::new(value).range(range.clone()));
             ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                ui.style_mut().spacing.slider_width = ui.available_width();
+                ui.style_mut().spacing.slider_width =
+                    ui.available_width() - ui.spacing().item_spacing.x;
                 let slider = ui.add(egui::Slider::new(value, range).show_value(false));
                 drag | slider
             })
