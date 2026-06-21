@@ -5,6 +5,7 @@ use strum::VariantArray;
 
 use crate::palette::{lutgen_dir, DynamicPalette};
 use crate::state::LutAlgorithm;
+use crate::utils::floor_to_pixels;
 use crate::App;
 
 /// Helper to add a labeled slider with dynamic DragValue sizing.
@@ -89,10 +90,11 @@ impl PaletteFilterBox {
         let mut apply = false;
         let mut res = ui
             .group(|ui| {
+                let width = floor_to_pixels(ui, ui.available_width());
                 egui::Resize::default()
                     .resizable([true, false])
-                    .min_width(ui.available_width())
-                    .max_width(ui.available_width())
+                    .min_width(width)
+                    .max_width(width)
                     .with_stroke(false)
                     .show(ui, |ui| {
                         ui.horizontal(|ui| {
@@ -498,7 +500,7 @@ impl App {
                 .resizable(true)
                 .min_width(214.)
                 .show(ctx, |ui| {
-                    ui.take_available_width();
+                    ui.set_width(floor_to_pixels(ui, ui.available_width()));
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         self.show_sidebar_inner(ui);
                     });
