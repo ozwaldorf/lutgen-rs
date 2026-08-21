@@ -6,7 +6,6 @@ on:
     paths:
       - '.github/workflows/website.yml'
       - 'docs/**'
-      - 'crates/studio/**'
   workflow_dispatch:
 
 permissions:
@@ -40,11 +39,6 @@ jobs:
           cd docs
           bundle install
           bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
-      - name: Build with Trunk
-        run: |
-          cd crates/studio
-          trunk build --release
-          mv dist ../../docs/_site/app
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

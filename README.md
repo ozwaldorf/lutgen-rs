@@ -6,7 +6,6 @@
     <h2 align="center">lutgen-rs</h2>
     <p align="center">
         <a href="https://crates.io/crates/lutgen-cli"><img alt="crate" src="https://img.shields.io/crates/v/lutgen-cli?label=cli&style=for-the-badge" /></a>
-        <a href="https://crates.io/crates/lutgen-studio"><img alt="crate" src="https://img.shields.io/crates/v/lutgen-studio?label=studio&style=for-the-badge" /></a>
         <a href="https://lut.sh"><img alt="crate" src="https://img.shields.io/badge/wiki-lut.sh-blue?style=for-the-badge" /></a>
         <a href="https://github.com/ozwaldorf/lutgen-rs/actions/workflows/release.yml"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/ozwaldorf/lutgen-rs/release.yml?label=Build&style=for-the-badge" /></a>
         <a href="https://garnix.io"><img alt="ci" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Fozwaldorf%2Flutgen-rs&style=for-the-badge&logo=%20&label=garnix&labelColor=grey" /></a>
@@ -78,51 +77,17 @@ cargo install lutgen-cli
 
 Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
 
-## Lutgen Studio
-
-<img width="66%" alt="Lutgen Studio" src="https://github.com/user-attachments/assets/436ece7a-b59f-404d-a6d6-6c0e754355f2" />
-
-### Package Repositories
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/lutgen-studio.svg?exclude_unsupported=1)](https://repology.org/project/lutgen-studio/versions)
-
-### Required Dependencies
-
-(For this example, Ubuntu packages are listed)
-
-- libxcb-render0-dev
-- libxcb-shape0-dev
-- libxcb-xfixes0-dev
-- libxkbcommon-dev
-- libssl-dev
-- wayland
-
-### Install from source
-
-```bash
-git clone https://github.com/ozwaldorf/lutgen-rs
-cd lutgen-rs
-cargo install --path crates/studio
-```
-
-### Crates.io
-
-```bash
-cargo install lutgen-studio
-```
-
 ## Rust Library
 
 See the latest rust documentation on [docs.rs/lutgen](https://docs.rs/lutgen)
 
 ## Nix flake
 
-A nix flake is available providing both lutgen and lutgen-studio packages.
+A nix flake is available providing the lutgen package.
 The flake can be easily run via:
 
 ```bash
 nix run github:ozwaldorf/lutgen-rs
-nix run github:ozwaldorf/lutgen-rs#lutgen-studio
 ```
 
 Cache is provided via https://garnix.io
@@ -138,7 +103,6 @@ nix develop
 
 # inside dev shell
 cargo run -r --bin lutgen
-cargo run -r --bin lutgen-studio
 ```
 
 ## Planned features

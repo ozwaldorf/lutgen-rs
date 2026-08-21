@@ -39,7 +39,6 @@
         # source and package versions
         src = craneLib.path ./.;
         version = (fromTOML (readFile ./crates/cli/Cargo.toml)).package.version;
-        studioVersion = (fromTOML (readFile ./crates/studio/Cargo.toml)).package.version;
 
         # Common args
         commonArgs = {
@@ -66,35 +65,6 @@
           }
         );
 
-        # runtime libraries for studio
-        LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath (
-          with pkgs;
-          [
-            libxkbcommon
-            libGL
-            fontconfig
-            wayland
-            xorg.libXcursor
-            xorg.libXrandr
-            xorg.libXi
-            xorg.libX11
-          ]
-        )}";
-
-        lutgen-studio = stableCraneLib.buildPackage (
-          commonArgs
-          // rec {
-            doCheck = false;
-            pname = "lutgen-studio";
-            version = studioVersion;
-            nativeBuildInputs = [ pkgs.makeWrapper ];
-            cargoExtraArgs = "--locked --bin lutgen-studio";
-            postInstall = ''
-              wrapProgram "$out/bin/${pname}" \
-                --set LD_LIBRARY_PATH "${LD_LIBRARY_PATH}"
-            '';
-          }
-        );
       in
       {
         checks =
@@ -134,17 +104,16 @@
           };
 
         packages = {
-          inherit lutgen lutgen-studio;
+          inherit lutgen;
           default = lutgen;
         };
 
         devShells.default = craneLib.devShell {
-          inherit LD_LIBRARY_PATH;
           checks = self.checks.${system};
           packages = with pkgs; [
             jekyll
             bundler
-            trunk
+            nodejs
           ];
 
         };
@@ -154,7 +123,6 @@
     // {
       overlays.default = _: prev: {
         lutgen = self.packages.${prev.system}.default;
-        lutgen-studio = self.packages.${prev.system}.default;
       };
     };
 }

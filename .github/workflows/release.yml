@@ -62,21 +62,13 @@ jobs:
       id: versions
       run: |
         cross build --release --target=${{ matrix.TARGET }} --bin lutgen
-        cross build --release --target=${{ matrix.TARGET }} --bin lutgen-studio
         cp target/${{ matrix.TARGET }}/release/lutgen${{ matrix.EXTENSION }} lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        cp target/${{ matrix.TARGET }}/release/lutgen-studio${{ matrix.EXTENSION }} lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         echo "lutgen=$(cargo read-manifest --manifest-path crates/cli/Cargo.toml | jq .version -r)" >> $GITHUB_OUTPUT
-        echo "lutgen_studio=$(cargo read-manifest --manifest-path crates/studio/Cargo.toml | jq .version -r)" >> $GITHUB_OUTPUT
 
     - uses: actions/upload-artifact@v4
       with:
         name: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         path: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        path: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
 
     - uses: svenstaro/upload-release-action@v2
       name: Upload lutgen to release
@@ -84,16 +76,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: lutgen-cli-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         asset_name: lutgen-cli-v${{ steps.versions.outputs.lutgen }}-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        tag: ${{!startsWith(github.ref, 'refs/tags/') && 'nightly-' || ''}}${{ github.ref }}
-        prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        overwrite: true
-
-    - uses: svenstaro/upload-release-action@v2
-      name: Upload lutgen-studio to release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: lutgen-studio-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
-        asset_name: lutgen-studio-v${{ steps.versions.outputs.lutgen_studio }}-${{ matrix.TARGET }}${{ matrix.EXTENSION }}
         tag: ${{!startsWith(github.ref, 'refs/tags/') && 'nightly-' || ''}}${{ github.ref }}
         prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
         overwrite: true
