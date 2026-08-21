@@ -240,7 +240,10 @@ export function buildKernel(radius) {
     weights.push(weight);
     sum += weight;
   }
-  return { half, weights: Float32Array.from(weights, (weight) => weight / sum) };
+  return {
+    half,
+    weights: Float32Array.from(weights, (weight) => weight / sum),
+  };
 }
 
 export class LutPipeline {
@@ -323,7 +326,10 @@ export class LutPipeline {
   ensureLutTextures(size) {
     if (this.lutSize === size && this.lutTextures[0]) return;
     for (const tex of this.lutTextures) if (tex) this.gl.deleteTexture(tex);
-    this.lutTextures = [this.createLutTexture(size), this.createLutTexture(size)];
+    this.lutTextures = [
+      this.createLutTexture(size),
+      this.createLutTexture(size),
+    ];
     this.lutSize = size;
   }
 
@@ -362,7 +368,15 @@ export class LutPipeline {
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texStorage2D(gl.TEXTURE_2D, 1, gl.R32F, weights.length, 1);
     gl.texSubImage2D(
-      gl.TEXTURE_2D, 0, 0, 0, weights.length, 1, gl.RED, gl.FLOAT, weights,
+      gl.TEXTURE_2D,
+      0,
+      0,
+      0,
+      weights.length,
+      1,
+      gl.RED,
+      gl.FLOAT,
+      weights,
     );
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -392,7 +406,11 @@ export class LutPipeline {
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo);
     gl.framebufferTextureLayer(
-      gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, 0, layer,
+      gl.FRAMEBUFFER,
+      gl.COLOR_ATTACHMENT0,
+      target,
+      0,
+      layer,
     );
     gl.viewport(0, 0, size, size);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -435,11 +453,13 @@ export class LutPipeline {
     gl.bindTexture(gl.TEXTURE_2D, this.kernelTexture);
 
     let src = 0;
-    for (const axis of [
-      [1, 0, 0],
-      [0, 1, 0],
-      [0, 0, 1],
-    ]) {
+    for (
+      const axis of [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+      ]
+    ) {
       gl.uniform3i(bu.u_axis, axis[0], axis[1], axis[2]);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_3D, this.lutTextures[src]);

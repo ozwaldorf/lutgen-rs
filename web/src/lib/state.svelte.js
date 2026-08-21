@@ -59,8 +59,10 @@ export function selectPalette(palette) {
     write(SELECTION_KEY, { colors: palette.colors });
   } else {
     write(SELECTION_KEY, { id: palette.id });
-    app.recents = [palette.id, ...app.recents.filter((r) => r !== palette.id)]
-      .slice(0, MAX_RECENTS);
+    app.recents = [
+      palette.id,
+      ...app.recents.filter((r) => r !== palette.id),
+    ].slice(0, MAX_RECENTS);
     write(RECENTS_KEY, app.recents);
   }
 }

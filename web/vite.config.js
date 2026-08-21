@@ -15,7 +15,9 @@ function label(name) {
   return name
     .replace(/^_/, "")
     .split("_")
-    .map((p) => (UPPER.has(p) ? p.toUpperCase() : p[0].toUpperCase() + p.slice(1)))
+    .map((
+      p,
+    ) => (UPPER.has(p) ? p.toUpperCase() : p[0].toUpperCase() + p.slice(1)))
     .join(" ");
 }
 
@@ -33,8 +35,12 @@ function palettes() {
 
       const toml = readFileSync(PALETTES_TOML, "utf8");
       const entries = [];
-      for (const [, name, body] of toml.matchAll(/^([a-z_0-9]+) = \[([^\]]*)\]/gm)) {
-        const colors = [...body.matchAll(/"(#[0-9a-fA-F]{6})"/g)].map((m) => m[1]);
+      for (
+        const [, name, body] of toml.matchAll(/^([a-z_0-9]+) = \[([^\]]*)\]/gm)
+      ) {
+        const colors = [...body.matchAll(/"(#[0-9a-fA-F]{6})"/g)].map((m) =>
+          m[1]
+        );
         if (colors.length) {
           entries.push({
             id: name.replace(/^_/, "").replace(/_/g, "-"),
