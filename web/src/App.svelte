@@ -7,7 +7,7 @@
 
   let canvas = $state(null);
   const SAMPLE = {
-    src: "/sample.jpg",
+    src: `${import.meta.env.BASE_URL}sample.jpg`,
     name: "Seattle_Sunset",
     fileName: "Seattle_Sunset.jpg",
   };

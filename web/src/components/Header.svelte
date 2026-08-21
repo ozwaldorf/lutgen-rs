@@ -5,7 +5,7 @@
 </script>
 
 <header>
-  <img class="mark" src="/lutgen.png" alt="" />
+  <img class="mark" src="{import.meta.env.BASE_URL}lutgen.png" alt="" />
   <h1>Lutgen Web</h1>
 
   <span class="file-name">{fileName}</span>
