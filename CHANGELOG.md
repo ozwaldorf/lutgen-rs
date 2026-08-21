@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Lutgen Studio: deprecated
+
+The `lutgen-studio` GUI has been removed in favor of Lutgen Web, an
+interactive browser app at [lut.sh/app](https://lut.sh/app) that runs the
+full remapping pipeline on the GPU.
+
+Existing `lutgen-studio` releases stay published on crates.io and in
+distro repositories, but the crate is no longer built, released, or
+maintained. Installs from source, the `lutgen-studio` nix package, and
+the per-target release binaries are all gone.
+
+The CLI and the `lutgen` library are unaffected.
+
 ## [2026-05-14]
 
 ### Lutgen CLI v1.1.1

@@ -77,6 +77,24 @@ cargo install lutgen-cli
 
 Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
 
+## Lutgen Web
+
+An interactive WebGL app is available at [lut.sh/app](https://lut.sh/app),
+supporting every built-in palette with live previews.
+
+Built from `web/`:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+> [!NOTE]
+> Lutgen Web replaces `lutgen-studio`, the previous desktop GUI, which is no
+> longer built or maintained. Existing studio releases remain published on
+> crates.io and in distro repositories.
+
 ## Rust Library
 
 See the latest rust documentation on [docs.rs/lutgen](https://docs.rs/lutgen)
