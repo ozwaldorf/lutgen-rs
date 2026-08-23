@@ -1230,14 +1230,19 @@ mod tests {
         let options = lutgen();
 
         let roff = options.render_manpage("lutgen", bpaf::doc::Section::General, None, None, None);
-        std::fs::write("../../docs/man/lutgen.1", roff).expect("failed to write manpage");
 
         let md = options
             .header("")
             .render_markdown("lutgen")
             .replace('|', "&#124;");
         let header = "---\nlayout: page\ntitle: Command summary\npermalink: cli\n---";
-        std::fs::write("../../docs/pages/cli.md", format!("{header}{md}"))
-            .expect("failed to write markdown docs");
+        let md = format!("{header}{md}");
+
+        // Overwriting committed docs is only wanted when regenerating them on
+        // purpose, not on every test run in a possibly read-only source tree.
+        if std::env::var_os("LUTGEN_GENERATE_DOCS").is_some() {
+            std::fs::write("../../docs/man/lutgen.1", roff).expect("failed to write manpage");
+            std::fs::write("../../docs/pages/cli.md", md).expect("failed to write markdown docs");
+        }
     }
 }
