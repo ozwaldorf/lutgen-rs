@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { parse } from "smol-toml";
 import { defineConfig } from "vite";
 
 const PALETTES_TOML = fileURLToPath(
@@ -10,6 +11,7 @@ const PALETTES_TOML = fileURLToPath(
 const MODULE_ID = "virtual:palettes";
 const RESOLVED_ID = `\0${MODULE_ID}`;
 const UPPER = new Set(["oled", "ist", "ii"]);
+const HEX = /^#[0-9a-fA-F]{6}$/;
 
 function label(name) {
   return name
@@ -33,22 +35,25 @@ function palettes() {
       // Watching the toml makes edits trigger a reload in dev.
       this.addWatchFile(PALETTES_TOML);
 
-      const toml = readFileSync(PALETTES_TOML, "utf8");
-      const entries = [];
-      for (
-        const [, name, body] of toml.matchAll(/^([a-z_0-9]+) = \[([^\]]*)\]/gm)
-      ) {
-        const colors = [...body.matchAll(/"(#[0-9a-fA-F]{6})"/g)].map((m) =>
-          m[1]
-        );
-        if (colors.length) {
-          entries.push({
+      // Parsed rather than pattern matched, so any entry the crate accepts is
+      // carried over and anything unexpected fails the build instead of being
+      // dropped. Mirrors the validation in crates/palettes/build.rs.
+      const entries = Object.entries(parse(readFileSync(PALETTES_TOML, "utf8")))
+        .map(([name, colors]) => {
+          if (
+            !Array.isArray(colors) ||
+            !colors.every((c) => typeof c === "string" && HEX.test(c))
+          ) {
+            throw new Error(
+              `palettes.toml: "${name}" must be an array of "#rrggbb" strings`,
+            );
+          }
+          return {
             id: name.replace(/^_/, "").replace(/_/g, "-"),
             name: label(name),
             colors,
-          });
-        }
-      }
+          };
+        });
 
       return [
         `export const PALETTES = ${JSON.stringify(entries)};`,

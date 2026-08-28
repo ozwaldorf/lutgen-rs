@@ -125,8 +125,8 @@
   }
 
   function saveImage() {
-    canvas.toBlob((blob) =>
-      downloadBlob(blob, `${imageName}-${app.palette.id}.jpg`),
+    canvas.toBlob(
+      (blob) => downloadBlob(blob, `${imageName}-${app.palette.id}.jpg`),
       "image/jpeg",
       0.95,
     );
