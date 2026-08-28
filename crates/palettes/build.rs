@@ -3,7 +3,7 @@ use std::error::Error;
 use std::fs::{read_to_string, write};
 use std::path::Path;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tinytemplate::TinyTemplate;
 
 const TEMPLATE: &str = r#"
@@ -53,6 +53,17 @@ struct Palette {
     name: String,
     palette: Vec<Color>,
 }
+
+#[derive(Deserialize)]
+struct PaletteDefinition {
+    src: Vec<String>,
+    /// Set when the palette carries colors its sources do not define, so
+    /// update.sh reports the difference instead of failing.
+    #[serde(default)]
+    incomplete_src: bool,
+    palette: Vec<String>,
+}
+
 #[derive(Serialize)]
 struct Context {
     palettes: Vec<Palette>,
@@ -67,13 +78,28 @@ fn main() -> Result<(), Box<dyn Error>> {
     tt.add_template("lib.rs", TEMPLATE)?;
 
     let ctx = Context {
-        palettes: toml::from_str::<BTreeMap<String, Vec<String>>>(&read_to_string(
+        palettes: toml::from_str::<BTreeMap<String, PaletteDefinition>>(&read_to_string(
             "palettes.toml",
         )?)?
         .into_iter()
-        .map(|(name, palette)| Palette {
-            name: pascal_case(name),
-            palette: palette.into_iter().map(parse_color).collect(),
+        .map(|(name, definition)| {
+            let PaletteDefinition {
+                src,
+                incomplete_src,
+                palette,
+            } = definition;
+            assert!(
+                src.iter().all(|source| source.starts_with("https://")),
+                "{name}.src must contain only HTTPS URLs"
+            );
+            assert!(
+                !incomplete_src || !src.is_empty(),
+                "{name}.incomplete_src marks colors its sources omit, so it needs sources"
+            );
+            Palette {
+                name: pascal_case(name),
+                palette: palette.into_iter().map(parse_color).collect(),
+            }
         })
         .collect(),
     };

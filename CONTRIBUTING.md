@@ -44,7 +44,49 @@ We will then take care of the issue as soon as possible.
 
 > Note: Many of the palettes were automatically scraped, and thus some are missing things or incorrect. If your palette ends with `-base16`, `-gogh`, or `-terminal-sexy`, it would be appreciated if you could verify the palette and submit a PR removing the suffix.
 
-If you discover that any of the included palettes are missing colors or incorrect, or if you just want to add your favorite color palette, open a pull request editing the [palettes.json](palettes/palettes.json) file. You should make sure that new entries are kept in alphabetical order, and there are no duplicates. In the pull request description, please include a link to the reference used for the palette.
+If you discover that an included palette is missing colors or incorrect, or if you want to add a new palette, open a pull request editing [`crates/palettes/palettes.toml`](crates/palettes/palettes.toml). Keep new entries in alphabetical order and do not add duplicates.
+
+Every new or updated palette must include a direct link to its upstream source file in its `src` array, using the upstream repository's `main` or `master` branch. Link to the source file itself, not a repository, directory, documentation page, or other indirect reference:
+
+```toml
+[example]
+src = [
+  "https://github.com/example/theme/blob/main/path/to/palette.toml",
+]
+palette = [
+  "#000000",
+  "#ffffff",
+]
+```
+
+If a palette combines multiple upstream files, include every direct source-file URL in its `src` array. Include the same source links in the pull request description.
+
+Verify your entry with [`crates/palettes/update.sh`](crates/palettes/update.sh), which fetches each `src` and checks that every committed color is present upstream:
+
+```sh
+./crates/palettes/update.sh example   # one palette
+./crates/palettes/update.sh           # all of them
+```
+
+Upstream files usually define more colors than a palette keeps, so the check requires the committed colors to be a subset of the source, not an exact match. Responses are cached in `crates/palettes/.cache`; delete it to refetch.
+
+A few palettes keep colors no upstream file contains: the ayu variants blend theirs at runtime, and `catppuccin_oled` substitutes its own near-blacks for mocha's darkest three. These set `incomplete_src = true`, which reports them as drift rather than failure:
+
+```toml
+[example]
+src = [
+  "https://github.com/example/theme/blob/main/path/to/palette.toml",
+]
+incomplete_src = true
+palette = [
+  "#000000",
+  "#ffffff",
+]
+```
+
+Only set it for a palette whose extra colors you have verified by hand, and say where they came from in the pull request. It is not a way to quiet a source that simply does not match.
+
+A palette may list several sources when no single file holds every color; the script combines them. Prefer a link to the theme's own repository, falling back to a base16/base24 scheme file and then to [iTerm2-Color-Schemes](https://github.com/mbadolato/iTerm2-Color-Schemes). Within that repository the `schemes/*.itermcolors` files are the most complete, since the other export formats drop the bold, link, and selection colors.
 
 ### Reporting Bugs
 

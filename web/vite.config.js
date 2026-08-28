@@ -39,18 +39,23 @@ function palettes() {
       // carried over and anything unexpected fails the build instead of being
       // dropped. Mirrors the validation in crates/palettes/build.rs.
       const entries = Object.entries(parse(readFileSync(PALETTES_TOML, "utf8")))
-        .map(([name, colors]) => {
+        .map(([name, definition]) => {
+          const sources = definition?.src;
+          const colors = definition?.palette;
           if (
+            !Array.isArray(sources) ||
+            !sources.every((source) => typeof source === "string") ||
             !Array.isArray(colors) ||
             !colors.every((c) => typeof c === "string" && HEX.test(c))
           ) {
             throw new Error(
-              `palettes.toml: "${name}" must be an array of "#rrggbb" strings`,
+              `palettes.toml: "${name}" must contain src and palette arrays, with palette containing only "#rrggbb" strings`,
             );
           }
           return {
             id: name.replace(/^_/, "").replace(/_/g, "-"),
             name: label(name),
+            src: sources,
             colors,
           };
         });
