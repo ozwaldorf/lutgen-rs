@@ -602,10 +602,12 @@ enum Lutgen {
 fn load_image<P: AsRef<Path>>(path: P) -> Result<DynamicImage, String> {
     let path = path.as_ref();
     let time = Instant::now();
-    let lut = image::ImageReader::open(path)
+    let mut decoder = image::ImageReader::open(path)
         .map_err(|e| format!("failed to open image: {e}"))?
         .with_guessed_format()
-        .map_err(|e| format!("failed to guess image format: {e}"))?
+        .map_err(|e| format!("failed to guess image format: {e}"))?;
+    decoder.no_limits();
+    let lut = decoder
         .decode()
         .map_err(|e| format!("failed to decode image: {e}"))?;
     println!("✔ Loaded {path:?} in {:.2?}", time.elapsed());
@@ -617,10 +619,11 @@ fn load_static_or_animated_image<P: AsRef<Path>>(
 ) -> Result<Either<RgbaImage, Vec<Frame>>, String> {
     let path = path.as_ref();
     let time = Instant::now();
-    let decoder = image::ImageReader::open(path)
+    let mut decoder = image::ImageReader::open(path)
         .map_err(|e| format!("failed to open image: {e}"))?
         .with_guessed_format()
         .map_err(|e| format!("failed to guess image format: {e}"))?;
+    decoder.no_limits();
 
     let output = match decoder.format() {
         Some(image::ImageFormat::Gif) => {
