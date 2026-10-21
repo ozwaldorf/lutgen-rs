@@ -73,6 +73,19 @@ cargo install --path crates/cli
 cargo install lutgen-cli
 ```
 
+### Docker image
+
+Build the Docker image:
+```sh
+sh <(curl -L https://raw.githubusercontent.com/ozwaldorf/lutgen-rs/main/scripts/build.sh)
+```
+
+Run with volume mounted for file access:
+```sh
+docker run --rm -v $PWD:/workspace lutgen:latest --help
+docker run --rm -v $PWD:/workspace lutgen:latest apply -p=catppuccin-mocha /workspace/example.png
+```
+
 ### Documentation
 
 Detailed documentation, examples, and more are available on [The Lutgen Wiki](https://ozwaldorf.github.io/lutgen-rs)
@@ -143,4 +156,3 @@ cargo run -r --bin lutgen
 - [The Catppuccin Org](https://github.com/catppuccin) for continual feedback and support along the way
 - [Stonks3141](https://github.com/Stonks3141) for maintaining the Alpine Linux package
 - All the nixpkgs maintainers
-
