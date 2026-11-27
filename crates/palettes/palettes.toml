@@ -8023,7 +8023,7 @@ palette = [
 
 [modus-operandi]
 src = [
-  "https://github.com/protesilaos/modus-themes/blob/main/modus-operandi-theme.el",
+  "https://github.com/protesilaos/modus-themes/blob/main/modus-themes.el",
   "https://github.com/protesilaos/my-website/blob/main/_pages/emacs/modus-themes-colors.md",
 ]
 palette = [
@@ -8153,7 +8153,7 @@ palette = [
 
 [modus-vivendi]
 src = [
-  "https://github.com/protesilaos/modus-themes/blob/main/modus-operandi-theme.el",
+  "https://github.com/protesilaos/modus-themes/blob/main/modus-themes.el",
   "https://github.com/protesilaos/my-website/blob/main/_pages/emacs/modus-themes-colors.md",
 ]
 palette = [
